@@ -168,6 +168,7 @@
 						style="width: 40%; aspect-ratio: 1/1"
           ></b-image>
 				  </div>
+          <support></support>
           <b-notification :closable="false">
             <p class="is-size-6">{{$t('UseOfData1')}}</p>
             <p class="is-size-6">{{$t('UseOfData2')}}</p>
@@ -250,6 +251,7 @@
 						</div>
 						<div class="column is-half">
 						<b-button v-if="notSignedUp"
+            id="signupmodal-signup"
 					class="is-primary fullWidth"
           :loading="signupLoading"
 					:disabled="!(username && password && majority && terms && passwordConfirmation && notSignedUp)"
@@ -264,6 +266,7 @@
 					"
 					>{{ $t("SignUp") }}</b-button
 				><b-button v-else
+          id="signupmodal-verify"
 					class="is-success fullWidth"
 					:disabled="(notSignedUp) || (verificationToken.length!=40)"
 					@click="
@@ -296,10 +299,13 @@ import sharers from "@/mixins/sharers";
 import tts from "@/mixins/tts";
 import deviceInfos from "@/mixins/deviceInfos";
 import emoji from "@/mixins/emoji";
+import support from "@/components/auth/support";
 import { convertToSimpleLanguage } from "@/utils/utils";
+import { SoundHelper } from "@/utils/sounds";
 export default {
   components: {
     installVoice,
+    support
   },
   watch: {
     step1Parameters: function () {
@@ -605,6 +611,7 @@ export default {
           } catch (error) {
             console.log("error ", error);
           }
+          SoundHelper.playAccountCreation();
           this.$router.push({
             path: "/tutorials/",
           });

@@ -104,6 +104,7 @@ import pictoList from "@/components/pictos/pictoList";
 import pictoBar from "@/components/pictos/pictoBar";
 import lang from "@/mixins/lang";
 export default {
+  nuxtI18n: false,
   layout: "pictalk",
   mixins: [lang],
   data: {
@@ -333,12 +334,6 @@ export default {
             res.data.image =
               this.$config.apiURL + "/image/pictalk/" + res.data.image;
           }
-          if (res.data.meaning) {
-            res.data.meaning = JSON.parse(res.data.meaning);
-          }
-          if (res.data.speech) {
-            res.data.speech = JSON.parse(res.data.speech);
-          }
           res.data.collection = true;
 
           res.data.partial = false;
@@ -348,12 +343,6 @@ export default {
               if (collection.image) {
                 collection.image =
                   this.$config.apiURL + "/image/pictalk/" + collection.image;
-              }
-              if (collection.meaning) {
-                collection.meaning = JSON.parse(collection.meaning);
-              }
-              if (collection.speech) {
-                collection.speech = JSON.parse(collection.speech);
               }
               collection.collection = true;
               collection.fatherCollectionId = res.data.id;
@@ -377,12 +366,6 @@ export default {
               if (picto.image) {
                 picto.image =
                   this.$config.apiURL + "/image/pictalk/" + picto.image;
-              }
-              if (picto.meaning) {
-                picto.meaning = JSON.parse(picto.meaning);
-              }
-              if (picto.speech) {
-                picto.speech = JSON.parse(picto.speech);
               }
               picto.fatherCollectionId = res.data.id;
               if (!this.getPictoFromId(picto.id)) {
@@ -464,7 +447,7 @@ export default {
   bottom: 2px;
   margin: 0 auto;
   width: 99vw;
-  max-height: 20%;
+  max-height: 30%;
   position: fixed;
   max-width: 767px;
   z-index: 4;

@@ -46,6 +46,7 @@
 import pictoList from "@/components/pictos/pictoList";
 import pictoBar from "@/components/pictos/pictoBar";
 export default {
+  nuxtI18n: false,
   layout: "public",
   middleware: ["axios"],
   components: {

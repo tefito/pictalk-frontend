@@ -59,12 +59,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [
-    "@/plugins/baseURL",
-    { src: '@/plugins/vuex-persistedstate', mode: 'client' },
-    { src: '@/plugins/dexieDB', mode: 'client' },
-    { src: '@/plugins/vueVirtualScroller', mode: 'client' },
-  ],
+  plugins: ["@/plugins/baseURL", { src: '@/plugins/vuex-persistedstate', mode: 'client' }, { src: '@/plugins/matomo', mode: 'client' }, { src: '@/plugins/dexieDB', mode: 'client' }, { src: '@/plugins/vueVirtualScroller', mode: 'client' },],
   /*
    ** Nuxt.js dev-modules
    */
@@ -91,20 +86,28 @@ export default {
   sitemap: {
     hostname: 'https://www.pictalk.org',
     gzip: false,
+    i18n: true,
+    trailingSlash: true,
+    i18n: {
+      locales: ['en', 'es', 'fr', 'it', 'de', 'ro', 'pt', 'el', 'ar', 'sk'],
+      routesNameSeparator: '___'
+    },
     exclude: [
       '/changePassword',
       '/account',
       '/resetPassword/**',
-      '/_nuxt/**'
+      '/_nuxt/**',
+      '/administration'
     ],
   },
   i18n: {
     baseURL: 'https://www.pictalk.org',
+    defaultLocale: 'en',
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
+      alwaysRedirect: false,
       redirectOn: 'root',
-      alwaysRedirect: true
     },
     locales: [
       {
@@ -160,12 +163,18 @@ export default {
         iso: 'ar-SA',
         name: 'اللغة العربية',
         file: 'ar-SA.js'
+      },
+      {
+        code: 'sk',
+        iso: 'sk-SK',
+        name: 'Slovenský',
+        file: 'sk-SK.js'
       }
     ],
     lazy: true,
     langDir: 'lang/',
     defaultLocale: 'en',
-    strategy: 'no_prefix',
+    strategy: 'prefix_except_default',
     vueI18n: {
       fallbackLocale: 'en',
     },
@@ -177,13 +186,11 @@ export default {
     "@nuxtjs/pwa",
     "nuxt-clipboard2",
     'nuxt-responsive-loader',
-    '@nuxtjs/sitemap',
     '@nuxtjs/robots',
     '@nuxtjs/sentry',
     '@nuxtjs/i18n',
-    ['nuxt-matomo', { matomoUrl: '//matomo.home.asidiras.dev/', siteId: 1, cookies: false },
-      '@vueuse/nuxt',
-    ]
+    '@nuxtjs/sitemap',
+    '@vueuse/nuxt'
   ],
   robots: {
     Disallow: [
@@ -191,15 +198,17 @@ export default {
       '/changepassword',
       '/account',
       '/resetPassword/**',
-      '/_nuxt/**'
+      '/_nuxt/**',
+      '/administration'
     ],
     Sitemap: 'https://www.pictalk.org/sitemap.xml'
   },
   pwa: {
     icon: {
       src: "https://www.pictalk.org/icon.png",
-      sizes: [512],
+      sizes: [48, 72, 96, 120, 144, 152, 192, 384, 512],
       type: "image/png",
+      purpose: ['maskable'],
     },
     workbox: {
       /*
@@ -227,6 +236,7 @@ export default {
         src: "https://www.pictalk.org/icon.png",
         sizes: "512x512",
         type: "image/png",
+        purpose: "any"
       }],
       screenshots: [
         {
@@ -266,14 +276,21 @@ export default {
    ** Build configuration
    */
   build: {
-    extend(config) {
+    extend(config, ctx) {
       config.resolve.alias["vue"] = "vue/dist/vue.common";
       config.resolve.symlinks = false;
       config.module.rules.push({
         test: /\.mjs$/,
         include: /node_modules/,
         type: 'javascript/auto',
-      })
+      });
+      config.module.rules.push({
+        test: /\.(ogg|mp3|wav|mpe?g)$/i,
+        loader: 'file-loader',
+        options: {
+          name: '[path][name].[ext]'
+        }
+      });
     },
     transpile: ['merge-images-horizontally-with-text'],
   },

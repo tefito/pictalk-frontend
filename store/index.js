@@ -421,8 +421,8 @@ export const actions = {
 
     vuexContext.commit("editCollection", {
       ...editedCollection,
-      ...(editedCollection.meaning && { meaning: JSON.parse(editedCollection.meaning) }),
-      ...(editedCollection.speech && { speech: JSON.parse(editedCollection.speech) }),
+      ...(editedCollection.meaning && { meaning: editedCollection.meaning }),
+      ...(editedCollection.speech && { speech: editedCollection.speech }),
       ...(editedCollection.priority && { priority: JSON.parse(editedCollection.priority) }),
       image: axios.defaults.baseURL + "/image/pictalk/" + editedCollection.image,
       createdDate: editedCollection.createdDate,
@@ -537,7 +537,11 @@ export const actions = {
     }
     user.notifications.forEach((notification) => {
       if (notification.meaning != "") {
-        notification.meaning = JSON.parse(notification.meaning)
+        try {
+          notification.meaning = JSON.parse(notification.meaning)
+        } catch (err) {
+          notification.meaning = notification.meaning
+        }
       }
     });
     vuexContext.commit("editUser", user);
@@ -706,10 +710,18 @@ export const actions = {
       if (notifications?.length != vuexContext.getters.getUser.notifications.length) {
         vuexContext.dispatch("downloadCollections");
       }
-      await Promise.all(notifications.map((notification) => {
-        return new Promise(async (resolve, reject) => {
-          if (notification.meaning) {
-            notification.meaning = JSON.parse(notification?.meaning);
+      notifications?.forEach(async (notification) => {
+        if (notification.meaning) {
+          try {
+            notification.meaning = JSON.parse(notification?.meaning)
+          } catch (err) {
+            notification.meaning = notification?.meaning
+          }
+        }
+        if (notification.affected) {
+          if (!getCollectionFromId(vuexContext, parseInt(notification.affected, 10))) {
+            var res = await axios.get("/collection/find/" + parseInt(notification.affected, 10));
+            parseAndUpdateEntireCollection(vuexContext, res.data);
           }
           if (notification.affected) {
             if (!await getCollectionFromId(vuexContext, parseInt(notification.affected, 10))) {
@@ -719,21 +731,22 @@ export const actions = {
             notification.image = (await getCollectionFromId(vuexContext, parseInt(notification.affected, 10)))?.image;
           }
           resolve();
-        })
-      }));
-      // Mettre les notifications dans user
-      let user = { ...vuexContext.getters.getUser };
-      user.notifications = notifications;
-      vuexContext.commit("editUser", {
-        ...vuexContext.getters.getUser,
-        notifications: notifications,
-      });
+        }
+      })
+    };
+    // Mettre les notifications dans user
+    let user = { ...vuexContext.getters.getUser };
+    user.notifications = notifications;
+    vuexContext.commit("editUser", {
+      ...vuexContext.getters.getUser,
+      notifications: notifications,
+    });
 
-      // DL les nouvelles collections
-      return notifications;
-    }
+    // DL les nouvelles collections
+    return notifications;
   }
 }
+
 export const getters = {
   getCollections(state) {
     return getDexieDB().collection.toArray();
@@ -818,12 +831,6 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
         "/image/pictalk/" +
         collection.image;
     }
-    if (collection.meaning) {
-      collection.meaning = JSON.parse(collection.meaning);
-    }
-    if (collection.speech) {
-      collection.speech = JSON.parse(collection.speech);
-    }
     collection.collection = true;
 
     if (collection.collections && collection.pictos) {
@@ -867,12 +874,6 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
             "/image/pictalk/" +
             picto.image;
         }
-        if (picto.meaning) {
-          picto.meaning = JSON.parse(picto.meaning);
-        }
-        if (picto.speech) {
-          picto.speech = JSON.parse(picto.speech);
-        }
         picto.fatherCollectionId = collection.id;
         if (!existsPicto) {
           pictosTocreate.push(picto);
@@ -896,12 +897,6 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
             axios.defaults.baseURL +
             "/image/pictalk/" +
             col.image;
-        }
-        if (col.meaning) {
-          col.meaning = JSON.parse(col.meaning);
-        }
-        if (col.speech) {
-          col.speech = JSON.parse(col.speech);
         }
         if (!col.pictos) {
           col.pictos = [];
@@ -958,7 +953,7 @@ async function parseAndUpdatePictogram(vuexContext, picto) {
   if (picto.speech) {
     picto.speech = JSON.parse(picto.speech);
   }
-  if (!await getPictoFromId(vuexContext, picto.id)) {
+  if (!getPictoFromId(vuexContext, picto.id)) {
     vuexContext.commit("addPicto", picto);
   } else {
     vuexContext.commit("editPicto", picto);

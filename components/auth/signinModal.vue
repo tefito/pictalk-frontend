@@ -48,6 +48,7 @@
 </template>
 <script >
 import signup from "@/components/auth/signupModal";
+import { SoundHelper } from "@/utils/sounds";
 export default {
   data() {
     return {
@@ -83,10 +84,13 @@ export default {
             query: { ...this.$route.query, fatherCollectionId: this.$store.getters.getRootId },
           });
           if (this.$store.getters.getUser.notifications.length != 0) {
+            SoundHelper.playNotification();
             this.$buefy.notification.open({
               message: this.$t("UnreadNotifications"),
               type: "is-info",
             });
+          } else {
+            SoundHelper.playAccountCreation();
           }
         }
       } catch (error) {

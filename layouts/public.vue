@@ -25,22 +25,27 @@ export default {
     };
   },
   created() {
-    if (process.client) {
+    if (process.client) {
+      var _mtm = window._mtm = window._mtm || [];
+      _mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
+      var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+      g.async = true; g.src = 'https://matomo.home.asidiras.dev/js/container_V1sL8eXl.js'; s.parentNode.insertBefore(g, s);
+    }
     // If the user isn't authenticated and the popup cookie isn't set or hasn't expired, show the popup
     this.popupTimeout = setTimeout(() => {
       if (!Cookie.get('popup') && !this.$store.getters.isAuthenticated) {
-      this.$buefy.modal.open({
-        parent: this,
-        component: popupModal,
-        hasModalCard: true,
-        trapFocus: true,
-        canCancel: false,
-        onCancel: () => {
-          this.$buefy.modal.close();
-        },
-      });
-      Cookie.set('popup', true, { expires: 3 });
-    }
+        this.$buefy.modal.open({
+          parent: this,
+          component: popupModal,
+          hasModalCard: true,
+          trapFocus: true,
+          canCancel: false,
+          onCancel: () => {
+            this.$buefy.modal.close();
+          },
+        });
+        Cookie.set('popup', true, { expires: 3 });
+      }
     }, 30000);
     if (
       this.$store.getters.isAuthenticated &&
@@ -54,10 +59,10 @@ export default {
       }
     }
   }
-  },
-  destroyed() {
-    clearTimeout(this.popupTimeout);
-  },
+},
+destroyed() {
+  clearTimeout(this.popupTimeout);
+},
 };
 </script>
 <style scoped>

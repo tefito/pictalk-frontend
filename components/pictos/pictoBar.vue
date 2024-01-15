@@ -1,77 +1,41 @@
 <template>
   <div class="notification columns is-mobile nopadding" :style="cssVars">
     <div class="column is-narrow nopadding">
-      <b-button
-        style="background-color: hsl(0, 100%, 100%); color: #ff5757"
-        icon-right="delete"
-        class="customButton  getsBigger"
-          @click="eraseSpeech()"
-      />
+      <b-button style="background-color: hsl(0, 100%, 100%); color: #ff5757" icon-right="delete"
+        :class="'customButton ' + buttonsShowSize" @click="eraseSpeech()" />
     </div>
     <div class="column is-narrow nopadding">
-      <b-button
-        style="background-color: hsl(0, 100%, 100%); color: #ff5757"
-        icon-right="backspace"
-        class="customButton  getsBigger"
-          @click="removeSpeech(true)"
-      />
+      <b-button style="background-color: hsl(0, 100%, 100%); color: #ff5757" icon-right="backspace"
+        :class="'customButton ' + buttonsShowSize" @click="removeSpeech(true)" />
     </div>
     <div class="column" style="padding: 0%">
       <div id="bar" class="scrolling">
-        <miniPicto
-          v-for="(picto, index) in pictosWithoutSilent"
-          :key="index"
-          :image="picto.image"
-          :pictoCount="picto.count"
-        />
+        <miniPicto v-for="(picto, index) in pictosWithoutSilent" :key="index" :image="picto.image"
+          :pictoCount="picto.count" />
       </div>
     </div>
     <div class="column is-narrow nopadding">
-      <b-button
-        v-if="$store.getters.getTemporaryLanguage"
-        class="getsBigger"
-        type="is-success"
-        icon-right="volume-high"
-        @click="pictalk(pictos)"
-        >{{ getEmoji($store.getters.getTemporaryLanguage) }}</b-button
-      >
-      <b-button
-      v-if="$store.getters.getTemporaryLanguage"
-        style="background-color: hsl(154, 70%, 55%)"
-        icon-right="volume-high"
-        class="customButton getsBigger"
-        @click="pictalk(pictos)"
-      >{{ getEmoji($store.getters.getTemporaryLanguage) }}</b-button>
-      <b-button
-      v-else
-        style="background-color: hsl(154, 70%, 55%)"
-        icon-right="volume-high"
-        class="customButton getsBigger"
-        @click="pictalk(pictos)"
-      />
+      <b-button v-if="$store.getters.getTemporaryLanguage" :class="'customButton ' + buttonsShowSize" type="is-success"
+        icon-right="volume-high" @click="pictalk(pictos)">{{ getEmoji($store.getters.getTemporaryLanguage) }}</b-button>
+      <b-button v-if="$store.getters.getTemporaryLanguage" style="background-color: hsl(154, 70%, 55%)"
+        icon-right="volume-high" :class="'customButton ' + buttonsShowSize" @click="pictalk(pictos)">{{
+          getEmoji($store.getters.getTemporaryLanguage) }}</b-button>
+      <b-button v-else id="pictobar-speak" style="background-color: hsl(154, 70%, 55%)" icon-right="volume-high"
+        :class="'customButton ' + buttonsShowSize" @click="pictalk(pictos)" />
     </div>
     <div class="column is-narrow nopadding">
-      <b-button
-        style="background-color: hsl(210, 100%, 65%)"
-        icon-right="content-copy"
-        class="customButton getsBigger"
-        @click="copyPictosToClipboardBase(pictosWithoutSilent)"
-      />
+      <b-button style="background-color: hsl(210, 100%, 65%)" icon-right="content-copy"
+        :class="'customButton ' + buttonsShowSize" @click="copyPictosToClipboardBase(pictosWithoutSilent)"
+        id="pictobar-copy" />
     </div>
     <div v-if="vocalize" class="onTop">
-      <b-button
-        icon-left="close"
-        @click="vocalize = false"
+      <b-button icon-left="close" @click="vocalize = false"
         style="margin-left: 2vmax; margin-top: 2vmax; background-color: hsl(0, 100%, 65%); color: white"
-        class="customButton"
-      />
-      
+        class="customButton" />
+
       <div class="columns is-multiline is-mobile topColumns">
-        <img
-          v-for="(picto, index) in pictosWithoutSilent"
-          :key="index"
-          :src="picto.image"
-          :class="(animation? (wordIndex >= index? pronounceShowSize+' animations': pronounceShowSize+' lowBrightness') : pronounceShowSize)"></img>
+        <img v-for="(picto, index) in pictosWithoutSilent" :key="index" :src="picto.image"
+          :class="(animation ? (wordIndex >= index ? pronounceShowSize + ' animations' : pronounceShowSize + ' lowBrightness') : pronounceShowSize)"></img>
       </div>
     </div>
   </div>
@@ -84,6 +48,7 @@ import deviceInfos from "@/mixins/deviceInfos";
 import emoji from "@/mixins/emoji";
 import tts from "@/mixins/tts";
 import lang from "@/mixins/lang";
+import { SoundHelper } from "@/utils/sounds";
 export default {
   mixins: [emoji, tts, deviceInfos, lang],
   methods: {
@@ -164,37 +129,40 @@ export default {
         });
       }
     },
-    async copyPictosToClipboardBase(pictos) {
-      const canWriteToClipboard = await this.askWritePermission();
-      if (canWriteToClipboard) {
-        await this.copyPictosToClipboardV2(pictos);
+    copyPictosToClipboardBase(pictos) {
+      if (this.writePermission || this.detectBrowser() == "Safari") {
+        console.log("Force copy pictos for ios devices");
+        this.copyPictosToClipboardV2(pictos);
       } else {
-        await this.copyPictosToClipboardLegacy(pictos);
+        this.copyPictosToClipboardLegacy(pictos);
       }
     },
-    async copyPictosToClipboardV2(pictos) {
-      const paths = pictos.map((picto) => picto.image);
-      const text = this.getText(pictos);
-      const b64 = await mergeImages(paths, {
-        crossOrigin: "Anonymous",
-        text: text,
-        color: "white",
-      });
+    copyPictosToClipboardV2(pictos) {
       try {
-        const blob = this.b64toBlob(b64);
-        const data = [new ClipboardItem({ [blob.type]: blob })];
-        await navigator.clipboard.write(data);
+        const data = [new ClipboardItem({ [this.preGeneratedBlob.type]: this.preGeneratedBlob })];
+        navigator.clipboard.write(data);
+        SoundHelper.playSentenceCopy();
         const notif = this.$buefy.toast.open({
           message: this.$t("CopySucces"),
           type: "is-success",
         });
       } catch (e) {
         console.log(e);
-        await this.$copsyText(b64);
-        const notif = this.$buefy.toast.open({
-          message: this.$t("CopyError"),
-          type: "is-danger",
-        });
+        try {
+          this.copyPictosToClipboardLegacy(pictos);
+          SoundHelper.playSentenceCopy();
+          const notif = this.$buefy.toast.open({
+            message: this.$t("CopySucces"),
+            type: "is-success",
+          });
+        } catch (e) {
+          SoundHelper.playError()
+          const notif = this.$buefy.toast.open({
+            message: this.$t("CopyError"),
+            type: "is-danger",
+          });
+        }
+
       }
     },
     async pictalk(pictos) {
@@ -291,9 +259,16 @@ export default {
           return;
         }
       }
+      try {
+        SoundHelper.playSentenceReturn();
+      } catch (e) {
+        console.log(e)
+      }
+
       this.$store.commit("removeSpeech");
     },
     eraseSpeech() {
+      SoundHelper.playSentenceErase();
       if (this.publicMode) {
         this.$router.push("/public/pictalk?fatherCollectionId=346");
         this.$store.commit("eraseSpeech");
@@ -353,6 +328,19 @@ export default {
         return "topImage column is-6-mobile is-4-tablet is-4-desktop is-4-widescreen is-4-fullhd";
       }
     },
+    buttonsShowSize() {
+      console.log(this.$store.getters.getUser.settings?.pronounceShowSize)
+      if (!this.$store.getters.getUser.settings?.pronounceShowSize && this.$store.getters.getUser.settings?.pronounceShowSize != 0) {
+        return "getsBigger";
+      }
+      if (this.$store.getters.getUser.settings?.pronounceShowSize == 0) {
+        return "getsBiggerMin";
+      } else if (this.$store.getters.getUser.settings?.pronounceShowSize == 1) {
+        return "getsBigger";
+      } else if (this.$store.getters.getUser.settings?.pronounceShowSize == 2) {
+        return "getsBiggerMax";
+      }
+    },
     cssVars() {
       return {
         "--bg-color":
@@ -363,7 +351,7 @@ export default {
     },
     pictosWithoutSilent() {
       return this.pictos.filter(
-        (picto) => picto.speech[this.getUserLang] != ""
+        (picto) => picto.speech[this.getUserLang] != "" && picto.image
       );
     },
   },
@@ -384,8 +372,9 @@ export default {
       }
     });
   },
-  created() {
+  async created() {
     this.$nuxt.$on("removeSpeechDrag", this.triggerRemoveSpeechDrag);
+    this.writePermission = await this.askWritePermission();
   },
   beforeDestroy() {
     this.$nuxt.$off("removeSpeechDrag");
@@ -409,16 +398,32 @@ export default {
     },
   },
   watch: {
+    pictosWithoutSilent: {
+      async handler(value) {
+        // Pre Generate the Blob
+        if (value.length > 0) {
+          const paths = value.map((picto) => picto.image);
+          const text = this.getText(value);
+          const b64 = await mergeImages(paths, {
+            crossOrigin: "Anonymous",
+            text: text,
+            color: "white",
+          });
+          this.preGeneratedBlob = this.b64toBlob(b64);
+          console.log("this.preGeneratedBlob: ", this.preGeneratedBlob);
+        }
+      }
+    },
     pictos: {
       deep: true,
-      handler (value) {
+      handler(value) {
         setTimeout(() => {
           let element = document.getElementById("bar");
           element.scrollLeft = element.scrollWidth;
         }, 125);
-        if (this.$store.getters.getUser.settings?.pronounceClick && value.length > this.pictoLength) {
+        if ((this.$store.getters.getUser.settings?.pronounceClick || this.publicMode) && value.length >= this.pictoLength && value.length > 0 && value[value.length - 1]?.speech != "") {
           this.pronounce(
-            value[value.length -1].speech[this.getUserLang],
+            value[value.length - 1].speech[this.getUserLang],
             this.getUserLang,
             this.voiceURI,
             this.pitch,
@@ -444,6 +449,8 @@ export default {
       voices: [],
       voiceURI: "",
       pictoLength: 0,
+      preGeneratedBlob: undefined,
+      writePermission: undefined,
     };
   },
 };
@@ -456,14 +463,17 @@ export default {
   border: 2px solid #666;
   transition: all 0.05s;
 }
+
 .customButton:hover {
   box-shadow: 0px 0px 12px #00000090;
 }
+
 .content {
   display: flex;
   align-items: flex-start;
   justify-content: space-evenly;
 }
+
 .onTop {
   position: fixed;
   top: 52px;
@@ -473,6 +483,7 @@ export default {
   background-color: #000000df;
   z-index: 2;
 }
+
 .topColumns {
   margin-left: auto;
   width: 96vw;
@@ -485,12 +496,14 @@ export default {
   max-height: 70vh;
   overflow-y: auto;
 }
+
 .topImage {
   margin-bottom: 1vh;
   padding: 2px;
   aspect-ratio: 1/1;
   object-fit: contain;
 }
+
 .notification {
   background-color: var(--bg-color);
   position: relative;
@@ -499,11 +512,13 @@ export default {
   border-color: #4c4329;
   border-width: 2px;
 }
+
 .nopadding {
   padding: 0.25rem;
   padding-left: 0.1rem;
   padding-right: 0.1rem;
 }
+
 .scrolling {
   display: flex;
   flex-direction: row;
@@ -513,12 +528,14 @@ export default {
   scroll-behavior: smooth;
   overflow-y: hidden;
 }
+
 .buttonBorder {
   border: solid;
   border-color: #f14668;
   border-width: 1px;
 }
-.getsBigger {
+
+.getsBiggerMin {
   width: 7vmin;
   height: 7vmin;
   min-height: 40px;
@@ -526,12 +543,67 @@ export default {
   min-width: 40px;
   max-width: 60px;
 }
+
+@media screen and (min-width: 768px) {
+  .getsBiggerMin {
+    width: 8vmin;
+    height: 8vmin;
+    min-height: 60px;
+    max-height: 70px;
+    min-width: 60px;
+    max-width: 70px;
+  }
+}
+
+.getsBigger {
+  width: 8vmin;
+  height: 8vmin;
+  min-height: 50px;
+  max-height: 80px;
+  min-width: 50px;
+  max-width: 80px;
+}
+
+@media screen and (min-width: 768px) {
+  .getsBigger {
+    width: 8vmin;
+    height: 8vmin;
+    min-height: 80px;
+    max-height: 100px;
+    min-width: 80px;
+    max-width: 100px;
+  }
+}
+
+
+.getsBiggerMax {
+  width: 10vmin;
+  height: 10vmin;
+  min-height: 60px;
+  max-height: 100px;
+  min-width: 60px;
+  max-width: 100px;
+}
+
+@media screen and (min-width: 768px) {
+  .getsBiggerMax {
+    width: 10vmin;
+    height: 10vmin;
+    min-height: 100px;
+    max-height: 120px;
+    min-width: 100px;
+    max-width: 120px;
+  }
+}
+
+
 @keyframes lightup {
   from {
     filter: brightness(0.6);
     -webkit-filter: brightness(0.6);
     transform: scale(0.9);
   }
+
   to {
     filter: brightness(1);
     -webkit-filter: brightness(1);
@@ -544,6 +616,7 @@ export default {
   animation-duration: 195ms;
   animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
 .lowBrightness {
   transform: scale(0.9);
   filter: brightness(0.6);
