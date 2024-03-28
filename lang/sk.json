@@ -409,5 +409,7 @@
     "Adhesion": "Podporte nás",
     "Question": "Otáznik",
     "DeleteAccount": "Odstránenie účtu",
-    "DeleteAccountText": "trvalé vymazanie vášho konta a všetkého jeho obsahu."
+    "DeleteAccountText": "trvalé vymazanie vášho konta a všetkého jeho obsahu.",
+    "AddToSidebar": "Pridať na bočný panel",
+    "RemoveFromSidebar": "Odstrániť z bočného panela"
 }
