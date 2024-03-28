@@ -411,5 +411,7 @@
     "Adhesion": "Unterstützen Sie uns",
     "Question": "Fragezeichen",
     "DeleteAccount": "Konto löschen",
-    "DeleteAccountText": "Dauerhafte Löschung Ihres Kontos und aller seiner Inhalte"
+    "DeleteAccountText": "Dauerhafte Löschung Ihres Kontos und aller seiner Inhalte",
+    "AddToSidebar": "Zur Seitenleiste hinzufügen",
+    "RemoveFromSidebar": "Aus der Seitenleiste entfernen"
 }
