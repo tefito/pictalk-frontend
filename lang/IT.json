@@ -411,5 +411,7 @@
     "Adhesion": "Sosteneteci",
     "Question": "Punto interrogativo",
     "DeleteAccount": "Cancellare l'account",
-    "DeleteAccountText": "Cancellazione definitiva dell'account e di tutti i suoi contenuti."
+    "DeleteAccountText": "Cancellazione definitiva dell'account e di tutti i suoi contenuti.",
+    "AddToSidebar": "Aggiungi alla barra laterale",
+    "RemoveFromSidebar": "Rimuovi dalla barra laterale"
 }
