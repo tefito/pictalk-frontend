@@ -411,5 +411,7 @@
     "DeleteAccount": "Odstránenie účtu",
     "DeleteAccountText": "trvalé vymazanie vášho konta a všetkého jeho obsahu.",
     "AddToSidebar": "Pridať na bočný panel",
-    "RemoveFromSidebar": "Odstrániť z bočného panela"
+    "RemoveFromSidebar": "Odstrániť z bočného panela",
+    "RestoreItem": "Obnovenie strateného predmetu",
+    "TooltipTrash": "Vyhľadávanie v odstránených položkách"
 }
