@@ -413,5 +413,7 @@
     "DeleteAccount": "Konto löschen",
     "DeleteAccountText": "Dauerhafte Löschung Ihres Kontos und aller seiner Inhalte",
     "AddToSidebar": "Zur Seitenleiste hinzufügen",
-    "RemoveFromSidebar": "Aus der Seitenleiste entfernen"
+    "RemoveFromSidebar": "Aus der Seitenleiste entfernen",
+    "RestoreItem": "Einen verlorenen Gegenstand wiederherstellen",
+    "TooltipTrash": "Gelöschte Objekte durchsuchen"
 }
