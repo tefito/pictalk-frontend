@@ -35,7 +35,7 @@
 
       <div class="columns is-multiline is-mobile topColumns">
         <img v-for="(picto, index) in pictosWithoutSilent" :key="index" :src="picto.image"
-          :class="(animation ? (wordIndex >= index ? pronounceShowSize + ' animations' : pronounceShowSize + ' lowBrightness') : pronounceShowSize)"></img>
+          :class="($store.getters.getTtsBoundarySupport ? (wordIndex >= index ? pronounceShowSize + ' animations' : pronounceShowSize + ' lowBrightness') : pronounceShowSize)"></img>
       </div>
     </div>
   </div>
@@ -105,7 +105,6 @@ export default {
         let synthesis = new SpeechSynthesisUtterance();
         synthesis.volume = 0;
         synthesis.addEventListener("boundary", (event) => {
-          this.animation = true;
           this.$store.commit('setTtsBoundarySupport', true);
         });
         this.pronounce("a", this.getUserLang, this.voiceURI, 1, 1, synthesis);
@@ -430,7 +429,6 @@ export default {
       }
     },
     voiceURI: function () {
-      this.animation = false;
       this.testBoundaryEventSupport();
     },
   },
