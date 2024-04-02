@@ -1,6 +1,18 @@
 import axios from "axios";
 import Cookie from "js-cookie";
 export const strict = false;
+
+// use the axios middleware
+axios.interceptors.request.use((config) => {
+  if (!config.url.includes('api.arasaac.org') && !config.url.includes('flickr.com') && !config.url.includes('staticflickr.com')) {
+    let token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+  return config;
+},);
+
 export const state = () => ({
   collections: [],
   pictos: [],
@@ -574,6 +586,12 @@ export const actions = {
       directSharers: newUser.directSharers
     });
     return newUser;
+  },
+  async getOrphanedCollections(vuexContext) {
+    const orphanedCollections = (await axios.get("/collection/orphaned")).data;
+    return orphanedCollections.map(collection =>
+      parseAndUpdateEntireCollection(vuexContext, collection)
+    );
   },
   async downloadCollections(vuexContext, alreadyFetchedCollections = null) {
     let res;

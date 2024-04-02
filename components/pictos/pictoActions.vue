@@ -9,7 +9,7 @@
           class="fullWidth modeButton" />
       </div>
       <div class="option">
-        <b-button data-cy="picto-action-dropdown-delete" :disabled="!canDelete || !isOnline"
+        <b-button v-if="!isInSidebar" data-cy="picto-action-dropdown-delete" :disabled="!canDelete || !isOnline"
           style="background-color: hsl(0, 100%, 75%)" icon-left="delete" :label="$t('DeletePicto')"
           @click="deletePicto()" class="fullWidth modeButton" />
       </div>
@@ -38,9 +38,9 @@
           class="fullWidth modeButton" />
       </div>
       <div v-else class="option">
-        <b-button :disabled="!isOnline" style="background-color: hsl(70, 100%, 75%)" icon-left="delete"
-          :label="$t('RemoveFromSidebar')" @click="removeShortcutToSidebar(picto.id, !picto.collection)"
-          class="fullWidth modeButton" />
+        <b-button :disabled="!isOnline" style="background-color: hsl(70, 100%, 75%); text-wrap: wrap;"
+          icon-left="delete" :label="$t('RemoveFromSidebar')"
+          @click="removeShortcutToSidebar(picto.id, !picto.collection)" class="fullWidth modeButton" />
       </div>
       <div v-if="picto.collection && this.$store.getters.getUser.admin" class="option">
         <b-button :disabled="!isOnline" :loading="publishLoad" :style="picto.public
@@ -64,6 +64,7 @@
 <script>
 import pictogram from "../../mixins/pictogram";
 export default {
+  middleware: ["axios"],
   mixins: [pictogram],
   props: {
     picto: {

@@ -413,5 +413,7 @@
   "DeleteAccount": "Delete account",
   "DeleteAccountText": "Permanent deletion of your account and all of its content",
   "AddToSidebar": "Add to sidebar",
-  "RemoveFromSidebar": "Remove from sidebar"
+  "RemoveFromSidebar": "Remove from sidebar",
+  "RestoreItem": "Restore a lost item",
+  "TooltipTrash": "Search through deleted items"
 }

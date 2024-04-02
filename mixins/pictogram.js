@@ -8,12 +8,12 @@ export default {
     }
   },
   methods: {
-    async setShortcutCollectionIdDirectlyToRoot(collectionId, isPicto) {
+    async setShortcutCollectionIdDirectlyToRoot(item, isPicto) {
       let collection = JSON.parse(
         JSON.stringify(this.getCollectionFromId(this.$store.getters.getRootId))
       );
       if (isPicto) {
-        collection.pictos.push({ id: collectionId });
+        collection.pictos.push(item);
         try {
           await this.$store.dispatch("editCollection", {
             id: collection.id,
@@ -30,7 +30,7 @@ export default {
           );
         }
       } else {
-        collection.collections.push({ id: collectionId });
+        collection.collections.push(item);
         try {
           await this.$store.dispatch("editCollection", {
             id: collection.id,
@@ -47,6 +47,8 @@ export default {
           );
         }
       }
+      // emit event to resync picto list
+      $nuxt.$emit("resyncPictoList");
     },
     setCopyCollectionId(collectionId, isPicto) {
       this.$store.commit("setCopyCollectionId", {
@@ -111,26 +113,44 @@ export default {
             )
           )
         );
+        let currentCollection = JSON.parse(
+          JSON.stringify(
+            this.getCollectionFromId(
+              parseInt(this.$route.params.fatherCollectionId, 10)
+            )
+          )
+        );
         if (isPicto) {
           sidebar.pictos.push({
             id: collectionId,
           });
+          // Remove the picto from the current collection
+          currentCollection.pictos = currentCollection.pictos.filter((picto) => picto.id != collectionId);
 
           await this.$store.dispatch("editCollection", {
             id: sidebar.id,
             pictos: sidebar.pictos,
           });
-          $nuxt.$emit("resyncPictoList");
+          await this.$store.dispatch("editCollection", {
+            id: currentCollection.id,
+            collections: currentCollection.pictos,
+          });
         } else {
           sidebar.collections.push({
             id: collectionId,
           });
+          currentCollection.collections = currentCollection.collections.filter((picto) => picto.id != collectionId);
           await this.$store.dispatch("editCollection", {
             id: sidebar.id,
             collections: sidebar.collections,
           });
-          $nuxt.$emit("resyncPictoList");
+          await this.$store.dispatch("editCollection", {
+            id: currentCollection.id,
+            collections: currentCollection.collections,
+          });
+
         }
+        $nuxt.$emit("resyncPictoList");
       } catch (error) {
         if (error.response.status == 401) {
           this.$buefy.toast.open({
@@ -149,13 +169,44 @@ export default {
     },
     async removeShortcutToSidebar(collectionId, isPicto) {
       try {
+        const sidebarId = this.$store.getters.getSidebarId;
+
+        let sidebar = JSON.parse(
+          JSON.stringify(
+            this.getCollectionFromId(
+              parseInt(sidebarId, 10)
+            )
+          )
+        );
+        let currentCollection = JSON.parse(
+          JSON.stringify(
+            this.getCollectionFromId(
+              parseInt(this.$route.params.fatherCollectionId, 10)
+            )
+          )
+        );
         if (!isPicto) {
-          const res = await this.$store.dispatch("removeCollection", {
+          currentCollection.collections.push({
+            id: collectionId,
+          });
+          await this.$store.dispatch("editCollection", {
+            id: currentCollection.id,
+            collections: currentCollection.collections,
+          });
+          await this.$store.dispatch("removeCollection", {
             collectionId: collectionId,
             fatherCollectionId: this.$store.getters.getSidebarId,
           });
+
         } else {
-          const res = await this.$store.dispatch("removePicto", {
+          currentCollection.pictos.push({
+            id: collectionId,
+          });
+          await this.$store.dispatch("editCollection", {
+            id: currentCollection.id,
+            pictos: currentCollection.pictos,
+          });
+          await this.$store.dispatch("removePicto", {
             pictoId: collectionId,
             fatherCollectionId: this.$store.getters.getSidebarId
           });
