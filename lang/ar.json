@@ -411,5 +411,7 @@
     "DeleteAccount": "حذف الحساب",
     "DeleteAccountText": "الحذف الدائم لحسابك وجميع محتوياته",
     "AddToSidebar": "أضف إلى الشريط الجانبي",
-    "RemoveFromSidebar": "إزالة من الشريط الجانبي"
+    "RemoveFromSidebar": "إزالة من الشريط الجانبي",
+    "RestoreItem": "استعادة العنصر المفقود",
+    "TooltipTrash": "البحث من خلال العناصر المحذوفة"
 }
