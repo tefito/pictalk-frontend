@@ -104,8 +104,6 @@ export default {
   },
   computed: {
     isSidebarUsed() {
-      console.log("isSidebarUsed")
-      console.log(this.sidebarPictos.length != 0)
       return this.sidebarPictos.length != 0;
     },
     homeLink() {

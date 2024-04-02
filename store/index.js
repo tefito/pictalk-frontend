@@ -28,6 +28,7 @@ export const state = () => ({
   temporaryLanguage: null,
   publicBundles: null,
   dragndrop: null,
+  ttsBoundarySupport: null,
 });
 
 export const mutations = {
@@ -45,6 +46,9 @@ export const mutations = {
     state.publicBundles = null;
     state.dragndrop = null;
     state.token = null;
+  },
+  async setTtsBoundarySupport(state, ttsBoundarySupport) {
+    state.ttsBoundarySupport = ttsBoundarySupport;
   },
   async setPublicBundles(state, bundles) {
     state.publicBundles = bundles;
@@ -783,6 +787,9 @@ export const getters = {
   },
   getJwtExpDateFromCookie(state) {
     return localStorage.getItem("tokenExpiration");
+  },
+  getTtsBoundarySupport(state) {
+    return state.ttsBoundarySupport;
   },
 };
 

@@ -101,11 +101,12 @@ export default {
       return chars;
     },
     testBoundaryEventSupport() {
-      if (this.voiceURI != "") {
+      if (this.voiceURI != "" && this.$store.getters.getTtsBoundarySupport == null) {
         let synthesis = new SpeechSynthesisUtterance();
         synthesis.volume = 0;
         synthesis.addEventListener("boundary", (event) => {
           this.animation = true;
+          this.$store.commit('setTtsBoundarySupport', true);
         });
         this.pronounce("a", this.getUserLang, this.voiceURI, 1, 1, synthesis);
       }
