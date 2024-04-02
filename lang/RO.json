@@ -413,5 +413,7 @@
     "DeleteAccount": "Ștergeți contul",
     "DeleteAccountText": "Ștergerea permanentă a contului dvs. și a întregului său conținut",
     "AddToSidebar": "Adăugați la bara laterală",
-    "RemoveFromSidebar": "Eliminați din bara laterală"
+    "RemoveFromSidebar": "Eliminați din bara laterală",
+    "RestoreItem": "Restaurați un element pierdut",
+    "TooltipTrash": "Căutați printre elementele șterse"
 }
