@@ -413,5 +413,7 @@
     "DeleteAccount": "Eliminar a conta",
     "DeleteAccountText": "Eliminação permanente da sua conta e de todo o seu conteúdo",
     "AddToSidebar": "Adicionar à barra lateral",
-    "RemoveFromSidebar": "Remover da barra lateral"
+    "RemoveFromSidebar": "Remover da barra lateral",
+    "RestoreItem": "Restaurar um objeto perdido",
+    "TooltipTrash": "Pesquisar nos itens eliminados"
 }
