@@ -343,7 +343,7 @@ export default {
         }
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(msg);
-        if (msg.text != 'a' && msg.text != '' && this.$store.getters.getUser.settings?.analytics != false) {
+        if (msg.text != 'a' && msg.text != '' && this.$store.getters.getUser.settings?.analytics != false && msg.voice) {
           window._paq.push(["trackEvent", "Sentences", "Pronounce", JSON.stringify({ "text": msg.text, "voice": msg.voice.lang, "voiceURI": msg.voiceURI, "pitch": msg.pitch, "rate": msg.rate })]);
         }
       } else {
