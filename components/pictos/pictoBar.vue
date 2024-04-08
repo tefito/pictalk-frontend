@@ -19,7 +19,7 @@
         icon-right="volume-high" @click="pictalk(pictos)">{{ getEmoji($store.getters.getTemporaryLanguage) }}</b-button>
       <b-button v-if="$store.getters.getTemporaryLanguage" style="background-color: hsl(154, 70%, 55%)"
         icon-right="volume-high" :class="'customButton ' + buttonsShowSize" @click="pictalk(pictos)">{{
-    getEmoji($store.getters.getTemporaryLanguage) }}</b-button>
+          getEmoji($store.getters.getTemporaryLanguage) }}</b-button>
       <b-button v-else id="pictobar-speak" style="background-color: hsl(154, 70%, 55%)" icon-right="volume-high"
         :class="'customButton ' + buttonsShowSize" @click="pictalk(pictos)" />
     </div>
@@ -69,6 +69,9 @@ export default {
       }
     },
     getText(pictos) {
+      if (!pictos || pictos.length == 0) {
+        return "";
+      }
       let speech = "";
       for (let index = 0; index < pictos.length - 1; index++) {
         speech =
