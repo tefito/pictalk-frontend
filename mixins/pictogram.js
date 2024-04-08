@@ -17,7 +17,7 @@ export default {
         try {
           await this.$store.dispatch("editCollection", {
             id: collection.id,
-            collections: collection.pictos,
+            pictos: collection.pictos,
           });
           const notif = this.$buefy.toast.open({
             message: this.$t("PublicCopy"),
