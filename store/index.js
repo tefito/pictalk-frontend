@@ -78,7 +78,7 @@ export const mutations = {
       );
       if (fatherCollectionIndex !== -1) {
         const collectionIndex = state.collections[fatherCollectionIndex].collections.findIndex(
-          collection => collection.id === newCollection.fatherCollectionId
+          collection => collection.id === newCollection.id
         );
         if (collectionIndex == -1) {
           state.collections[fatherCollectionIndex].collections.push(newCollection);
