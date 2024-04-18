@@ -415,5 +415,6 @@
     "AddToSidebar": "Zur Seitenleiste hinzufügen",
     "RemoveFromSidebar": "Aus der Seitenleiste entfernen",
     "RestoreItem": "Einen verlorenen Gegenstand wiederherstellen",
-    "TooltipTrash": "Gelöschte Objekte durchsuchen"
+    "TooltipTrash": "Gelöschte Objekte durchsuchen",
+    "clickHere": "hier klicken"
 }
