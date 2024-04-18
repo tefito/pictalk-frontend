@@ -413,5 +413,6 @@
     "AddToSidebar": "Pridať na bočný panel",
     "RemoveFromSidebar": "Odstrániť z bočného panela",
     "RestoreItem": "Obnovenie strateného predmetu",
-    "TooltipTrash": "Vyhľadávanie v odstránených položkách"
+    "TooltipTrash": "Vyhľadávanie v odstránených položkách",
+    "clickHere": "kliknite sem"
 }
