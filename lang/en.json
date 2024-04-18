@@ -415,5 +415,6 @@
   "AddToSidebar": "Add to sidebar",
   "RemoveFromSidebar": "Remove from sidebar",
   "RestoreItem": "Restore a lost item",
-  "TooltipTrash": "Search through deleted items"
+  "TooltipTrash": "Search through deleted items",
+  "clickHere": "click here"
 }
