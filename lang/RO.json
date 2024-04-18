@@ -415,5 +415,6 @@
     "AddToSidebar": "Adăugați la bara laterală",
     "RemoveFromSidebar": "Eliminați din bara laterală",
     "RestoreItem": "Restaurați un element pierdut",
-    "TooltipTrash": "Căutați printre elementele șterse"
+    "TooltipTrash": "Căutați printre elementele șterse",
+    "clickHere": "click aici"
 }
