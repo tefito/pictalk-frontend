@@ -1,14 +1,14 @@
 <template>
   <div class="margins">
     <div v-if="sidebar
-      " style="padding-top: 9px" />
+    " style="padding-top: 9px" />
     <div class="columns is-multiline is-mobile even">
       <picto :class="sidebar
-      ? 'column is-12'
-      : sidebarUsed
-        ? 'column is-6-mobile is-4-tablet is-3-desktop is-3-widescreen is-one-fifth-fullhd'
-        : customPictoSize
-      " v-for="(picto, index) in getFilteredPictoList" :key="index" :picto="picto" :publicMode="publicMode"
+        ? 'column is-12'
+        : sidebarUsed
+          ? 'column is-6-mobile is-4-tablet is-3-desktop is-3-widescreen is-one-fifth-fullhd'
+          : customPictoSize
+        " v-for="(picto, index) in getFilteredPictoList" :key="index" :picto="picto" :publicMode="publicMode"
         :sidebarMode="sidebar" :ref="picto.collection ? 'dragCollection' : 'dragPictogram'" />
       <div data-cy="cypress-empty-column"
         class="column is-one-third-mobile is-one-quarter-tablet is-one-quarter-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
@@ -83,7 +83,7 @@ export default {
   },
   computed: {
     getFilteredPictoList() {
-      return this.pictos.filter((picto) => picto?.meaning[this.getUserLang] || picto?.meaning == "");
+      return this.pictos.filter((picto) => picto?.meaning && (picto.meaning[this.getUserLang] || picto.meaning == ""));
     },
     isDropZone() {
       return (

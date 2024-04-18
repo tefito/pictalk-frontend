@@ -41,7 +41,7 @@
         </div>
         <a class="centerImage" target="_blank"
           href="https://docs.google.com/forms/d/e/1FAIpQLSd5HcoyXbT03tBsrVIo_MfJxiLHQdEqVjFBR_Cb8iDEARLNFw/viewform?usp=sf_link">
-          <img class="centerImage" loading="lazy" id="googleForms" :srcset="require('@/assets/googleForms.webp').srcSet"
+          <img class="centerImage" loading="lazy" id="googleForms" :srcset="require('@/assets/GoogleForms.webp').srcSet"
             alt="Google Forms" custom-class="portrait grayscale" width="192px" />
         </a>
       </b-notification>
@@ -113,7 +113,7 @@
       </b-field>
       <b-button class="is-text" @click="toggleDebugInfos()">{{
         $t("FeedbackToggle")
-      }}</b-button>
+        }}</b-button>
       <div v-if="showDebugInfos" style="margin-top: 0.85rem">
         <h2 class="subtitle is-size-5 headers">
           {{ $t("FeedbackDeviceInfo") }}
