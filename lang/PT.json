@@ -415,5 +415,6 @@
     "AddToSidebar": "Adicionar à barra lateral",
     "RemoveFromSidebar": "Remover da barra lateral",
     "RestoreItem": "Restaurar um objeto perdido",
-    "TooltipTrash": "Pesquisar nos itens eliminados"
+    "TooltipTrash": "Pesquisar nos itens eliminados",
+    "clickHere": "clique aqui"
 }
