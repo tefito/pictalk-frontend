@@ -416,5 +416,8 @@
     "RemoveFromSidebar": "Eliminar de la barra lateral",
     "RestoreItem": "Recuperar un objeto perdido",
     "TooltipTrash": "Buscar en los elementos eliminados",
-    "clickHere": "pulse aquí"
+    "clickHere": "pulse aquí",
+    "Feedback2": "Tu opinión importa ✊",
+    "FeedbackSurvey2": "¡Estamos en 2024 y es hora de que tus opiniones cuenten ✊! Hemos construido Pictalk gracias a los feedbacks de la comunidad y ahora necesitamos los tuyos. Estamos trabajando duro en la próxima versión de Pictalk y queremos asegurarnos de que ningún usuario se quede atrás 👤. Por favor, tómate 5 minutos para rellenar esta encuesta, contamos contigo 🫵.",
+    "FeedbackSurvey2Link": "Encontrará el enlace a la encuesta en el botón naranja con el símbolo de un bicho en la barra de menús."
 }
