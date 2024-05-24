@@ -86,8 +86,8 @@
                           <a :href="'mailto:' + notification.username" class="subtitle is-6 mailto">{{
                             notification.username
                               .split("@")[0]
-                            .replace(".", " ")
-                            }}</a>
+                              .replace(".", " ")
+                          }}</a>
                           {{ notificationText(notification) }}
                         </p>
                         <figure class="image is-64x64">
@@ -336,6 +336,9 @@ export default {
     }
   },
   methods: {
+    getUserNotifications() {
+      return this.$store.getters.getUser.notifications;
+    },
     showRestoreItemModal() {
       this.$buefy.modal.open({
         parent: this,

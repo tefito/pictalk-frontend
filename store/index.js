@@ -717,35 +717,36 @@ export const actions = {
   },
   async getNotifications(vuexContext) {
     const notificationsRequest = await axios.get("/user/notification");
-    if (notificationsRequest.status == 200) {
-      const notifications = notificationsRequest.data;
-      if (notifications?.length != vuexContext.getters.getUser.notifications.length) {
-        vuexContext.dispatch("downloadCollections");
+    if (notificationsRequest.status !== 200) return;
+
+    const notifications = notificationsRequest.data;
+    console.log(notifications)
+    if (notifications?.length != vuexContext.getters.getUser.notifications.length) {
+      vuexContext.dispatch("downloadCollections");
+    }
+    notifications?.forEach(async (notification) => {
+      if (notification.meaning) {
+        try {
+          notification.meaning = JSON.parse(notification?.meaning)
+        } catch (err) {
+          notification.meaning = notification?.meaning
+        }
       }
-      notifications?.forEach(async (notification) => {
-        if (notification.meaning) {
-          try {
-            notification.meaning = JSON.parse(notification?.meaning)
-          } catch (err) {
-            notification.meaning = notification?.meaning
-          }
+      if (notification.affected) {
+        if (!getCollectionFromId(vuexContext, parseInt(notification.affected, 10))) {
+          var res = await axios.get("/collection/find/" + parseInt(notification.affected, 10));
+          parseAndUpdateEntireCollection(vuexContext, res.data);
         }
         if (notification.affected) {
-          if (!getCollectionFromId(vuexContext, parseInt(notification.affected, 10))) {
+          if (!await getCollectionFromId(vuexContext, parseInt(notification.affected, 10))) {
             var res = await axios.get("/collection/find/" + parseInt(notification.affected, 10));
-            parseAndUpdateEntireCollection(vuexContext, res.data);
+            await parseAndUpdateEntireCollection(vuexContext, res.data);
           }
-          if (notification.affected) {
-            if (!await getCollectionFromId(vuexContext, parseInt(notification.affected, 10))) {
-              var res = await axios.get("/collection/find/" + parseInt(notification.affected, 10));
-              await parseAndUpdateEntireCollection(vuexContext, res.data);
-            }
-            notification.image = (await getCollectionFromId(vuexContext, parseInt(notification.affected, 10)))?.image;
-          }
-          resolve();
+          notification.image = (await getCollectionFromId(vuexContext, parseInt(notification.affected, 10)))?.image;
         }
-      })
-    };
+        resolve();
+      }
+    });
     // Mettre les notifications dans user
     let user = { ...vuexContext.getters.getUser };
     user.notifications = notifications;
@@ -753,8 +754,6 @@ export const actions = {
       ...vuexContext.getters.getUser,
       notifications: notifications,
     });
-
-    // DL les nouvelles collections
     return notifications;
   }
 }
