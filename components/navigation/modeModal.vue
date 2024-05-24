@@ -3,57 +3,37 @@
     <section class="modal-card-body">
       <p class="subtitle centered">{{ $t("AnotherSpace") }}</p>
       <div class="option">
-        <b-button
-          style="background-color: hsl(0, 100%, 70%)"
-          class="fullWidth customButton"
-          :label="$t('MyHome')"
-          @click="GoToRoot()"
-          icon-left="home"
-        />
+        <b-button style="background-color: hsl(0, 100%, 70%)" class="fullWidth customButton" :label="$t('MyHome')"
+          @click="GoToRoot()" icon-left="home" />
       </div>
       <div class="option">
-        <b-button
-          style="background-color: hsl(154, 100%, 70%)"
-          :label="$t('PublicCollections')"
-          @click="$router.push({ path: '/public' })"
-          icon-left="web"
-          class="fullWidth customButton"
-        />
+        <b-button style="background-color: hsl(210, 100%, 70%)" :label="$t('MyShared')" @click="goTo(sharedLink)"
+          icon-left="folder-account" class="fullWidth customButton" />
       </div>
       <div class="option">
-        <b-button
-          style="background-color: hsl(210, 100%, 70%)"
-          :label="$t('MyShared')"
-          @click="goTo(sharedLink)"
-          icon-left="folder-account"
-          class="fullWidth customButton"
-        />
-      </div>
-      <div class="option">
-        <b-button
-          style="background-color: hsl(45, 100%, 70%)"
-          :label="$t('MySidebar')"
-          @mousedown="goTo(sidebarLink)"
-          icon-left="page-layout-sidebar-right"
-          class="fullWidth customButton"
-        />
+        <b-button style="background-color: hsl(154, 100%, 70%)" :label="$t('PublicCollections')"
+          @click="goTo('/public/')" icon-left="web" class="fullWidth customButton" />
       </div>
     </section>
   </div>
 </template>
-<script >
+<script>
 export default {
   methods: {
     GoToRoot() {
       if (this.$store.getters.getRootId) {
         this.$router.push({
-          path: "/pictalk",
-          query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin, fatherCollectionId: this.$store.getters.getRootId },
+          path: "/pictalk/" + this.$store.getters.getRootId,
+          query: {
+            isAdmin: this.$route.query.isAdmin,
+          },
         });
       } else {
         this.$router.push({
           path: "/pictalk",
-          query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin },
+          query: {
+            isAdmin: this.$route.query.isAdmin,
+          },
         });
       }
       this.$parent.close();
@@ -61,7 +41,7 @@ export default {
     goTo(link) {
       this.$router.push({
         path: "/pictalk",
-        query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin, fatherCollectionId: link},
+        query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin, fatherCollectionId: link },
       });
       this.$parent.close();
     },
@@ -88,19 +68,23 @@ export default {
   transition: all 0.05s;
   margin: 0 2px;
 }
+
 .customButton:hover {
   box-shadow: 0px 0px 12px #00000090;
 }
+
 .buttonBorder {
   border: solid;
   border-width: 1px;
   border-color: #48c78e;
 }
+
 .option {
   display: flex;
   align-items: center;
   padding: 0.3em 0;
 }
+
 .small-card {
   position: fixed;
   left: 50%;
@@ -112,17 +96,21 @@ export default {
   min-height: 200px;
   border-radius: 12px;
 }
+
 .centered {
   text-align: center;
 }
+
 .fullWidth {
   width: 100%;
   justify-content: left;
 }
+
 .modeButton {
   color: white;
   border-color: transparent;
 }
+
 .modeButton:hover {
   color: #f1f1f1;
   filter: brightness(1.1);

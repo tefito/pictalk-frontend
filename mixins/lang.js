@@ -14,7 +14,7 @@ export default {
   computed: {
     getUserLang() {
       const user = this.$store.getters.getUser;
-      if (user?.language) {
+      if (user?.language && Object.keys(user.language).length > 0) {
         return Object.keys(user.language)[0].replace(/[^a-z]/g, "");
       }
       if (user?.displayLanguage) {

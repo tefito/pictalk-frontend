@@ -409,5 +409,15 @@
     "AnalyticsText": "Ajuda-nos a compreender como utiliza o Pictalk. As informações permanecem anónimas e não são partilhadas com ninguém 🕵️‍♀️",
     "AdhesionText": "Não hesite em juntar-se à nossa organização e apoiar o projeto ❤️",
     "Adhesion": "Apoiar-nos",
-    "Question": "Ponto de interrogação"
+    "Question": "Ponto de interrogação",
+    "DeleteAccount": "Eliminar a conta",
+    "DeleteAccountText": "Eliminação permanente da sua conta e de todo o seu conteúdo",
+    "AddToSidebar": "Adicionar à barra lateral",
+    "RemoveFromSidebar": "Remover da barra lateral",
+    "RestoreItem": "Restaurar um objeto perdido",
+    "TooltipTrash": "Pesquisar nos itens eliminados",
+    "clickHere": "clique aqui",
+    "Feedback2": "A sua opinião é importante ✊",
+    "FeedbackSurvey2": "Estamos em 2024 e é altura de as vossas opiniões contarem ✊! Construímos o Pictalk graças aos feedbacks da comunidade e precisamos dos vossos agora. Estamos a trabalhar arduamente na próxima versão do Pictalk e queremos garantir que nenhum utilizador é deixado para trás 👤. Por favor, dedique 5 minutos para preencher este inquérito, contamos consigo 🫵.",
+    "FeedbackSurvey2Link": "Pode encontrar a ligação para o inquérito no botão cor de laranja com o símbolo de um inseto na barra de menu."
 }

@@ -1,236 +1,99 @@
 <template>
   <b-navbar fixed-top>
     <template slot="brand">
-      <b-tooltip 
-        position="is-bottom"
-        multilined
-        size="is-small"
-        type="is-primary"
-        :label="$t('TooltipReturn')"
-        :delay="1000"
-        :triggers="['hover']"
-        style="margin-top: 3px"
-      >
-        <b-button
-            :disabled="parseInt($route.query.fatherCollectionId) == $store.getters.getUser.root"
-            class="customButton"
-            style="background-color: hsl(210, 100%, 60%); min-width: 80px"
-            @click="navigateToParentCollection()"
-            icon-right="arrow-left"
-        />
-        </b-tooltip>
-      <b-navbar-item
-        v-if="!$route.query.isAdmin"
-        class="logo"
-        tag="nuxt-link"
-        v-bind:to="$route.query.isAdmin ? '/': ''"
-        style="padding: 0%; padding-right: 1px; padding-left: 1vw;"
-      >
-        <img
-          v-if="fits"
-          src="~/assets/logo_compressed.png"
-          alt="Logo of a web app that help speach-disabled people"
-          height="44px"
-          style="aspect-ratio: 411 / 130; margin-right: 0.5em"
-        />
-        <img
-          style="aspect-ratio: 1 / 1; margin-right: 0.5em"
-          height="44px"
-          v-if="!fits"
-          src="~/assets/small_logo.png"
-          alt="Logo of a web app that help speach-disabled people"
-        />
+      <b-tooltip position="is-bottom" multilined size="is-small" type="is-primary" :label="$t('TooltipReturn')"
+        :delay="1000" :triggers="['hover']" style="margin-top: 3px">
+        <b-button :disabled="parseInt($route.params.fatherCollectionId) == $store.getters.getUser.root"
+          class="customButton" style="background-color: hsl(210, 100%, 60%); min-width: 80px"
+          @click="navigateToParentCollection()" icon-right="arrow-left" />
+      </b-tooltip>
+      <b-navbar-item v-if="!$route.query.isAdmin" class="logo" tag="nuxt-link"
+        v-bind:to="$route.query.isAdmin ? '/' : ''" style="padding: 0%; padding-right: 1px; padding-left: 1vw;">
+        <img v-if="fits" src="~/assets/logo_compressed.png" alt="Logo of a web app that help speach-disabled people"
+          height="44px" style="aspect-ratio: 411 / 130; margin-right: 0.5em" />
+        <img style="aspect-ratio: 1 / 1; margin-right: 0.5em" height="44px" v-if="!fits" src="~/assets/small_logo.png"
+          alt="Logo of a web app that help speach-disabled people" />
       </b-navbar-item>
-      <div
-        :style="this.$route.path.includes('pictalk') ? '' : 'display:none'"
-        class="columns is-mobile margins"
-      >
-        <div
-          v-if="$route.query.isAdmin && !checkCopyCollectionId"
-          class="column noPadding dropdown"
-        >
-          <b-dropdown
-            :disabled="!isEditorFatherId && !isToUserFatherId"
-            id="nav-create"
-            class="column"
-            :mobile-modal="false"
-            trap-focus
-            :triggers="['click', 'hover']"
-            aria-role="list"
-          >
+      <div :style="this.$route.path.includes('pictalk') ? '' : 'display:none'" class="columns is-mobile margins">
+        <div v-if="$route.query.isAdmin && !checkCopyCollectionId" class="column noPadding dropdown">
+          <b-dropdown :disabled="!isEditorFatherId && !isToUserFatherId" id="nav-create" class="column"
+            :mobile-modal="false" trap-focus :triggers="['click', 'hover']" aria-role="list">
             <template #trigger>
-              <b-button
-                :disabled="!isEditorFatherId && !isToUserFatherId"
-                style="background-color: hsl(154, 100%, 65%)"
-                data-cy="pictalk-navbar-create-button"      
-                icon-right="plus"
-                :label="$t('Create')"
-                class="customButton"
-              />
+              <b-button :disabled="!isEditorFatherId && !isToUserFatherId" style="background-color: hsl(154, 100%, 65%)"
+                data-cy="pictalk-navbar-create-button" icon-right="plus" :label="$t('Create')" class="customButton" />
             </template>
-            <b-dropdown-item
-              class="verticalPadding"
-              @click="addPicto(true)"
-              aria-role="listitem"
-              data-cy="pictalk-navbar-create-pictogram-button"
-              ><b>{{ $t("Pictogram") }}</b> <b-icon icon="image" />
+            <b-dropdown-item class="verticalPadding" @click="addPicto(true)" aria-role="listitem"
+              data-cy="pictalk-navbar-create-pictogram-button"><b>{{ $t("Pictogram") }}</b> <b-icon icon="image" />
             </b-dropdown-item>
-            <b-dropdown-item
-              class="verticalPadding"
-              @click="addPicto(false)"
-              aria-role="listitem"
-              data-cy="pictalk-navbar-create-collection-button"
-              ><b>{{ $t("Collection") }}</b> <b-icon icon="folder-table" />
+            <b-dropdown-item class="verticalPadding" @click="addPicto(false)" aria-role="listitem"
+              data-cy="pictalk-navbar-create-collection-button"><b>{{ $t("Collection") }}</b> <b-icon
+                icon="folder-table" />
             </b-dropdown-item>
           </b-dropdown>
         </div>
 
-        <div
-          v-if="checkCopyCollectionId && $route.query.isAdmin"
-          class="column noPadding"
-        >
-          <b-button
-            class="customButton"
-            style="background-color: hsl(210, 100%, 60%); min-width: 80px"
-            @click="copyCollection()"
-            icon-right="content-paste"
-          />
+        <div v-if="checkCopyCollectionId && $route.query.isAdmin" class="column noPadding">
+          <b-button class="customButton" style="background-color: hsl(210, 100%, 60%); min-width: 80px"
+            @click="copyCollection()" icon-right="content-paste" />
         </div>
-        <div
-          v-if="checkCopyCollectionId && $route.query.isAdmin"
-          class="column noPadding"
-        >
-          <b-button
-            class="customButton"
-            style="background-color: hsl(0, 0%, 96%); min-width: 80px"
-            @click="cancelCopy()"
-            icon-right="close"
-          />
+        <div v-if="checkCopyCollectionId && $route.query.isAdmin" class="column noPadding">
+          <b-button class="customButton" style="background-color: hsl(0, 0%, 96%); min-width: 80px"
+            @click="cancelCopy()" icon-right="close" />
         </div>
       </div>
     </template>
     <template slot="start">
       <b-navbar-dropdown data-cy="pictalk-navbar-dropdown" :label="$t('Menu')">
         <b-navbar-item tag="nuxt-link" to="/"> {{ $t("Home") }}</b-navbar-item>
-        <b-navbar-item tag="nuxt-link" to="/news"
-          >{{ $t("News") }} &#127881;</b-navbar-item
-        >
-        <b-navbar-item tag="nuxt-link" to="/informations"
-          >{{ $t("Informations") }} 👐</b-navbar-item
-        >
+        <b-navbar-item tag="nuxt-link" to="/news">{{ $t("News") }} &#127881;</b-navbar-item>
+        <b-navbar-item tag="nuxt-link" to="/informations">{{ $t("Informations") }} 👐</b-navbar-item>
       </b-navbar-dropdown>
-      <b-navbar-item tag="nuxt-link" to="/tutorials"
-        >{{ $t("Tutorial") }} 🚀</b-navbar-item
-      >
+      <b-navbar-item tag="nuxt-link" to="/tutorials">{{ $t("Tutorial") }} 🚀</b-navbar-item>
     </template>
     <template slot="end">
       <b-navbar-item tag="div">
         <div class="buttons b-tooltips">
-          <b-button
-            v-if="isAdministrator()"
-            type="is-success is-light"
-            icon-right="poll"
-            tag="nuxt-link"
-            to="/administration/"
-          />
-          <b-tooltip 
-          position="is-bottom"
-            multilined
-            size="is-small"
-            type="is-primary"
-            :label="$t('TooltipAdmin')"
-            :delay="1000"
-            :triggers="['hover']"
-            >
-          <div
-          v-if="!checkCopyCollectionId || !$route.query.isAdmin"
-          class="column noPadding"
-          >
-            <b-button
-              style="background-color: hsl(44, 100%, 65%)"
-              data-cy="pictalk-navbar-admin-button"
-              :icon-left="iconIsAdmin"
-              :label="$route.query.isAdmin ? $t('Viewer') : $t('Editor')"
-              @click="adminModeChoose()"
-              class="fullWidth customButton rotateArrow"
-            />
-          </div>
+          <b-button v-if="isAdministrator()" type="is-success is-light" icon-right="poll" tag="nuxt-link"
+            to="/administration/" />
+          <b-tooltip position="is-bottom" multilined size="is-small" type="is-primary" :label="$t('TooltipAdmin')"
+            :delay="1000" :triggers="['hover']">
+            <div v-if="!checkCopyCollectionId || !$route.query.isAdmin" class="column noPadding">
+              <b-button style="background-color: hsl(44, 100%, 65%)" data-cy="pictalk-navbar-admin-button"
+                :icon-left="iconIsAdmin" :label="$route.query.isAdmin ? $t('Viewer') : $t('Editor')"
+                @click="adminModeChoose()" class="fullWidth customButton rotateArrow" />
+            </div>
           </b-tooltip>
-          <b-tooltip
-            position="is-bottom"
-            multilined
-            size="is-small"
-            type="is-primary"
-            :label="$t('TooltipHome')"
-            :delay="1000"
-            :triggers="['hover']"
-          >
-            <b-button
-              @click="openModeModal()"
-              style="color: white"
-              icon-right="menu-down"
-              :icon-left="icon"
-              :class="'customButton ' + colorClass"
-            />
+          <b-tooltip position="is-bottom" multilined size="is-small" type="is-primary" :label="$t('TooltipHome')"
+            :delay="1000" :triggers="['hover']">
+            <b-button @click="openModeModal()" style="color: white" icon-right="menu-down" :icon-left="icon"
+              :class="'customButton ' + colorClass" />
           </b-tooltip>
 
-          <b-tooltip
-            v-if="this.notifications.length != 0"
-            position="is-bottom"
-            multilined
-            size="is-small"
-            type="is-primary"
-            :label="$t('TooltipNotifications')"
-            :delay="1000"
-            :triggers="['hover']"
-          >
-            <b-dropdown
-              position="is-bottom-left"
-              aria-role="menu"
-              trap-focus
-              append-to-body
-              class="notificationsdrop"
-              ><template #trigger>
-                <b-button
-                  style="background-color: hsl(0, 100%, 100%); color: #ff5757"
-                  icon-right="bell-alert"
-                  class="customButton"
-                />
+          <b-tooltip v-if="getUserNotifications() && getUserNotifications().length != 0" position="is-bottom" multilined
+            size="is-small" type="is-primary" :label="$t('TooltipNotifications')" :delay="1000" :triggers="['hover']">
+            <b-dropdown position="is-bottom-left" aria-role="menu" trap-focus append-to-body
+              class="notificationsdrop"><template #trigger>
+                <b-button style="background-color: hsl(0, 100%, 100%); color: #ff5757" icon-right="bell-alert"
+                  class="customButton" />
               </template>
-              <b-dropdown-item
-                aria-role="menu-item"
-                :focusable="false"
-                custom
-                class="lessPadding limitHeight"
-              >
-                <div
-                  v-for="notification in this.notifications"
-                  :key="notification.operation + Math.random()"
-                  class="card lessPadding notification"
-                >
+              <b-dropdown-item aria-role="menu-item" :focusable="false" custom class="lessPadding limitHeight">
+                <div v-for="notification in getUserNotifications()" :key="notification.operation + Math.random()"
+                  class="card lessPadding notification">
                   <div class="card-content noPadding">
                     <div class="media">
                       <div class="media-content noPadding centered">
                         <p class="title is-6 notifTitle">
-                          <a
-                            :href="'mailto:' + notification.username"
-                            class="subtitle is-6 mailto"
-                            >{{
-                              notification.username
-                                .split("@")[0]
-                                .replace(".", " ")
-                            }}</a
-                          >
+                          <a :href="'mailto:' + notification.username" class="subtitle is-6 mailto">{{
+                            notification.username
+                              .split("@")[0]
+                            .replace(".", " ")
+                            }}</a>
                           {{ notificationText(notification) }}
                         </p>
                         <figure class="image is-64x64">
-                          <img
-                            @click="
-                              notificationGoToCollectionOrReturn(notification)
-                            "
-                            :src="notification.image"
-                            alt="Placeholder image"
-                          />
+                          <img @click="
+                            notificationGoToCollectionOrReturn(notification)
+                            " :src="getNotificationImage(notification)" alt="Placeholder image" />
                         </figure>
                         <p class="title is-6 notifTitle greyback">
                           <!--<b-icon
@@ -244,32 +107,20 @@
                     </div>
                   </div>
                 </div>
-                <b-button
-                  class="is-danger center"
-                  icon-left="delete"
-                  expanded
-                  @click="deleteUserNotifications()"
-                />
+                <b-button class="is-danger center" icon-left="delete" expanded @click="deleteUserNotifications()" />
               </b-dropdown-item>
             </b-dropdown>
           </b-tooltip>
 
-          <b-tooltip
-            v-if="this.$route.path.includes('pictalk')"
-            position="is-bottom"
-            multilined
-            size="is-small"
-            type="is-primary"
-            :label="$t('TooltipAcount')"
-            :delay="1000"
-            :triggers="['hover']"
-          >
-            <b-button
-              style="background-color: hsl(207, 100%, 65%)"
-              @click="goToAccount()"
-              icon-right="cog"
-              class="customButton"
-            />
+          <b-tooltip v-if="this.$route.path.includes('pictalk')" position="is-bottom" multilined size="is-small"
+            type="is-primary" :label="$t('TooltipAcount')" :delay="1000" :triggers="['hover']">
+            <b-button style="background-color: hsl(207, 100%, 65%)" @click="goToAccount()" icon-right="cog"
+              class="customButton" />
+          </b-tooltip>
+          <b-tooltip v-if="this.$route.path.includes('pictalk')" position="is-bottom" multilined size="is-small"
+            type="is-primary" :label="$t('TooltipTrash')" :delay="1000" :triggers="['hover']">
+            <b-button style="background-color: hsl(45, 100%, 65%)" @click="showRestoreItemModal()" icon-right="delete"
+              class="customButton" />
           </b-tooltip>
           <!--
           <b-tooltip
@@ -289,37 +140,15 @@
             />
           </b-tooltip>
           -->
-          <b-tooltip
-            position="is-bottom"
-            multilined
-            size="is-small"
-            type="is-primary"
-            :label="$t('TooltipFeedback')"
-            :delay="1000"
-            :triggers="['hover']"
-          >
-            <b-button
-              style="background-color: hsl(34, 100%, 55%)"
-              icon-right="bug"
-              class="customButton"
-              @click="openFeedbackModal()"
-            />
+          <b-tooltip position="is-bottom" multilined size="is-small" type="is-primary" :label="$t('TooltipFeedback')"
+            :delay="1000" :triggers="['hover']">
+            <b-button style="background-color: hsl(34, 100%, 55%)" icon-right="bug" class="customButton"
+              @click="openFeedbackModal()" />
           </b-tooltip>
-          <b-tooltip
-            position="is-bottom"
-            multilined
-            size="is-small"
-            type="is-primary"
-            :label="$t('TooltipLogout')"
-            :delay="1000"
-            :triggers="['hover']"
-          >
-            <b-button
-              style="background-color: hsl(0, 100%, 100%)"
-              icon-right="logout"
-              class="customButton"
-              @click="onLogout"
-            />
+          <b-tooltip position="is-bottom" multilined size="is-small" type="is-primary" :label="$t('TooltipLogout')"
+            :delay="1000" :triggers="['hover']">
+            <b-button style="background-color: hsl(0, 100%, 100%)" icon-right="logout" class="customButton"
+              @click="onLogout" />
           </b-tooltip>
         </div>
       </b-navbar-item>
@@ -333,6 +162,7 @@ import PictoSteps from "@/components/pictos/pictoSteps";
 import feedbackModal from "@/components/auth/feedbackModal";
 import Security from "@/components/auth/securityModal";
 import modeModal from "@/components/navigation/modeModal.vue";
+import RestoreItemModal from "@/components/pictos/restoreItem.vue";
 export default {
   mixins: [lang, navbar],
   components: {
@@ -341,46 +171,51 @@ export default {
   },
   async created() {
     if (process.client) {
-    if ('BroadcastChannel' in window) {
-      const bc = new BroadcastChannel("offline-ready");
-      bc.onmessage = (event) => {
-        if (event.isTrusted) {
-          this.offlineReadyTotal = event.data.total;
-          this.offlineReadyProgress = event.data.progress;
-        }
-      };
-      const bc1 = new BroadcastChannel("authenticated-webworker");
-      console.log("Posting message to webworker")
-      if (this.$store.getters.getJwtFromCookie && this.$store.getters.getJwtExpDateFromCookie) {
-        bc1.postMessage({jwt: this.$store.getters.getJwtFromCookie, expDate: this.$store.getters.getJwtExpDateFromCookie});
-      }
-      bc1.onmessage = (event) => {
-        console.log("Received authenticated event from webworker")
-        if (event.isTrusted) {
-          if (event.data === "authenticated") {
-            bc1.postMessage({jwt: this.$store.getters.getJwtFromCookie, expDate: this.$store.getters.getJwtExpDateFromCookie});
+      if ('BroadcastChannel' in window) {
+        const bc = new BroadcastChannel("offline-ready");
+        bc.onmessage = (event) => {
+          if (event.isTrusted) {
+            this.offlineReadyTotal = event.data.total;
+            this.offlineReadyProgress = event.data.progress;
           }
+        };
+        const bc1 = new BroadcastChannel("authenticated-webworker");
+        console.log("Posting message to webworker")
+        if (this.$store.getters.getJwtFromCookie && this.$store.getters.getJwtExpDateFromCookie) {
+          bc1.postMessage({ jwt: this.$store.getters.getJwtFromCookie, expDate: this.$store.getters.getJwtExpDateFromCookie });
         }
-      };
-    }
-    this.intervalId = setInterval(async () => {
+        bc1.onmessage = (event) => {
+          console.log("Received authenticated event from webworker")
+          if (event.isTrusted) {
+            if (event.data === "authenticated") {
+              bc1.postMessage({ jwt: this.$store.getters.getJwtFromCookie, expDate: this.$store.getters.getJwtExpDateFromCookie });
+            }
+          }
+        };
+      }
       if (window.navigator.onLine) {
         try {
-          let notifCount = this.$store.getters.getUser.notifications.length;
           await this.$store.dispatch("getNotifications");
-          if (notifCount < this.$store.getters.getUser.notifications.length) {
-            this.$buefy.notification.open({
-              message: this.$t("UnreadNotifications"),
-              type: "is-info",
-            });
-          }
-        } catch (err) {
-          console.log(err);
-          clearInterval(this.intervalId);
-          return [];
-        }
+        } catch (err) { }
       }
-    }, 60000);
+      this.intervalId = setInterval(async () => {
+        if (window.navigator.onLine) {
+          try {
+            let notifCount = this.$store.getters.getUser.notifications.length;
+            await this.$store.dispatch("getNotifications");
+            if (notifCount < this.$store.getters.getUser.notifications.length) {
+              this.$buefy.notification.open({
+                message: this.$t("UnreadNotifications"),
+                type: "is-info",
+              });
+            }
+          } catch (err) {
+            console.log(err);
+            clearInterval(this.intervalId);
+            return [];
+          }
+        }
+      }, 60000);
     }
   },
   async fetch() {
@@ -397,7 +232,7 @@ export default {
       fits: false,
       offlineReadyTotal: null,
       offlineReadyProgress: null,
-      notifications : [],
+      notifications: [],
     };
   },
   destroyed() {
@@ -490,11 +325,10 @@ export default {
     sidebarLink() {
       return "/pictalk/" + this.$store.getters.getSidebarId + this.admin;
     },
-    async isEditorFatherId() {
-      const collection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10))
-      return collection?.editors.find(
-          (editor) => editor == this.$store.getters.getUser.username
-        ) != undefined
+    isEditorFatherId() {
+      return this.getCollectionFromId(parseInt(this.$route.params.fatherCollectionId, 10))?.editors.find(
+        (editor) => editor == this.$store.getters.getUser.username
+      ) != undefined
     },
     async isToUserFatherId() {
       const collection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10))
@@ -502,25 +336,36 @@ export default {
     }
   },
   methods: {
+    showRestoreItemModal() {
+      this.$buefy.modal.open({
+        parent: this,
+        component: RestoreItemModal,
+        hasModalCard: true,
+        customClass: "custom-class custom-class-2",
+        trapFocus: true,
+        canCancel: ["escape", "x"],
+      });
+    },
     navigateToParentCollection() {
       const speechCollectionArray = this.$store.getters.getSpeech.filter((picto) => !picto.sidebar && picto.collection);
       const speechCollectionArrayBeforePosition = speechCollectionArray.slice(0, speechCollectionArray.findIndex((picto) => picto.id == parseInt(this.$route.query.fatherCollectionId)));
       if (speechCollectionArrayBeforePosition.length < 1) {
         if (this.publicMode) {
           this.$router.push(
-            { path: "/public/pictalk",
-            query: { ...this.$route.query, fatherCollectionId: 346 },
-          });
+            {
+              path: "/public/pictalk",
+              query: { ...this.$route.query, fatherCollectionId: 346 },
+            });
         } else {
           if (this.$store.getters.getRootId) {
             this.$router.push({
               path: "/pictalk",
-              query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin, fatherCollectionId: this.$store.getters.getRootId },
+              query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin, fatherCollectionId: this.$store.getters.getRootId },
             });
           } else {
             this.$router.push({
-              path : "/pictalk",
-              query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin },
+              path: "/pictalk",
+              query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin },
             });
           }
         }
@@ -784,6 +629,7 @@ export default {
   left: 50%;
   transform: translateX(-50%);
 }
+
 @media (min-width: 1216px) {
   .logo {
     left: 0;
@@ -791,30 +637,37 @@ export default {
     position: relative;
   }
 }
+
 .b-tooltips {
   .b-tooltip:not(:last-child) {
     margin-right: 0.5em;
   }
+
   .b-tooltip {
     margin-bottom: 0.5em;
   }
 }
+
 .notifTitle {
   margin-bottom: 0.5em;
 }
+
 .greyback {
   background-color: #f5f5f5;
   padding: 0.2em;
   border-radius: 2px;
 }
+
 .mailto {
   color: #ee0000 !important;
   text-decoration: underline;
 }
+
 .limitHeight {
   max-height: 600px;
   overflow-y: auto;
 }
+
 .lock {
   width: 90%;
   display: flex;
@@ -825,6 +678,7 @@ export default {
   margin-left: auto;
   margin-right: auto;
 }
+
 .addButton {
   border: solid;
   border-color: #4c4329;
@@ -832,6 +686,7 @@ export default {
   height: 100%;
   width: 95%;
 }
+
 .margins {
   margin-left: 20px;
   margin-right: 1vw;
@@ -839,12 +694,15 @@ export default {
   height: 44px;
   align-items: center;
 }
+
 .noPadding {
   padding: 0%;
 }
+
 .lessPadding {
   padding: 0.38rem;
 }
+
 .downloadDiv {
   border: solid;
   border-width: 1px;
@@ -859,9 +717,11 @@ export default {
   display: flex;
   font-size: 0.85em;
 }
+
 .notification {
   margin: 0.6rem;
 }
+
 .centered {
   align-items: center;
   display: flex;
@@ -873,16 +733,20 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
 .dropdown-button {
   height: 44px;
 }
+
 .verticalPadding {
   padding-top: 0.75em;
   padding-bottom: 0.75em;
 }
+
 .rounded {
   border-radius: 24px;
 }
+
 .customButton {
   font-size: clamp(0.8em, 4vw, 1.15em);
   font-weight: 600;
@@ -891,16 +755,20 @@ export default {
   transition: all 0.05s;
   margin: 0 2px;
 }
+
 .customButton:hover {
   box-shadow: 0px 0px 12px #00000090;
 }
+
 .modeButton {
   color: white;
   border-color: transparent;
 }
+
 .modeButton:hover {
   color: #f1f1f1;
 }
+
 .version {
   display: flex;
   align-items: flex-end;

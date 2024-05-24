@@ -8,16 +8,16 @@ export default {
     }
   },
   methods: {
-    async setShortcutCollectionIdDirectlyToRoot(collectionId, isPicto) {
+    async setShortcutCollectionIdDirectlyToRoot(item, isPicto) {
       let collection = JSON.parse(
         JSON.stringify(this.getCollectionFromId(this.$store.getters.getRootId))
       );
       if (isPicto) {
-        collection.pictos.push({ id: collectionId });
+        collection.pictos.push(item);
         try {
           await this.$store.dispatch("editCollection", {
             id: collection.id,
-            collections: collection.pictos,
+            pictos: collection.pictos,
           });
           const notif = this.$buefy.toast.open({
             message: this.$t("PublicCopy"),
@@ -30,7 +30,7 @@ export default {
           );
         }
       } else {
-        collection.collections.push({ id: collectionId });
+        collection.collections.push(item);
         try {
           await this.$store.dispatch("editCollection", {
             id: collection.id,
@@ -47,6 +47,8 @@ export default {
           );
         }
       }
+      // emit event to resync picto list
+      $nuxt.$emit("resyncPictoList");
     },
     setCopyCollectionId(collectionId, isPicto) {
       this.$store.commit("setCopyCollectionId", {
@@ -74,21 +76,13 @@ export default {
     async addToSpeech() {
       this.$store.commit("addSpeech", {
         ...this.picto,
-        sidebar: this.sidebarMode,
+        sidebar: false,
       });
       if (this.picto.collection == true) {
-        if (this.sidebarMode) {
-          this.$router.push({
-            query: {
-              ...this.$route.query,
-            },
-          });
-        } else {
-          this.$router.push({
-            path: this.public ? '/public/pictalk' : this.$route.path,
-            query: { ...this.$route.query, fatherCollectionId: this.picto.id },
-          });
-        }
+        this.$router.push({
+          path: this.pictoLink,
+          query: { ...this.$route.query },
+        });
       }
     },
     deletePicto() {
@@ -116,6 +110,125 @@ export default {
         trapFocus: true,
         canCancel: ["escape", "x"],
       });
+    },
+    async pushShortcutToSidebar(collectionId, isPicto) {
+      try {
+        const sidebarId = this.$store.getters.getSidebarId;
+
+        let sidebar = JSON.parse(
+          JSON.stringify(
+            this.getCollectionFromId(
+              parseInt(sidebarId, 10)
+            )
+          )
+        );
+        let currentCollection = JSON.parse(
+          JSON.stringify(
+            this.getCollectionFromId(
+              parseInt(this.$route.params.fatherCollectionId, 10)
+            )
+          )
+        );
+        if (isPicto) {
+          sidebar.pictos.push({
+            id: collectionId,
+          });
+          // Remove the picto from the current collection
+          currentCollection.pictos = currentCollection.pictos.filter((picto) => picto.id != collectionId);
+
+          await this.$store.dispatch("editCollection", {
+            id: sidebar.id,
+            pictos: sidebar.pictos,
+          });
+          await this.$store.dispatch("editCollection", {
+            id: currentCollection.id,
+            collections: currentCollection.pictos,
+          });
+        } else {
+          sidebar.collections.push({
+            id: collectionId,
+          });
+          currentCollection.collections = currentCollection.collections.filter((picto) => picto.id != collectionId);
+          await this.$store.dispatch("editCollection", {
+            id: sidebar.id,
+            collections: sidebar.collections,
+          });
+          await this.$store.dispatch("editCollection", {
+            id: currentCollection.id,
+            collections: currentCollection.collections,
+          });
+
+        }
+        $nuxt.$emit("resyncPictoList");
+      } catch (error) {
+        if (error.response.status == 401) {
+          this.$buefy.toast.open({
+            message: this.$t("NotAuthorized"),
+            position: "is-top",
+            type: "is-danger",
+          });
+        } else {
+          this.$buefy.toast.open({
+            message: this.$t("CouldNotPaste"),
+            position: "is-top",
+            type: "is-danger",
+          });
+        }
+      }
+    },
+    async removeShortcutToSidebar(collectionId, isPicto) {
+      try {
+        const sidebarId = this.$store.getters.getSidebarId;
+
+        let sidebar = JSON.parse(
+          JSON.stringify(
+            this.getCollectionFromId(
+              parseInt(sidebarId, 10)
+            )
+          )
+        );
+        let currentCollection = JSON.parse(
+          JSON.stringify(
+            this.getCollectionFromId(
+              parseInt(this.$route.params.fatherCollectionId, 10)
+            )
+          )
+        );
+        if (!isPicto) {
+          currentCollection.collections.push({
+            id: collectionId,
+          });
+          await this.$store.dispatch("editCollection", {
+            id: currentCollection.id,
+            collections: currentCollection.collections,
+          });
+          await this.$store.dispatch("removeCollection", {
+            collectionId: collectionId,
+            fatherCollectionId: this.$store.getters.getSidebarId,
+          });
+
+        } else {
+          currentCollection.pictos.push({
+            id: collectionId,
+          });
+          await this.$store.dispatch("editCollection", {
+            id: currentCollection.id,
+            pictos: currentCollection.pictos,
+          });
+          await this.$store.dispatch("removePicto", {
+            pictoId: collectionId,
+            fatherCollectionId: this.$store.getters.getSidebarId
+          });
+        }
+        $nuxt.$emit("resyncPictoList");
+      } catch (err) {
+        console.log(err);
+        this.$buefy.toast.open({
+          message: this.$t("CouldNotRemove"),
+          position: "is-top",
+          type: "is-danger",
+        });
+      }
     },
     async publishPicto() {
       try {

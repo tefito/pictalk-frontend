@@ -35,12 +35,12 @@
 
       <div class="columns is-multiline is-mobile topColumns">
         <img v-for="(picto, index) in pictosWithoutSilent" :key="index" :src="picto.image"
-          :class="(animation ? (wordIndex >= index ? pronounceShowSize + ' animations' : pronounceShowSize + ' lowBrightness') : pronounceShowSize)"></img>
+          :class="($store.getters.getTtsBoundarySupport ? (wordIndex >= index ? pronounceShowSize + ' animations' : pronounceShowSize + ' lowBrightness') : pronounceShowSize)"></img>
       </div>
     </div>
   </div>
 </template>
-<script >
+<script>
 import miniPicto from "@/components/pictos/miniPicto";
 import mergeImages from "merge-images-horizontally-with-text";
 import tradLanguageListVue from "@/components/pictos/tradLanguageList.vue";
@@ -69,6 +69,9 @@ export default {
       }
     },
     getText(pictos) {
+      if (!pictos || pictos.length == 0) {
+        return "";
+      }
       let speech = "";
       for (let index = 0; index < pictos.length - 1; index++) {
         speech =
@@ -101,11 +104,11 @@ export default {
       return chars;
     },
     testBoundaryEventSupport() {
-      if (this.voiceURI != "") {
+      if (this.voiceURI != "" && this.$store.getters.getTtsBoundarySupport == null) {
         let synthesis = new SpeechSynthesisUtterance();
         synthesis.volume = 0;
         synthesis.addEventListener("boundary", (event) => {
-          this.animation = true;
+          this.$store.commit('setTtsBoundarySupport', true);
         });
         this.pronounce("a", this.getUserLang, this.voiceURI, 1, 1, synthesis);
       }
@@ -209,19 +212,11 @@ export default {
             if (this.publicMode) {
               //this.$router.push("/public/");
             } else {
-              if (this.$store.getters.getSidebarId) {
-                this.$router.push({
-                  query: {
-                    isAdmin: this.$route.query.isAdmin,
-                  },
-                });
-              } else {
-                this.$router.push({
-                  query: {
-                    isAdmin: this.$route.query.isAdmin,
-                  },
-                });
-              }
+              this.$router.push({
+                query: {
+                  isAdmin: this.$route.query.isAdmin,
+                },
+              });
             }
           } else {
             this.$router.push({
@@ -278,14 +273,12 @@ export default {
           this.$router.push({
             query: {
               isAdmin: this.$route.query.isAdmin,
-              fatherCollectionId: this.$store.getters.getRootId,
             },
           });
         } else {
           this.$router.push({
             query: {
               isAdmin: this.$route.query.isAdmin,
-              fatherCollectionId: undefined
             },
           });
         }
@@ -434,7 +427,6 @@ export default {
       }
     },
     voiceURI: function () {
-      this.animation = false;
       this.testBoundaryEventSupport();
     },
   },

@@ -13,9 +13,10 @@
     </div>
   </div>
 </template>
-<script >
+<script>
 import axios from "axios";
 import account from "@/components/auth/account";
+import MiniFeedbackModal from "../../components/auth/miniFeedbackModal.vue";
 export default {
   nuxtI18n: false,
   components: {
@@ -44,6 +45,23 @@ export default {
       } catch (error) {
         console.log("error ", error);
       }
+    }
+  },
+  mounted() {
+    const user = this.$store.getters.getUser;
+    if (!user.settings.popupfeedback) {
+      setTimeout(() => {
+        this.$buefy.modal.open({
+          parent: this,
+          component: MiniFeedbackModal,
+          hasModalCard: true,
+          customClass: "custom-class custom-class-2",
+          trapFocus: true,
+          canCancel: ["escape", "x"],
+        });
+      }, 2000);
+      user.settings.popupfeedback = true;
+      this.$store.dispatch("editUser", user);
     }
   },
 };

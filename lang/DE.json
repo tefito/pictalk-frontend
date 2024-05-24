@@ -409,5 +409,15 @@
     "AnalyticsText": "Helfen Sie uns zu verstehen, wie Sie Pictalk nutzen. Die Informationen bleiben anonym und werden nicht an Dritte weitergegeben 🕵️‍♀️",
     "AdhesionText": "Fühlen Sie sich frei, unserer Organisation beizutreten und das Projekt zu unterstützen ❤️",
     "Adhesion": "Unterstützen Sie uns",
-    "Question": "Fragezeichen"
+    "Question": "Fragezeichen",
+    "DeleteAccount": "Konto löschen",
+    "DeleteAccountText": "Dauerhafte Löschung Ihres Kontos und aller seiner Inhalte",
+    "AddToSidebar": "Zur Seitenleiste hinzufügen",
+    "RemoveFromSidebar": "Aus der Seitenleiste entfernen",
+    "RestoreItem": "Einen verlorenen Gegenstand wiederherstellen",
+    "TooltipTrash": "Gelöschte Objekte durchsuchen",
+    "clickHere": "hier klicken",
+    "Feedback2": "Ihre Meinung zählt ✊",
+    "FeedbackSurvey2": "Wir schreiben das Jahr 2024 und es ist Zeit, dass Ihre Meinung zählt ✊! Wir haben Pictalk dank der Rückmeldungen aus der Community aufgebaut und brauchen jetzt eure. Wir arbeiten hart an der nächsten Version von Pictalk und wir wollen sicherstellen, dass kein Nutzer zurückgelassen wird 👤. Bitte nehmen Sie sich 5 Minuten Zeit, um diese Umfrage auszufüllen, wir zählen auf Sie 🫵.",
+    "FeedbackSurvey2Link": "Den Link zur Umfrage finden Sie in der orangefarbenen Schaltfläche mit dem Käfersymbol in der Menüleiste."
 }

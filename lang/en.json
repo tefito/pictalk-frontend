@@ -409,5 +409,15 @@
   "AnalyticsText": "Help us understand how you use Pictalk. Information remains anonymous and is not shared with anyone 🕵️‍♀️",
   "AdhesionText": "Feel free to join our organization and support the project ❤️",
   "Adhesion": "Support us",
-  "Question": "Question mark"
+  "Question": "Question mark",
+  "DeleteAccount": "Delete account",
+  "DeleteAccountText": "Permanent deletion of your account and all of its content",
+  "AddToSidebar": "Add to sidebar",
+  "RemoveFromSidebar": "Remove from sidebar",
+  "RestoreItem": "Restore a lost item",
+  "TooltipTrash": "Search through deleted items",
+  "clickHere": "click here",
+  "Feedback2": "Your opinion matters ✊",
+  "FeedbackSurvey2": "We are in 2024 and it's time your opinions count ✊! We've built Pictalk thanks to the feedbacks of the community and we need yours now. We are working hard on the next version of Pictalk and we want to make sure no user is left behind 👤. Please take 5 minutes to fill this survey, we count on you 🫵.",
+  "FeedbackSurvey2Link": "You can find the link to the survey in the orange button with a bug symbol in the menu bar."
 }

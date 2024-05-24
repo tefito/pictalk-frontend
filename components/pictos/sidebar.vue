@@ -1,8 +1,7 @@
 <template>
   <div class="vertical smallPadding">
     <div class="columns is-multiline is-mobile" style="padding: 5%">
-      <picto
-        class="
+      <picto class="
           column
           is-full-mobile
           is-full-tablet
@@ -10,13 +9,8 @@
           is-half-widescreen
           is-half-fullhd
           centeredImage
-        "
-        v-for="(picto, index) in pictos"
-        :key="index"
-        :picto="picto"
-        :publicMode="publicMode"
-        :sidebarMode="true"
-      ></picto>
+        " v-for="(picto, index) in pictos" :key="index" :picto="picto" :publicMode="publicMode" :sidebarMode="true">
+      </picto>
       <div class="column is-full" style="padding: 2rem"></div>
     </div>
   </div>
@@ -47,10 +41,12 @@ export default {
 .smallPadding {
   padding: 5%;
 }
+
 .centeredImage {
   align-items: center;
   justify-content: center;
 }
+
 .vertical {
   overflow-y: scroll;
   overflow-x: hidden;

@@ -8,6 +8,8 @@ function getDexieDB() {
 }
 
 export const strict = false;
+
+// use the axios middleware
 axios.interceptors.request.use((config) => {
   if (!config.url.includes('api.arasaac.org') && !config.url.includes('flickr.com') && !config.url.includes('staticflickr.com')) {
     let token = localStorage.getItem('token');
@@ -16,7 +18,8 @@ axios.interceptors.request.use((config) => {
     }
   }
   return config;
-});
+},);
+
 export const state = () => ({
   token: null,
   pictoSpeech: [],
@@ -30,6 +33,7 @@ export const state = () => ({
   temporaryLanguage: null,
   publicBundles: null,
   dragndrop: null,
+  ttsBoundarySupport: null,
 });
 
 export const mutations = {
@@ -45,6 +49,9 @@ export const mutations = {
     state.publicBundles = null;
     state.dragndrop = null;
     state.token = null;
+  },
+  async setTtsBoundarySupport(state, ttsBoundarySupport) {
+    state.ttsBoundarySupport = ttsBoundarySupport;
   },
   async setPublicBundles(state, bundles) {
     state.publicBundles = bundles;
@@ -418,7 +425,6 @@ export const actions = {
           "Content-Type": "multipart/form-data"
         }
       })).data;
-
     vuexContext.commit("editCollection", {
       ...editedCollection,
       ...(editedCollection.meaning && { meaning: editedCollection.meaning }),
@@ -563,6 +569,12 @@ export const actions = {
       directSharers: newUser.directSharers
     });
     return newUser;
+  },
+  async getOrphanedCollections(vuexContext) {
+    const orphanedCollections = (await axios.get("/collection/orphaned")).data;
+    return orphanedCollections.map(collection =>
+      parseAndUpdateEntireCollection(vuexContext, collection)
+    );
   },
   async downloadCollections(vuexContext, alreadyFetchedCollections = null) {
     let res;
@@ -811,6 +823,9 @@ export const getters = {
   getJwtExpDateFromCookie(state) {
     return localStorage.getItem("tokenExpiration");
   },
+  getTtsBoundarySupport(state) {
+    return state.ttsBoundarySupport;
+  },
 };
 
 async function parseAndUpdateEntireCollection(vuexContext, collection, download = false) {
@@ -849,6 +864,8 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
     // TODO Est-ce qu'on peut recuperer fatherCollectionId d'une autre facon ?
     // SI la collection n'existe pas alors cela sera undefined...
     if (localCollection) {
+      Object.assign(localCollection, collection);
+      collection = localCollection;
       collection.fatherCollectionId = localCollection.fatherCollectionId;
     } else {
       collectionsWithoutFatherCollectionId.push(collection);
@@ -861,7 +878,6 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
       collectionsToEdit.push(collection);
     }
   }
-
   if (collection.pictos && !collection.pictos.length == 0) {
     collection.pictos.map((picto) => {
       let localPicto = getPictoFromId(vuexContext, picto.id);

@@ -2,98 +2,59 @@
   <div>
     <button @click="dispatchDownloadCollections()">DOWNLOAD COLLECTIONS</button>
     <div class="columns is-mobile noscroll">
-      <div
-        :class="
-          !($route.query.fatherCollectionId == $store.getters.getSidebarId) &&
-          isSidebarUsed
-            ? 'is-8-mobile is-four-fifths-tablet is-10-desktop is-10-widescreen is-10-fullhd column noMargins scrolling lessPadding'
-            : 'is-12 column noMargins scrolling lessPadding'
-        "
-        id="pictoList-main"
-      >
-        <div v-if="pictos.length == 0 && !isPictoListPartial && !initialization">
-          <b-image
-            style="aspect-ratio: 1/1"
-            class="emptyCollection1"
-            lazy
+      <div :class="!($route.params.fatherCollectionId == $store.getters.getSidebarId) && isSidebarUsed
+        ? 'is-8-mobile is-9-tablet is-10-desktop is-10-widescreen is-10-fullhd column noMargins scrolling lessPadding'
+        : 'is-12 column noMargins scrolling lessPadding'
+        ">
+        <div v-if="pictos.length == 0 && !isPictoListPartial">
+          <b-image style="aspect-ratio: 1/1" class="emptyCollection1" lazy
             alt="an arrow and a lock pointing to the lock button on the upper part of the screen that allows the creation of pictograms"
-            :srcset="require('@/assets/EmptyCollection1.png').srcSet"
-          />
+            :srcset="require('@/assets/EmptyCollection1.png').srcSet" />
           <br />
           <b-message class="emptyMessage">
             {{ $t("EmptyCollection") }}
           </b-message>
 
-          <b-image
-            data-cy="cypress-emptyCollection"
-            style="aspect-ratio: 1/1"
-            class="emptyCollection2"
-            lazy
+          <b-image data-cy="cypress-emptyCollection" style="aspect-ratio: 1/1" class="emptyCollection2" lazy
             alt="An empty cardboard box that represents an empty collection with no pictograms"
-            :srcset="require('@/assets/EmptyCollection3.png').srcSet"
-          />
+            :srcset="require('@/assets/EmptyCollection3.png').srcSet" />
         </div>
-        <pictoList
-          data-cy="cypress-pictoList"
-          :pictos="pictos"
-          :sidebar="false"
-          :sidebarUsed="
-            isSidebarUsed &&
-            $route.query.fatherCollectionId != $store.getters.getSidebarId
-          "
-          v-if="!isPictoListPartial || isOnLine || !isPictoListEmpty"
-        />
+
+        <pictoList data-cy="cypress-pictoList" :pictos="pictos" :sidebar="false" :sidebarUsed="isSidebarUsed && $route.params.fatherCollectionId != $store.getters.getSidebarId
+          " v-if="!isPictoListPartial || isOnLine || !isPictoListEmpty" />
         <div v-else>
-          <b-image
-            data-cy="cypress-noConnection"
-            style="aspect-ratio: 1/1"
-            class="partialCollection"
-            lazy
+          <b-image data-cy="cypress-noConnection" style="aspect-ratio: 1/1" class="partialCollection" lazy
             alt="No internet connection. To view the collection, please reconnect"
-            :srcset="require('@/assets/NoConnectionForCollection.png').srcSet"
-          />
+            :srcset="require('@/assets/NoConnectionForCollection.png').srcSet" />
           <b-message>
             {{ $t("CollectionNotExplored") }}
           </b-message>
         </div>
       </div>
 
-      <div
-        v-if="
-          !($route.query.fatherCollectionId == $store.getters.getSidebarId) &&
-          isSidebarUsed
-        "
-        class="
+      <div v-if="!($route.params.fatherCollectionId == $store.getters.getSidebarId) && isSidebarUsed" class="
           is-4-mobile
-          is-two-fifths-tablet
-          is-4-desktop
-          is-two-fifths-widescreen
-          is-5-fullhd
+          is-3-tablet
+          is-2-desktop
+          is-2-widescreen
+          is-2-fullhd
           column
           noMargins
           scrolling
           sidebar
           lessPadding
-        "
-      >
-        <pictoList
-          :pictos="sidebarPictos"
-          :sidebar="true"
-          v-if="isOnLine || !isSidebarEmpty"
-        />
+        ">
+        <b-image style="aspect-ratio: 1/1" v-if="sidebarPictos.length == 0" class="emptyCollection2" lazy
+          alt="An empty cardboard box that represents an empty collection with no pictograms"
+          :srcset="require('@/assets/EmptyCollection3.png').srcSet" />
+        <pictoList :pictos="sidebarPictos" :sidebar="true" v-if="isOnLine" />
       </div>
     </div>
     <div class="contenant">
-      <pictoBar
-        :style="
-          loadSpeech.length != 0
-            ? 'bottom: 2px'
-            : 'transform: translateY(105%);'
-        "
-        class="pictobar sidebar slide-up"
-        :pictos="loadSpeech"
-        :collectionColor="collectionColor"
-      />
+      <pictoBar :style="loadSpeech.length != 0
+        ? 'bottom: 2px'
+        : 'transform: translateY(105%);'
+        " class="pictobar sidebar slide-up" :pictos="loadSpeech" :collectionColor="collectionColor" />
     </div>
   </div>
 </template>
@@ -118,18 +79,12 @@ export default {
     sidebar: sidebar,
   },
   watch: {
-    async $route(to, from) {
-          if (to.query.fatherCollectionId != from.query.fatherCollectionId) {
-            console.log("pictos",await this.loadedPictos());
-            if (this.$route.query.fatherCollectionId) {
-              await this.fetchCollection(
-                parseInt(this.$route.query.fatherCollectionId, 10)
-              );
-            }
-            this.pictos = await this.loadedPictos();
-            console.log("pictos", this.pictos)
-          }
+    async sidebarPictoId(sidebarId, previousId) {
+      if (sidebarId && sidebarId != previousId) {
+        await this.fetchCollection(sidebarId);
+        this.sidebarPictos = this.loadedSidebarPictos();
       }
+    },
   },
   created() {
     window.addEventListener("online", this.refreshPictos);
@@ -142,10 +97,10 @@ export default {
         }
         this.priority_timer = setTimeout(async () => {
           this.pictos = await this.loadedPictos();
+          this.sidebarPictos = await this.loadedSidebarPictos();
         }, delay);
       } else {
-        console.log("resyncPictoList");
-        this.pictos = await this.loadedPictos();
+        this.pictos = this.loadedPictos();
       }
     });
   },
@@ -155,21 +110,14 @@ export default {
     this.$nuxt.$off("resyncPictoList");
   },
   computed: {
+    isSidebarUsed() {
+      return this.sidebarPictos.length != 0;
+    },
     homeLink() {
       return this.$route.path;
     },
     isOnLine() {
       return window.navigator.onLine;
-    },
-    isSidebarUsed() {
-      console.log("isSidebarUsed", this.sidebarPictos.length != 0)
-      return true;
-    },
-    isSidebarEmpty() {
-      console.log(this.sidebarPictos)
-      return (
-        this.sidebarPictos?.length == 0
-      );
     },
     isPictoListPartial() {
       return this.collection?.partial;
@@ -189,6 +137,9 @@ export default {
     loadSpeech() {
       return this.$store.getters.getSpeech;
     },
+    sidebarPictoId() {
+      return this.$store.getters.getSidebarId;
+    },
     collectionColor() {
       if (this.collection) {
         if (this.collection.color) {
@@ -204,16 +155,20 @@ export default {
   async mounted() {
     let query = { ...this.$route.query };
     if (
-      !this.$route.query.fatherCollectionId
+      !this.$route.params.fatherCollectionId
     ) {
       if (!this.$route.query.fatherCollectionId) {
         if (this.$store.getters.getRootId) {
-          query.fatherCollectionId =  this.$store.getters.getRootId;
+          query.fatherCollectionId = this.$store.getters.getRootId;
         } else {
           var res = await axios.get("/user/root/");
           this.$store.commit("setRootId", res.data.id);
-          query.fatherCollectionId = res.data.id;
+          path = "/pictalk/" + res.data.id;
         }
+      }
+      if (!this.$store.getters.getSidebarId) {
+        var res = await axios.get("/user/sider/");
+        this.$store.commit("setSidebarId", res.data.id);
       }
       this.$router.push({
         query: query,
@@ -228,8 +183,11 @@ export default {
       );
     }
     this.pictos = await this.loadedPictos();
+
     if (this.$store.getters.getSidebarId) {
-      await this.fetchCollection(this.$store.getters.getSidebarId);
+      await this.fetchCollection(
+        parseInt(this.$store.getters.getSidebarId, 10)
+      );
     }
     this.sidebarPictos = await this.loadedSidebarPictos();
 
@@ -253,7 +211,7 @@ export default {
     };
   },
   methods: {
-    async dispatchDownloadCollections(){
+    async dispatchDownloadCollections() {
       await this.$store.dispatch("downloadCollections");
     },
     loadedSidebarPictos() {
@@ -443,6 +401,7 @@ export default {
 .slide-up {
   transition: 200ms cubic-bezier(0.175, 0.885, 0.32, 1.075);
 }
+
 .pictobar {
   bottom: 2px;
   margin: 0 auto;
@@ -452,22 +411,27 @@ export default {
   max-width: 767px;
   z-index: 4;
 }
+
 .contenant {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .smallPadding {
   padding: 1px;
 }
+
 .noMargins {
   margin: 0%;
 }
+
 .lessPadding {
   padding-top: 0.7rem;
   padding-left: 0.45rem;
   padding-right: 0.45rem;
 }
+
 @media screen and (min-width: 1408px) {
   .lessPadding {
     padding-top: 0.7rem;
@@ -477,10 +441,18 @@ export default {
 }
 
 .sidebar {
-  -webkit-box-shadow: -2px 2px 8px 1px #777; /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
-  -moz-box-shadow: -2px 2px 8px 1px #777; /* Firefox 3.5 - 3.6 */
+  padding-top: 2px;
+  -webkit-box-shadow: -2px 2px 8px 1px #777;
+  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+  -moz-box-shadow: -2px 2px 8px 1px #777;
+  /* Firefox 3.5 - 3.6 */
+  -webkit-box-shadow: -2px 2px 8px 1px #777;
+  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+  -moz-box-shadow: -2px 2px 8px 1px #777;
+  /* Firefox 3.5 - 3.6 */
   box-shadow: -2px 2px 8px 1px #777;
 }
+
 .scrolling {
   overflow-y: scroll;
   overflow-x: hidden;
@@ -500,12 +472,17 @@ export default {
   height: calc(100vh - 54px);
   width: 100vw;
 }
+
 .has-background {
   border-radius: 7px;
-  -webkit-box-shadow: 2px 2px 1px 1px #ccc; /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
-  -moz-box-shadow: 2px 2px 1px 1px #ccc; /* Firefox 3.5 - 3.6 */
-  box-shadow: 2px 2px 1px 1px #ccc; /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+  -webkit-box-shadow: 2px 2px 1px 1px #ccc;
+  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+  -moz-box-shadow: 2px 2px 1px 1px #ccc;
+  /* Firefox 3.5 - 3.6 */
+  box-shadow: 2px 2px 1px 1px #ccc;
+  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
 }
+
 .partialCollection {
   width: 90%;
   max-width: 300px;
@@ -514,6 +491,7 @@ export default {
   margin-right: auto;
   margin-top: 15vh;
 }
+
 .emptyCollection1 {
   width: 50%;
   max-width: 250px;
@@ -521,6 +499,7 @@ export default {
   margin-left: auto;
   margin-right: auto;
 }
+
 .emptyCollection2 {
   width: 80%;
   max-width: 400px;
@@ -528,6 +507,7 @@ export default {
   margin-left: auto;
   margin-right: auto;
 }
+
 .onTop {
   -webkit-position: sticky;
   -moz-position: sticky;
@@ -544,6 +524,7 @@ export default {
   margin-right: auto;
   display: flex;
 }
+
 .emptyMessage {
   padding: 0.2rem;
   width: auto;
