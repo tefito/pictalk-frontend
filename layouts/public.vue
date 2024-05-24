@@ -8,7 +8,7 @@
     </client-only>
   </div>
 </template>
-<script >
+<script>
 import navbar from "@/components/navigation/navbar";
 import popupModal from "@/components/auth/popupModal";
 import Cookie from "js-cookie";
@@ -58,11 +58,10 @@ export default {
         this.$i18n.setLocale(this.$store.getters.getUser.displayLanguage);
       }
     }
+  },
+  destroyed() {
+    clearTimeout(this.popupTimeout);
   }
-},
-destroyed() {
-  clearTimeout(this.popupTimeout);
-},
 };
 </script>
 <style scoped>
@@ -74,4 +73,3 @@ destroyed() {
   height: calc(100vh - 32px);
 }
 </style>
-

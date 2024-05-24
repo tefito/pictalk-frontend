@@ -1,55 +1,42 @@
 <template>
   <div class="margins">
-    <div class="even">
-      <RecycleScroller
-    class="scroller"
-    :items="getFilteredPictoList"
-    :item-size="getItemSizeX()"
-    :grid-items="getRowCount(getDeviceType)"
-    :item-secondary-size="getItemSizeY()"
-    key-field="id"
-  >
-  <template #default="{ item, index, active }">
-      <picto
-        :picto="item"
-        :publicMode="publicMode"
-        :sidebarMode="sidebar"
-        :ref="item?.collection ? 'dragCollection' : 'dragPictogram'"
-      />
-      <div
-        data-cy="cypress-empty-column"
-        class="column is-one-third-mobile is-one-quarter-tablet is-one-quarter-desktop is-one-quarter-widescreen is-one-fifth-fullhd"
-      ></div>
-    </template>
-      </RecycleScroller>
+    <div v-if="
+      sidebar && !($route.query.sidebarPictoId != $store.getters.getSidebarId)
+    " style="padding-top: 9px" />
+    <div class="columns is-multiline is-mobile even">
+      <picto :class="sidebar
+          ? 'column is-12-mobile is-6-tablet is-6-desktop is-4-widescreen is-3-fullhd'
+          : sidebarUsed
+            ? 'column is-6-mobile is-4-tablet is-3-desktop is-3-widescreen is-one-fifth-fullhd'
+            : customPictoSize
+        " v-for="(picto, index) in getFilteredPictoList" :key="index" :picto="picto" :publicMode="publicMode"
+        :sidebarMode="sidebar" :ref="picto.collection ? 'dragCollection' : 'dragPictogram'" />
+      <div data-cy="cypress-empty-column"
+        class="column is-one-third-mobile is-one-quarter-tablet is-one-quarter-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+      </div>
     </div>
 
-    <div
-      v-if="canReturn && dragndropId"
-      class="drag-return"
-      v-on="{ dragover: onDragOver, dragleave: onDragLeave, drop: onDrop }"
-    ></div>
+    <div v-if="canReturn && dragndropId" class="drag-return"
+      v-on="{ dragover: onDragOver, dragleave: onDragLeave, drop: onDrop }"></div>
     <div id="return" class="return">
       <b-icon icon="chevron-left" class="return-icon" />
     </div>
     <div class="filler"></div>
   </div>
 </template>
-<script >
+<script>
 import picto from "@/components/pictos/picto";
 import lang from "@/mixins/lang";
 import links from "@/mixins/links";
-import { RecycleScroller } from "vue-virtual-scroller";
 export default {
   name: "pictoList",
   mixins: [lang, links],
   components: {
-    picto,
-    RecycleScroller
+    picto
   },
   data() {
     return {
-      timer: 0    
+      timer: 0
     };
   },
   methods: {
@@ -61,13 +48,13 @@ export default {
       if (this.sidebar) {
         const sidebarSize = window.innerWidth - mainContainerWidth - 7;
 
-        console.log("Sidebar size: ",(sidebarSize)/this.getRowCount(this.getDeviceType))
-        return (sidebarSize)/this.getRowCount(this.getDeviceType);
+        console.log("Sidebar size: ", (sidebarSize) / this.getRowCount(this.getDeviceType))
+        return (sidebarSize) / this.getRowCount(this.getDeviceType);
       } else {
-        console.log("Main container width is: ",mainContainerWidth)
-        console.log("Item size is: ",((mainContainerWidth)/this.getRowCount(this.getDeviceType)))
-        console.log("Item count is: ",this.getRowCount(this.getDeviceType))
-        return ((mainContainerWidth)/this.getRowCount(this.getDeviceType)) - 7 - 10;
+        console.log("Main container width is: ", mainContainerWidth)
+        console.log("Item size is: ", ((mainContainerWidth) / this.getRowCount(this.getDeviceType)))
+        console.log("Item count is: ", this.getRowCount(this.getDeviceType))
+        return ((mainContainerWidth) / this.getRowCount(this.getDeviceType)) - 7 - 10;
       }
     },
     getItemSizeY() {
@@ -76,15 +63,15 @@ export default {
         return 50;
       }
       if (this.sidebar) {
-        const sidebarSize = window.innerWidth - mainContainerWidth - (0.7 * window.innerWidth/100) - 3;
+        const sidebarSize = window.innerWidth - mainContainerWidth - (0.7 * window.innerWidth / 100) - 3;
 
-        console.log("Sidebar size: ",(sidebarSize)/this.getRowCount(this.getDeviceType))
-        return (sidebarSize)/this.getRowCount(this.getDeviceType);
+        console.log("Sidebar size: ", (sidebarSize) / this.getRowCount(this.getDeviceType))
+        return (sidebarSize) / this.getRowCount(this.getDeviceType);
       } else {
-        console.log("Main container width is: ",mainContainerWidth)
-        console.log("Item size is: ",((mainContainerWidth)/this.getRowCount(this.getDeviceType)))
-        console.log("Item count is: ",this.getRowCount(this.getDeviceType))
-        return ((mainContainerWidth)/this.getRowCount(this.getDeviceType));
+        console.log("Main container width is: ", mainContainerWidth)
+        console.log("Item size is: ", ((mainContainerWidth) / this.getRowCount(this.getDeviceType)))
+        console.log("Item count is: ", this.getRowCount(this.getDeviceType))
+        return ((mainContainerWidth) / this.getRowCount(this.getDeviceType));
       }
     },
     getRowCount(deviceType) {
@@ -143,11 +130,11 @@ export default {
           rowNumber = 5;
         }
       }
-      console.log("Device type is: ",deviceType)
-      console.log("Row number is: ",rowNumber)
+      console.log("Device type is: ", deviceType)
+      console.log("Row number is: ", rowNumber)
       return rowNumber;
     },
-    
+
     onDragOver(ev) {
       ev.preventDefault();
       ev.dataTransfer.dropEffect = "move";
@@ -167,7 +154,7 @@ export default {
       goBack.style.transform = "scale(0)";
       goBack.style.left = "10px";
     },
-    onDrop(ev) {},
+    onDrop(ev) { },
   },
   props: {
     pictos: {
@@ -192,13 +179,13 @@ export default {
   },
   computed: {
     getDeviceType() {
-      if (window.innerWidth < 768){
+      if (window.innerWidth < 768) {
         return 'mobile';
-      } else if (window.innerWidth < 1024){
+      } else if (window.innerWidth < 1024) {
         return 'tablet';
-      } else if (window.innerWidth < 1216){
+      } else if (window.innerWidth < 1216) {
         return 'desktop';
-      } else if (window.innerWidth < 1408){
+      } else if (window.innerWidth < 1408) {
         return 'widescreen';
       } else {
         return 'fullhd';
@@ -241,13 +228,16 @@ export default {
 .even {
   justify-content: space-between;
 }
+
 .margins {
   margin-left: 7px;
   margin-right: 7px;
 }
+
 .filler {
   padding-bottom: 30vh;
 }
+
 .drag-return {
   position: fixed;
   width: 35px;
@@ -261,6 +251,7 @@ export default {
   border-color: #00000020;
   border-width: 2px;
 }
+
 .return {
   position: fixed;
   width: 5vmax;
@@ -276,6 +267,7 @@ export default {
   transform: scale(0);
   box-shadow: 2px 2px 7px #00000090;
 }
+
 .return-icon {
   color: white;
   font-size: xxx-large;
