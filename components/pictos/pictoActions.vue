@@ -44,17 +44,17 @@
       </div>
       <div v-if="picto.collection && this.$store.getters.getUser.admin" class="option">
         <b-button :disabled="!isOnline" :loading="publishLoad" :style="picto.public
-        ? 'background-color: hsl(120, 100%, 75%)'
-        : 'background-color: hsl(120, 0%, 96%)'
-        " icon-left="web" :label="picto.public ? $t('Unpublish') : $t('Publish')" @click="publishPicto()"
+          ? 'background-color: hsl(120, 100%, 75%)'
+          : 'background-color: hsl(120, 0%, 96%)'
+          " icon-left="web" :label="picto.public ? $t('Unpublish') : $t('Publish')" @click="publishPicto()"
           class="fullWidth modeButton" />
       </div>
       <div :class="{ option: true, 'priority-wrapper': true, offline: !isOnline }">
         <b-button :disabled="!isOnline" :style="colorPriority" @click="alternateStar(false)"
           class="priority-button priority-label" label="-" />
         <b class="priority-label" :style="colorPriority">{{
-        showPriorityOrStarred
-      }}</b>
+          showPriorityOrStarred
+        }}</b>
         <b-button :disabled="!isOnline" :style="colorPriority" @click="alternateStar()"
           class="priority-button priority-label" label="+" />
       </div>
@@ -83,9 +83,9 @@ export default {
     },
   },
   computed: {
-    isInSidebar() {
+    async isInSidebar() {
       let sidebar =
-        this.getCollectionFromId(
+        await this.getCollectionFromId(
           parseInt(this.$store.getters.getSidebarId, 10)
         )
       if (this.picto.collection) {

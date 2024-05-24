@@ -325,10 +325,10 @@ export default {
     sidebarLink() {
       return "/pictalk/" + this.$store.getters.getSidebarId + this.admin;
     },
-    isEditorFatherId() {
-      return this.getCollectionFromId(parseInt(this.$route.params.fatherCollectionId, 10))?.editors.find(
-        (editor) => editor == this.$store.getters.getUser.username
-      ) != undefined
+    async isEditorFatherId() {
+      const collection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10));
+      console.log(collection);
+      return collection?.editors.find((editor) => editor == this.$store.getters.getUser.username) != undefined;
     },
     async isToUserFatherId() {
       const collection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10))
@@ -511,7 +511,7 @@ export default {
         try {
           let collection = JSON.parse(
             JSON.stringify(
-              this.getCollectionFromId(
+              await this.getCollectionFromId(
                 parseInt(this.$route.query.fatherCollectionId, 10)
               )
             )

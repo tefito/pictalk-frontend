@@ -1,35 +1,21 @@
 <template>
   <div>
     <clientOnly>
-    <div
-      class="is-widescreen"
-      style="margin-right: 0.5rem; margin-left: 0.5rem"
-    >
-      <pictoList
-        :publicMode="true"
-        :pictos="pictos"
-        :sidebar="false"
-        :sidebarUsed="false"
-      />
-    </div>
-    <div class="contenant">
-      <pictoBar
-        :style="
-          loadSpeech.length != 0
-            ? 'bottom: 2px'
-            : 'transform: translateY(105%);'
-        "
-        class="pictobar sidebar slide-up"
-        :publicMode="true"
-        :pictos="loadSpeech"
-        :collectionColor="collectionColor"
-      />
-    </div>
-    <div class="filler"></div>
-  </clientOnly>
+      <div class="is-widescreen" style="margin-right: 0.5rem; margin-left: 0.5rem">
+        <pictoList :publicMode="true" :pictos="pictos" :sidebar="false" :sidebarUsed="false" />
+      </div>
+      <div class="contenant">
+        <pictoBar :style="loadSpeech.length != 0
+          ? 'bottom: 2px'
+          : 'transform: translateY(105%);'
+          " class="pictobar sidebar slide-up" :publicMode="true" :pictos="loadSpeech"
+          :collectionColor="collectionColor" />
+      </div>
+      <div class="filler"></div>
+    </clientOnly>
   </div>
 </template>
-<script >
+<script>
 import axios from "axios";
 import pictoList from "@/components/pictos/pictoList";
 import pictoBar from "@/components/pictos/pictoBar";
@@ -59,13 +45,13 @@ export default {
   },
   async fetch() {
     if (process.client) {
-    if (this.$route.query.fatherCollectionId) {
-      await this.fetchCollection(
-        parseInt(this.$route.query.fatherCollectionId, 10)
-      );
+      if (this.$route.query.fatherCollectionId) {
+        await this.fetchCollection(
+          parseInt(this.$route.query.fatherCollectionId, 10)
+        );
+      }
+      this.pictos = await this.loadedPictos();
     }
-    this.pictos = await this.loadedPictos();
-  }
   },
   data() {
     return {
@@ -81,7 +67,7 @@ export default {
       return sortedItems;
     },
     async fetchCollection(collectionId) {
-      const collection = this.getCollectionFromId(collectionId);
+      const collection = await this.getCollectionFromId(collectionId);
       // TODO Traiter differement !collection et !collection.pictos || !collection.collections
       if (
         (!collection ||
@@ -99,18 +85,18 @@ export default {
             res.data.image =
               this.$config.apiURL + "/image/pictalk/" + res.data.image;
           }
-          
+
           res.data.collection = true;
 
           res.data.partial = false;
 
           if (res.data.collections && !res.data.collections.length == 0) {
-            res.data.collections.map((collection) => {
+            res.data.collections.map(async (collection) => {
               if (collection.image) {
                 collection.image =
                   this.$config.apiURL + "/image/pictalk/" + collection.image;
               }
-              
+
               collection.collection = true;
               collection.fatherCollectionId = res.data.id;
               if (!collection.pictos) {
@@ -121,7 +107,7 @@ export default {
               }
               collection.partial = true;
               // collectionIndex
-              if (!this.getCollectionFromId(collection.id)) {
+              if (!await this.getCollectionFromId(collection.id)) {
                 collectionsToCreate.push(collection);
               } else {
                 collectionsToEdit.push(collection);
@@ -134,7 +120,7 @@ export default {
                 picto.image =
                   this.$config.apiURL + "/image/pictalk/" + picto.image;
               }
-              
+
               picto.fatherCollectionId = res.data.id;
               if (!this.getPictoFromId(picto.id)) {
                 pictosTocreate.push(picto);
@@ -144,7 +130,7 @@ export default {
             });
           }
 
-          if (!this.getCollectionFromId(res.data.id)) {
+          if (!await this.getCollectionFromId(res.data.id)) {
             collectionsToCreate.push(JSON.parse(JSON.stringify(res.data)));
           } else {
             collectionsToEdit.push(JSON.parse(JSON.stringify(res.data)));
@@ -214,9 +200,11 @@ export default {
   max-width: 767px;
   z-index: 4;
 }
+
 .filler {
   padding-bottom: 20%;
 }
+
 .contenant {
   display: flex;
   justify-content: center;

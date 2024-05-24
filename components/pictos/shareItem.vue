@@ -1,12 +1,7 @@
 <template>
   <div class="modal-card">
     <header class="modal-card-head">
-      <b-button
-        class="button"
-        type="is-danger"
-        icon-left="close"
-        @click="$parent.close()"
-      />
+      <b-button class="button" type="is-danger" icon-left="close" @click="$parent.close()" />
       <p align="center" class="modal-card-title">
         {{ $t("ShareCollection") }}
       </p>
@@ -16,80 +11,44 @@
         <div class="lightbackground">
           <p class="subtitle centeredText">{{ $t("ShareAddSomeone") }}:</p>
           <b-field>
-            <b-input
-              v-model="addSharer"
-              expanded
-              :placeholder="$t('PlaceHolderEmail')"
-              type="email"
-              maxlength="64"
-            ></b-input>
+            <b-input v-model="addSharer" expanded :placeholder="$t('PlaceHolderEmail')" type="email"
+              maxlength="64"></b-input>
             <b-select v-model="mode" required>
               <option v-if="canShareWithEditorPermissions" value="editor">
                 ✏️
               </option>
               <option value="viewer">👁️</option>
             </b-select>
-            <b-button
-              id="sharemodal-add"
-              type="is-success"
-              icon-right="plus"
-              @click="pushToCollaborators()"
-            />
+            <b-button id="sharemodal-add" type="is-success" icon-right="plus" @click="pushToCollaborators()" />
           </b-field>
         </div>
         <div class="lightbackground">
           <p class="subtitle centeredText">{{ $t("ShareWhoHasAccess") }}?</p>
-          <b-table
-            :striped="true"
-            :narrowed="true"
-            :hoverable="true"
-            v-if="sharersDictToObj.length > 0"
-            :data="sharersDictToObj"
-            :columns="columns"
-            :mobile-cards="false"
-            :checked-rows.sync="selected"
-            checkable
-            :custom-is-checked="(a, b) => a.username == b.username"
-            checkbox-position="left"
-            checkbox-type="is-danger"
-          >
+          <b-table :striped="true" :narrowed="true" :hoverable="true" v-if="sharersDictToObj.length > 0"
+            :data="sharersDictToObj" :columns="columns" :mobile-cards="false" :checked-rows.sync="selected" checkable
+            :custom-is-checked="(a, b) => a.username == b.username" checkbox-position="left" checkbox-type="is-danger">
           </b-table>
           <div class="selectedOptions" v-if="selected.length > 0">
-            <b-button
-              id="sharemodal-remove"
-              class="roundedbtn"
-              type="is-danger"
-              icon-left="delete"
-              @click="removeFromCollaborators()"
-            />
-            <b-select
-              style="margin-left: auto"
-              class="roundedbtn"
-              v-model="modeSelect"
-              required
-              @input="changeSelectedMode"
-            >
+            <b-button id="sharemodal-remove" class="roundedbtn" type="is-danger" icon-left="delete"
+              @click="removeFromCollaborators()" />
+            <b-select style="margin-left: auto" class="roundedbtn" v-model="modeSelect" required
+              @input="changeSelectedMode">
               <option value="viewer">👁️</option>
               <option v-if="canShareWithEditorPermissions" value="editor">
                 ✏️
               </option>
               <option v-if="modeSelect == 'mixed'" value="mixed">
                 👁️/✏️
-              </option></b-select
-            >
+              </option>
+            </b-select>
           </div>
         </div>
 
         <div class="lightbackground">
           <p class="subtitle centeredText">{{ $t("ShareAddGroup") }}:</p>
           <b-field :label="$t('Groups')">
-            <div
-              v-if="groups.length != 0"
-              class="columns is-multiline is-mobile"
-            >
-              <div
-                v-for="(group, index) in groups"
-                class="
+            <div v-if="groups.length != 0" class="columns is-multiline is-mobile">
+              <div v-for="(group, index) in groups" class="
                   column
                   lessPadding
                   is-6-mobile
@@ -97,19 +56,12 @@
                   is-6-desktop
                   is-6-widescreen
                   is-6-fullhd
-                "
-              >
-                <div
-                  :class="
-                    selectedGroups.indexOf(index) >= 0
-                      ? 'card has-background rounder'
-                      : 'card rounder'
-                  "
-                >
-                  <div
-                    class="card-content smallerbottompadding"
-                    @click="GroupToSelected(index)"
-                  >
+                ">
+                <div :class="selectedGroups.indexOf(index) >= 0
+                    ? 'card has-background rounder'
+                    : 'card rounder'
+                  ">
+                  <div class="card-content smallerbottompadding" @click="GroupToSelected(index)">
                     <div class="media shrinked">
                       <div v-if="group.icon" class="media-left">
                         <b-icon :icon="group.icon" />
@@ -119,30 +71,18 @@
                       </p>
                     </div>
                     <div class="limitheight">
-                      <p
-                        v-for="(user, index) in group.users"
-                        class="is-size-6 limitwidth"
-                      >
+                      <p v-for="(user, index) in group.users" class="is-size-6 limitwidth">
                         {{ user in sharersDict ? "✅" : "❌" }}
                         {{ user }}
                       </p>
                     </div>
                   </div>
                   <div v-if="!groupStatus(group).full" class="addmissing">
-                    <b-button
-                      id="sharemodal-add-group"
-                      type="is-success"
-                      :loading="loading === index"
-                      class="roundedbtn"
-                      @click="addMissing(index)"
-                      >{{ $t("AddMissing") }}</b-button
-                    >
+                    <b-button id="sharemodal-add-group" type="is-success" :loading="loading === index"
+                      class="roundedbtn" @click="addMissing(index)">{{ $t("AddMissing") }}</b-button>
                     <b-select class="roundedbtn" v-model="group.mode" required>
                       <option value="viewer">👁️</option>
-                      <option
-                        v-if="canShareWithEditorPermissions"
-                        value="editor"
-                      >
+                      <option v-if="canShareWithEditorPermissions" value="editor">
                         ✏️
                       </option>
                     </b-select>
@@ -152,28 +92,21 @@
             </div>
           </b-field>
 
-          <b-button
-            id="sharemodal-add-group"
-            type="is-success"
-            class="actionButtons roundedbtn"
-            icon-left="plus"
-            @click="openAddGroupModal()"
-            >{{ $t("CreateNewGroup") }}</b-button
-          >
+          <b-button id="sharemodal-add-group" type="is-success" class="actionButtons roundedbtn" icon-left="plus"
+            @click="openAddGroupModal()">{{ $t("CreateNewGroup") }}</b-button>
         </div>
       </div>
     </section>
     <footer class="modal-card-foot">
       <b-button class="button" type="button" @click="$parent.close()">{{
         $t("Close")
-      }}</b-button>
+        }}</b-button>
     </footer>
   </div>
 </template>
-<script >
+<script>
 import sharers from "@/mixins/sharers";
 import addGroupModal from "@/components/auth/addGroupModal";
-import { SoundHelper } from "@/utils/sounds";
 export default {
   mixins: [sharers],
   props: {
@@ -358,7 +291,6 @@ export default {
             }
           }
         } else {
-          SoundHelper.playError();
           this.$buefy.toast.open({
             message: this.$t("NotShareYourself"),
             position: "is-top",
@@ -366,7 +298,6 @@ export default {
           });
         }
       } else {
-        SoundHelper.playError();
         this.$buefy.toast.open({
           message: this.$t("EmailPlease"),
           position: "is-top",
@@ -619,24 +550,30 @@ export default {
   border-color: #ff5757;
   border-radius: 3px;
 }
+
 .lessPadding {
   padding: 0.3rem;
 }
+
 .fourWidth {
   width: 39%;
 }
+
 .centeredText {
   text-align: center;
 }
+
 .subtitle {
   margin-bottom: 0.75em;
 }
+
 .actionButtons {
   display: flex;
   margin: 2em auto 0.5em auto;
   width: 50%;
   min-width: 230px;
 }
+
 .lightbackground {
   background-color: #fcfcfc;
   padding: 1em;
@@ -646,36 +583,45 @@ export default {
   border-color: #00000020;
   border-width: 1px;
 }
+
 .noScrolling {
   overflow-y: hidden;
 }
+
 .limitheight {
   height: 85px;
   overflow-y: auto;
 }
+
 .limitwidth {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: clip;
 }
+
 .shrinked {
   margin-bottom: 0.5em !important;
 }
+
 .rounder {
   border-radius: 12px;
 }
+
 .roundedbtn {
   border-radius: 24px;
 }
+
 .addmissing {
   display: flex;
   justify-content: center;
   padding-bottom: 1em;
   gap: 0.5em;
 }
+
 .smallerbottompadding {
   padding-bottom: 0.5em;
 }
+
 .selectedOptions {
   display: flex;
   justify-content: right;

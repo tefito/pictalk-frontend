@@ -48,7 +48,6 @@ import deviceInfos from "@/mixins/deviceInfos";
 import emoji from "@/mixins/emoji";
 import tts from "@/mixins/tts";
 import lang from "@/mixins/lang";
-import { SoundHelper } from "@/utils/sounds";
 export default {
   mixins: [emoji, tts, deviceInfos, lang],
   methods: {
@@ -144,7 +143,6 @@ export default {
       try {
         const data = [new ClipboardItem({ [this.preGeneratedBlob.type]: this.preGeneratedBlob })];
         navigator.clipboard.write(data);
-        SoundHelper.playSentenceCopy();
         const notif = this.$buefy.toast.open({
           message: this.$t("CopySucces"),
           type: "is-success",
@@ -153,13 +151,11 @@ export default {
         console.log(e);
         try {
           this.copyPictosToClipboardLegacy(pictos);
-          SoundHelper.playSentenceCopy();
           const notif = this.$buefy.toast.open({
             message: this.$t("CopySucces"),
             type: "is-success",
           });
         } catch (e) {
-          SoundHelper.playError()
           const notif = this.$buefy.toast.open({
             message: this.$t("CopyError"),
             type: "is-danger",
@@ -254,16 +250,9 @@ export default {
           return;
         }
       }
-      try {
-        SoundHelper.playSentenceReturn();
-      } catch (e) {
-        console.log(e)
-      }
-
       this.$store.commit("removeSpeech");
     },
     eraseSpeech() {
-      SoundHelper.playSentenceErase();
       if (this.publicMode) {
         this.$router.push("/public/pictalk?fatherCollectionId=346");
         this.$store.commit("eraseSpeech");

@@ -2,12 +2,7 @@
   <form action>
     <div class="modal-card">
       <header class="modal-card-head">
-        <b-button
-          class="button"
-          type="is-danger"
-          icon-left="close"
-          @click="$parent.close()"
-        />
+        <b-button class="button" type="is-danger" icon-left="close" @click="$parent.close()" />
         <p v-if="create && isPicto" align="center" class="modal-card-title">
           {{ $t("CreatePictogram") }}
         </p>
@@ -22,90 +17,38 @@
         </p>
       </header>
       <section id="search" class="modal-card-body scrolling">
-        <b-steps
-          v-model="activeStep"
-          rounded
-          animated
-          :has-navigation="false"
-          mobile-mode="compact"
-          label-position="bottom"
-        >
+        <b-steps v-model="activeStep" rounded animated :has-navigation="false" mobile-mode="compact"
+          label-position="bottom">
           <b-step-item clickable step="1" :label="$t('Image')">
             <div v-if="picto.path">
-              <img
-                class="mini-image"
-                style
-                :src="picto.path"
-                :alt="picto.meaning"
-                crossorigin="anonymous"
-              />
+              <img class="mini-image" style :src="picto.path" :alt="picto.meaning" crossorigin="anonymous" />
             </div>
 
             <b-field :label="$t('Search')">
-              <b-input
-                data-cy="picto-steps-search-input"
-                type="text"
-                v-model="pictoSearch"
-                :placeholder="$t('SearchNotice')"
-                expanded
-                :autofocus="true"
-                @keyup.native.enter="pictoExtractImg(pictoSearch)"
-              ></b-input>
-              <b-button
-                data-cy="picto-steps-search-button"
-                focused
-                type="is-info"
-                icon-right="magnify"
-                :loading="loading"
-                @click="pictoExtractImg(pictoSearch)"
-              />
+              <b-input data-cy="picto-steps-search-input" type="text" v-model="pictoSearch"
+                :placeholder="$t('SearchNotice')" expanded :autofocus="true"
+                @keyup.native.enter="pictoExtractImg(pictoSearch)"></b-input>
+              <b-button data-cy="picto-steps-search-button" focused type="is-info" icon-right="magnify"
+                :loading="loading" @click="pictoExtractImg(pictoSearch)" />
             </b-field>
             <br id="searchText" />
             <div class="columns is-multiline is-mobile">
               <Webpicto
                 class="column is-one-third-mobile is-one-quarter-tablet is-2-desktop is-2-widescreen is-2-fullhd containing has-background"
-                style="aspect-ratio: 1/1"
-                v-for="picto in paginate"
-                :key="picto.src"
-                :webpicto="picto"
-                @uploadfile="uploadfile($event, picto.pictohubId)"
-              />
+                style="aspect-ratio: 1/1" v-for="picto in paginate" :key="picto.src" :webpicto="picto"
+                @uploadfile="uploadfile($event, picto.pictohubId)" />
             </div>
 
-            <b-pagination
-              v-if="images.length > imgLimit"
-              :total="images.length"
-              v-model="page"
-              :range-before="0"
-              :range-after="0"
-              :order="'is-centered'"
-              :rounded="true"
-              :per-page="imgLimit"
-              :icon-prev="'chevron-left'"
-              :icon-next="'chevron-right'"
-            >
+            <b-pagination v-if="images.length > imgLimit" :total="images.length" v-model="page" :range-before="0"
+              :range-after="0" :order="'is-centered'" :rounded="true" :per-page="imgLimit" :icon-prev="'chevron-left'"
+              :icon-next="'chevron-right'">
             </b-pagination>
-            <b-notification
-              v-if="this.noResults"
-              auto-close
-              :duration="5000"
-              type="is-warning is-light"
-              has-icon
-              aria-close-label="Close notification"
-              role="alert"
-            >
+            <b-notification v-if="this.noResults" auto-close :duration="5000" type="is-warning is-light" has-icon
+              aria-close-label="Close notification" role="alert">
               {{ $t("NoResults") }}{{ this.pictoSearch }}
             </b-notification>
-            <b-button
-              rounded
-              expanded
-              v-if="!moreImages"
-              type="is-info is-light is-text"
-              icon-right="magnify"
-              :focused="loading"
-              :loading="loading"
-              @click="webImages(pictoSearch)"
-            >
+            <b-button rounded expanded v-if="!moreImages" type="is-info is-light is-text" icon-right="magnify"
+              :focused="loading" :loading="loading" @click="webImages(pictoSearch)">
               {{ $t("MoreImages") }}
             </b-button>
             <div>
@@ -113,13 +56,8 @@
               <b-field :label="$t('OrUploadYourOwn')">
                 <section>
                   <b-field class="file">
-                    <b-upload
-                      v-model="file"
-                      accept="image/png, image/jpeg, image/gif, image/jpg"
-                      native
-                      expanded
-                      required
-                    >
+                    <b-upload v-model="file" accept="image/png, image/jpeg, image/gif, image/jpg" native expanded
+                      required>
                       <a class="button is-primary is-fullwidth">
                         <b-icon icon="upload"></b-icon>
                         <span>{{ file.name || $t("ClickToUpload") }}</span>
@@ -127,14 +65,8 @@
                     </b-upload>
                   </b-field>
                   <b-field>
-                    <b-upload
-                      v-model="file"
-                      accept="image/png, image/jpeg, image/gif, image/jpg"
-                      native
-                      drag-drop
-                      expanded
-                      @input="uploadfile(file)"
-                    >
+                    <b-upload v-model="file" accept="image/png, image/jpeg, image/gif, image/jpg" native drag-drop
+                      expanded @input="uploadfile(file)">
                       <section class="section">
                         <div class="content has-text-centered">
                           <p>
@@ -150,11 +82,7 @@
                   <div v-if="file.name" class="tags">
                     <span class="tag is-primary is-medium">
                       {{ file.name }}
-                      <button
-                        class="delete is-medium"
-                        type="button"
-                        @click="discardfile()"
-                      ></button>
+                      <button class="delete is-medium" type="button" @click="discardfile()"></button>
                     </span>
                   </div>
                 </section>
@@ -165,166 +93,81 @@
           <b-step-item step="2" :label="$t('Speech')" clickable>
             <h1 class="title has-text-centered">
               {{ $t("Speech") }}
-              <b-dropdown
-                aria-role="list"
-                v-if="getAllUserLanguages.length > 1"
-              >
+              <b-dropdown aria-role="list" v-if="getAllUserLanguages.length > 1">
                 <template #trigger="{ active }">
                   <b-button>{{ getEmoji(languageSelectorSpeech) }}</b-button>
                 </template>
 
-                <b-dropdown-item
-                  v-for="language in getAllUserLanguages"
-                  :key="language + Math.random()"
-                  aria-role="listitem"
-                  @click="switchSpeechLanguage(language)"
-                  >{{ getEmoji(language) }}</b-dropdown-item
-                >
+                <b-dropdown-item v-for="language in getAllUserLanguages" :key="language + Math.random()"
+                  aria-role="listitem" @click="switchSpeechLanguage(language)">{{ getEmoji(language)
+                  }}</b-dropdown-item>
               </b-dropdown>
             </h1>
             <b-field :label="$t('Speech')">
-              <b-input
-                data-cy="picto-steps-speech-input"
-                type="text"
-                v-model="picto.speech[languageSelectorSpeech]"
-                :placeholder="$t('SpeechNotice')"
-                expanded
-                :disabled="silent"
-              ></b-input>
-              <b-button
-                v-if="!isPicto"
-                :type="silent ? 'is-primary' : 'is-primary is-light'"
-                icon-right="volume-mute"
-                @click="silent = !silent"
-              ></b-button>
-              <b-button
-                :disabled="silent"
-                type="is-success"
-                icon-right="volume-high"
-                @click="
-                  pronounce(
-                    picto.speech[languageSelectorSpeech],
-                    languageSelectorSpeech,
-                    getVoiceURIFromLanguage(languageSelectorSpeech),
-                    pitch,
-                    rate
-                  )
-                "
-              ></b-button>
+              <b-input data-cy="picto-steps-speech-input" type="text" v-model="picto.speech[languageSelectorSpeech]"
+                :placeholder="$t('SpeechNotice')" expanded :disabled="silent"></b-input>
+              <b-button v-if="!isPicto" :type="silent ? 'is-primary' : 'is-primary is-light'" icon-right="volume-mute"
+                @click="silent = !silent"></b-button>
+              <b-button :disabled="silent" type="is-success" icon-right="volume-high" @click="
+                pronounce(
+                  picto.speech[languageSelectorSpeech],
+                  languageSelectorSpeech,
+                  getVoiceURIFromLanguage(languageSelectorSpeech),
+                  pitch,
+                  rate
+                )
+                "></b-button>
             </b-field>
             <b-field :label="$t('Meaning')">
-              <b-input
-                data-cy="picto-steps-meaning-input"
-                type="text"
-                v-model="picto.meaning[languageSelectorSpeech]"
-                :placeholder="$t('MeaningNotice')"
-                expanded
-              ></b-input>
+              <b-input data-cy="picto-steps-meaning-input" type="text" v-model="picto.meaning[languageSelectorSpeech]"
+                :placeholder="$t('MeaningNotice')" expanded></b-input>
             </b-field>
             <b-field :label="$t('Color')">
-              <b-input
-                type="color"
-                v-model="picto.color"
-                :placeholder="$t('ColorNotice')"
-                required
-              ></b-input>
+              <b-input type="color" v-model="picto.color" :placeholder="$t('ColorNotice')" required></b-input>
             </b-field>
           </b-step-item>
           <b-step-item step="3" :label="$t('Options')" clickable>
             <h1 class="title has-text-centered">
               {{ $t("Options") }}
             </h1>
-            <canvas
-              id="canvas"
-              class="optionImage"
-              :style="rendered ? '' : 'display:none'"
-            ></canvas>
+            <canvas id="canvas" class="optionImage" :style="rendered ? '' : 'display:none'"></canvas>
             <img :src="dynamicSrc" style="display: none" id="image" />
             <img v-if="!rendered" :src="dynamicSrc" class="optionImage" />
             <b-field style="padding-top: 0.8rem">
-              <b-switch
-                v-model="options.cross.enabled"
-                type="is-success"
-                class="optionSwitch"
-                >{{ $t("Negation") }}</b-switch
-              >
-              <b-switch
-                v-model="options.arrow.enabled"
-                type="is-success"
-                class="optionSwitch"
-                >{{ $t("Time") }}</b-switch
-              >
-              <b-switch
-                v-model="options.plus.enabled"
-                type="is-success"
-                class="optionSwitch"
-                >{{ $t("Plural") }}</b-switch
-              >
-              <b-switch
-                v-model="options.question.enabled"
-                type="is-success"
-                class="optionSwitch"
-                >{{ $t("Question") }}</b-switch
-              >
+              <b-switch v-model="options.cross.enabled" type="is-success" class="optionSwitch">{{ $t("Negation")
+                }}</b-switch>
+              <b-switch v-model="options.arrow.enabled" type="is-success" class="optionSwitch">{{ $t("Time")
+                }}</b-switch>
+              <b-switch v-model="options.plus.enabled" type="is-success" class="optionSwitch">{{ $t("Plural")
+                }}</b-switch>
+              <b-switch v-model="options.question.enabled" type="is-success" class="optionSwitch">{{ $t("Question")
+                }}</b-switch>
             </b-field>
             <b-field>
-              <b-button
-                icon-left="refresh"
-                :label="$t('Rotation')"
-                @click="rotateImg()"
-              ></b-button>
+              <b-button icon-left="refresh" :label="$t('Rotation')" @click="rotateImg()"></b-button>
             </b-field>
 
             <div class="columns is-multiline is-mobile">
-              <div
-                v-if="options.cross.enabled"
-                class="column is-full-mobile optionSection"
-              >
+              <div v-if="options.cross.enabled" class="column is-full-mobile optionSection">
                 <p align="center" class="modal-card-title">
                   {{ $t("Negation") }}
                 </p>
                 <b-field :label="$t('Size')">
-                  <b-slider
-                    v-model="options.cross.scale"
-                    :min="20"
-                    :max="300"
-                    :step="10"
-                    ticks
-                    :custom-formatter="(val) => val + '%'"
-                  ></b-slider>
+                  <b-slider v-model="options.cross.scale" :min="20" :max="300" :step="10" ticks
+                    :custom-formatter="(val) => val + '%'"></b-slider>
                 </b-field>
                 <b-field :label="$t('Color')">
-                  <b-input
-                    lazy
-                    type="color"
-                    v-model="options.cross.color"
-                    :placeholder="$t('ColorNotice')"
-                    required
-                  ></b-input>
+                  <b-input lazy type="color" v-model="options.cross.color" :placeholder="$t('ColorNotice')"
+                    required></b-input>
                 </b-field>
                 <b-field :label="$t('Offsets')">
-                  <b-slider
-                    v-model="options.cross.Xoffset"
-                    :custom-formatter="(val) => val + '%'"
-                    rounded
-                    :step="5"
-                    ticks
-                    style="width: 45%; margin-right: 5%"
-                  ></b-slider>
-                  <b-slider
-                    v-model="options.cross.Yoffset"
-                    :custom-formatter="(val) => val + '%'"
-                    rounded
-                    :step="5"
-                    ticks
-                    style="width: 45%"
-                  ></b-slider>
+                  <b-slider v-model="options.cross.Xoffset" :custom-formatter="(val) => val + '%'" rounded :step="5"
+                    ticks style="width: 45%; margin-right: 5%"></b-slider>
+                  <b-slider v-model="options.cross.Yoffset" :custom-formatter="(val) => val + '%'" rounded :step="5"
+                    ticks style="width: 45%"></b-slider>
                 </b-field>
               </div>
-              <div
-                v-if="options.arrow.enabled"
-                class="column is-full-mobile optionSection"
-              >
+              <div v-if="options.arrow.enabled" class="column is-full-mobile optionSection">
                 <p align="center" class="modal-card-title">
                   {{ $t("Time") }}
                 </p>
@@ -337,56 +180,23 @@
                   </b-radio>
                 </div>
                 <b-field :label="$t('Size')">
-                  <b-slider
-                    v-model="options.arrow.scale"
-                    :min="20"
-                    :max="200"
-                    :step="10"
-                    ticks
-                    :custom-formatter="(val) => val + '%'"
-                  ></b-slider>
+                  <b-slider v-model="options.arrow.scale" :min="20" :max="200" :step="10" ticks
+                    :custom-formatter="(val) => val + '%'"></b-slider>
                 </b-field>
                 <b-field :label="$t('BorderColor')">
-                  <b-input
-                    lazy
-                    type="color"
-                    v-model="options.arrow.color"
-                    :placeholder="$t('ColorNotice')"
-                    required
-                    style="width: 45%; margin-right: 5%"
-                  ></b-input>
-                  <b-input
-                    lazy
-                    type="color"
-                    v-model="options.arrow.border"
-                    :placeholder="$t('ColorNotice')"
-                    required
-                    style="width: 45%"
-                  ></b-input>
+                  <b-input lazy type="color" v-model="options.arrow.color" :placeholder="$t('ColorNotice')" required
+                    style="width: 45%; margin-right: 5%"></b-input>
+                  <b-input lazy type="color" v-model="options.arrow.border" :placeholder="$t('ColorNotice')" required
+                    style="width: 45%"></b-input>
                 </b-field>
                 <b-field :label="$t('Offsets')">
-                  <b-slider
-                    v-model="options.arrow.Xoffset"
-                    :custom-formatter="(val) => val + '%'"
-                    rounded
-                    :step="5"
-                    ticks
-                    style="width: 45%; margin-right: 5%"
-                  ></b-slider>
-                  <b-slider
-                    v-model="options.arrow.Yoffset"
-                    :custom-formatter="(val) => val + '%'"
-                    rounded
-                    :step="5"
-                    ticks
-                    style="width: 45%"
-                  ></b-slider>
+                  <b-slider v-model="options.arrow.Xoffset" :custom-formatter="(val) => val + '%'" rounded :step="5"
+                    ticks style="width: 45%; margin-right: 5%"></b-slider>
+                  <b-slider v-model="options.arrow.Yoffset" :custom-formatter="(val) => val + '%'" rounded :step="5"
+                    ticks style="width: 45%"></b-slider>
                 </b-field>
               </div>
-              <div
-                v-if="options.plus.enabled"
-                class="column is-full-mobile optionSection"
-              >
+              <div v-if="options.plus.enabled" class="column is-full-mobile optionSection">
                 <p align="center" class="modal-card-title">
                   {{ $t("Plural") }}
                 </p>
@@ -399,96 +209,39 @@
                   </b-radio>
                 </div>
                 <b-field :label="$t('Size')">
-                  <b-slider
-                    v-model="options.plus.scale"
-                    :min="20"
-                    :max="200"
-                    :step="10"
-                    ticks
-                    :custom-formatter="(val) => val + '%'"
-                  ></b-slider>
+                  <b-slider v-model="options.plus.scale" :min="20" :max="200" :step="10" ticks
+                    :custom-formatter="(val) => val + '%'"></b-slider>
                 </b-field>
                 <b-field :label="$t('BorderColor')">
-                  <b-input
-                    lazy
-                    type="color"
-                    v-model="options.plus.color"
-                    :placeholder="$t('ColorNotice')"
-                    required
-                    style="width: 45%; margin-right: 5%"
-                  ></b-input>
-                  <b-input
-                    lazy
-                    type="color"
-                    v-model="options.plus.border"
-                    :placeholder="$t('ColorNotice')"
-                    required
-                    style="width: 45%"
-                  ></b-input>
+                  <b-input lazy type="color" v-model="options.plus.color" :placeholder="$t('ColorNotice')" required
+                    style="width: 45%; margin-right: 5%"></b-input>
+                  <b-input lazy type="color" v-model="options.plus.border" :placeholder="$t('ColorNotice')" required
+                    style="width: 45%"></b-input>
                 </b-field>
                 <b-field :label="$t('Offsets')">
-                  <b-slider
-                    v-model="options.plus.Xoffset"
-                    :custom-formatter="(val) => val + '%'"
-                    rounded
-                    :step="5"
-                    ticks
-                    style="width: 45%; margin-right: 5%"
-                  ></b-slider>
-                  <b-slider
-                    v-model="options.plus.Yoffset"
-                    :custom-formatter="(val) => val + '%'"
-                    rounded
-                    :step="5"
-                    ticks
-                    style="width: 45%"
-                  ></b-slider>
+                  <b-slider v-model="options.plus.Xoffset" :custom-formatter="(val) => val + '%'" rounded :step="5"
+                    ticks style="width: 45%; margin-right: 5%"></b-slider>
+                  <b-slider v-model="options.plus.Yoffset" :custom-formatter="(val) => val + '%'" rounded :step="5"
+                    ticks style="width: 45%"></b-slider>
                 </b-field>
               </div>
-              <div
-                v-if="options.question.enabled"
-                class="column is-full-mobile optionSection"
-              >
+              <div v-if="options.question.enabled" class="column is-full-mobile optionSection">
                 <p align="center" class="modal-card-title">
                   {{ $t("Question") }}
                 </p>
                 <b-field :label="$t('Size')">
-                  <b-slider
-                    v-model="options.question.scale"
-                    :min="20"
-                    :max="200"
-                    :step="10"
-                    ticks
-                    :custom-formatter="(val) => val + '%'"
-                  ></b-slider>
+                  <b-slider v-model="options.question.scale" :min="20" :max="200" :step="10" ticks
+                    :custom-formatter="(val) => val + '%'"></b-slider>
                 </b-field>
                 <b-field :label="$t('BorderColor')">
-                  <b-input
-                    lazy
-                    type="color"
-                    v-model="options.question.color"
-                    :placeholder="$t('ColorNotice')"
-                    required
-                    style="width: 45%; margin-right: 5%"
-                  ></b-input>
+                  <b-input lazy type="color" v-model="options.question.color" :placeholder="$t('ColorNotice')" required
+                    style="width: 45%; margin-right: 5%"></b-input>
                 </b-field>
                 <b-field :label="$t('Offsets')">
-                  <b-slider
-                    v-model="options.question.Xoffset"
-                    :custom-formatter="(val) => val + '%'"
-                    rounded
-                    :step="5"
-                    ticks
-                    style="width: 45%; margin-right: 5%"
-                  ></b-slider>
-                  <b-slider
-                    v-model="options.question.Yoffset"
-                    :custom-formatter="(val) => val + '%'"
-                    rounded
-                    :step="5"
-                    ticks
-                    style="width: 45%"
-                  ></b-slider>
+                  <b-slider v-model="options.question.Xoffset" :custom-formatter="(val) => val + '%'" rounded :step="5"
+                    ticks style="width: 45%; margin-right: 5%"></b-slider>
+                  <b-slider v-model="options.question.Yoffset" :custom-formatter="(val) => val + '%'" rounded :step="5"
+                    ticks style="width: 45%"></b-slider>
                 </b-field>
               </div>
             </div>
@@ -499,57 +252,29 @@
         <div class="container">
           <div class="columns is-mobile is-full">
             <div class="column is-one-quarter">
-              <b-button
-                @click="previousStep()"
-                :disabled="activeStep == 0"
-                class="button center"
-                type="button"
-                icon-right="chevron-left"
-              />
+              <b-button @click="previousStep()" :disabled="activeStep == 0" class="button center" type="button"
+                icon-right="chevron-left" />
             </div>
             <div class="column is-half">
-              <b-button
-              :id="this.create ? 'pictosteps-create-pictogram' : 'pictosteps-edit-pictogram'"
-                data-cy="picto-steps-create-edit-pictogram-button"
-                expanded
-                v-if="isPicto"
-                :disabled="
-                  !(
-                    Object.values(picto.meaning).length &&
-                    Object.values(picto.speech).length
-                  ) ||
+              <b-button :id="this.create ? 'pictosteps-create-pictogram' : 'pictosteps-edit-pictogram'"
+                data-cy="picto-steps-create-edit-pictogram-button" expanded v-if="isPicto" :disabled="!(
+                  Object.values(picto.meaning).length &&
+                  Object.values(picto.speech).length
+                ) ||
                   (!this.file.name && create)
-                "
-                :class="classCreateOrEdit"
-                :icon-right="iconPictoOrEdit"
-                :loading="creationLoading"
-                @click="onSubmitted(false)"
-              >
+                  " :class="classCreateOrEdit" :icon-right="iconPictoOrEdit" :loading="creationLoading"
+                @click="onSubmitted(false)">
               </b-button>
-              <b-button
-                :id="this.create ? 'pictosteps-create-collection' : 'pictosteps-edit-collection'"
-                data-cy="picto-steps-create-edit-collection-button"
-                expanded
-                v-if="!isPicto"
-                :class="classCreateOrEdit"
-                :disabled="
-                  !Object.values(picto.meaning).length ||
+              <b-button :id="this.create ? 'pictosteps-create-collection' : 'pictosteps-edit-collection'"
+                data-cy="picto-steps-create-edit-collection-button" expanded v-if="!isPicto" :class="classCreateOrEdit"
+                :disabled="!Object.values(picto.meaning).length ||
                   (!this.file.name && create)
-                "
-                :icon-right="iconCollectionOrEdit"
-                :loading="creationLoading"
-                @click="onSubmitted(true)"
-              >
+                  " :icon-right="iconCollectionOrEdit" :loading="creationLoading" @click="onSubmitted(true)">
               </b-button>
             </div>
             <div class="column is-one-quarter">
-              <b-button
-                class="button center"
-                type="button"
-                :disabled="activeStep == 2"
-                @click="nextStep()"
-                icon-right="chevron-right"
-              />
+              <b-button class="button center" type="button" :disabled="activeStep == 2" @click="nextStep()"
+                icon-right="chevron-right" />
             </div>
           </div>
         </div>
@@ -557,7 +282,7 @@
     </div>
   </form>
 </template>
-<script >
+<script>
 const jpegasus = require("jpegasus");
 import axios from "axios";
 import Webpicto from "@/components/pictos/webpicto";
@@ -565,7 +290,6 @@ import lang from "@/mixins/lang";
 import emoji from "@/mixins/emoji";
 import tts from "@/mixins/tts";
 import deviceInfos from "@/mixins/deviceInfos";
-import { SoundHelper } from "@/utils/sounds";
 export default {
   mixins: [emoji, lang, tts, deviceInfos],
   name: "PictoSteps",
@@ -766,7 +490,7 @@ export default {
             const myNewFile = new File(
               [this.file],
               this.file.name.substr(0, this.file.name.lastIndexOf(".")) +
-                ".jpg",
+              ".jpg",
               { type: this.file.type }
             );
             cfile = await jpegasus.compress(myNewFile, {
@@ -884,7 +608,6 @@ export default {
               pictohubId: this.pictohubId,
             }
           );
-          SoundHelper.playPictogramCreate()
           this.$buefy.toast.open({
             message: isCollection
               ? this.$t("CreatedCollection")
@@ -912,7 +635,6 @@ export default {
               ...(this.pictohubId && { pictohubId: this.pictohubId }),
             }
           );
-          SoundHelper.playPictogramCreate()
           this.$buefy.toast.open({
             message: isCollection
               ? this.$t("EditedCollection")
@@ -924,7 +646,6 @@ export default {
         }
       } catch (err) {
         console.log(err);
-        SoundHelper.playError()
         this.$buefy.toast.open({
           message: this.$t("PictoStepsCreationError"),
           type: "is-danger",
@@ -934,16 +655,16 @@ export default {
       this.creationLoading = false;
       this.$emit("close");
     },
-    traductionNeeded() {
+    async traductionNeeded() {
       // Si meaning du language principal change
       // Si meaning vide
       const savedPicto = this.picto.collection
-        ? this.getCollectionFromId(this.picto.id)
-        : this.getPictoFromId(this.picto.id);
+        ? await this.getCollectionFromId(this.picto.id)
+        : await this.getPictoFromId(this.picto.id);
       if (
         !savedPicto.meaning[this.getUserLang] ||
         savedPicto.meaning[this.getUserLang] !=
-          this.picto.meaning[this.getUserLang]
+        this.picto.meaning[this.getUserLang]
       ) {
         return true;
       } else {
@@ -1251,14 +972,14 @@ export default {
         );
       }
     },
-    drawQuestionMark(ctx, size, scale, Xoffset, Yoffset, color="#000000", borderColor = "#ffffff") {
+    drawQuestionMark(ctx, size, scale, Xoffset, Yoffset, color = "#000000", borderColor = "#ffffff") {
       // Define the path for the question mark
       let path = new Path2D('M159.148,0c-52.696,0-95.544,39.326-95.544,87.662h47.736c0-22.007,21.438-39.927,47.808-39.927c26.367,0,47.804,17.92,47.804,39.927v6.929c0,23.39-10.292,34.31-25.915,50.813c-20.371,21.531-45.744,48.365-45.744,105.899h47.745c0-38.524,15.144-54.568,32.692-73.12c17.368-18.347,38.96-41.192,38.96-83.592v-6.929C254.689,39.326,211.845,0,159.148,0z');
-      
+
       // Apply scale and offsets
       ctx.save();
       ctx.translate(Xoffset, Yoffset);
-      ctx.scale(scale/100, scale/100);
+      ctx.scale(scale / 100, scale / 100);
 
       // Set color and draw the question mark
       ctx.strokeStyle = borderColor;
@@ -1387,42 +1108,53 @@ export default {
 <style scoped>
 .has-background {
   border-radius: 3px;
-  -webkit-box-shadow: 0px 0px 1px 1px #ccc; /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
-  -moz-box-shadow: 0px 0px 1px 1px #ccc; /* Firefox 3.5 - 3.6 */
-  box-shadow: 0px 0px 1px 1px #ccc; /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+  -webkit-box-shadow: 0px 0px 1px 1px #ccc;
+  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+  -moz-box-shadow: 0px 0px 1px 1px #ccc;
+  /* Firefox 3.5 - 3.6 */
+  box-shadow: 0px 0px 1px 1px #ccc;
+  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
 }
+
 .containing {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
+
 .image {
   margin: auto;
 }
+
 .mini-image {
   display: block;
   margin-left: auto;
   margin-right: auto;
   max-height: 15rem;
 }
+
 .adminMenu {
   align-self: flex-end;
   margin: 0 auto;
   margin-top: auto;
 }
+
 .center {
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
+
 .halfWidth {
   width: 40%;
 }
+
 .scrolling {
   scrollbar-width: thin;
   scroll-behavior: smooth;
 }
+
 .optionSection {
   background-color: #f4f4f4;
   padding: 1rem;
@@ -1430,6 +1162,7 @@ export default {
   margin-left: 0%;
   border-radius: 15px;
 }
+
 .optionImage {
   margin: 0%;
   max-width: 70%;
@@ -1437,9 +1170,11 @@ export default {
   margin-left: auto;
   margin-right: auto;
 }
+
 .optionSwitch {
   padding-right: 0.3rem;
 }
+
 .has-addons {
   display: flex;
   justify-content: center;

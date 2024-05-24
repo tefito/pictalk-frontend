@@ -10,7 +10,7 @@ export default {
   methods: {
     async setShortcutCollectionIdDirectlyToRoot(item, isPicto) {
       let collection = JSON.parse(
-        JSON.stringify(this.getCollectionFromId(this.$store.getters.getRootId))
+        JSON.stringify(await this.getCollectionFromId(this.$store.getters.getRootId))
       );
       if (isPicto) {
         collection.pictos.push(item);
@@ -117,15 +117,15 @@ export default {
 
         let sidebar = JSON.parse(
           JSON.stringify(
-            this.getCollectionFromId(
+            await this.getCollectionFromId(
               parseInt(sidebarId, 10)
             )
           )
         );
         let currentCollection = JSON.parse(
           JSON.stringify(
-            this.getCollectionFromId(
-              parseInt(this.$route.params.fatherCollectionId, 10)
+            await this.getCollectionFromId(
+              parseInt(this.$route.query.fatherCollectionId, 10)
             )
           )
         );
@@ -182,15 +182,15 @@ export default {
 
         let sidebar = JSON.parse(
           JSON.stringify(
-            this.getCollectionFromId(
+            await this.getCollectionFromId(
               parseInt(sidebarId, 10)
             )
           )
         );
         let currentCollection = JSON.parse(
           JSON.stringify(
-            this.getCollectionFromId(
-              parseInt(this.$route.params.fatherCollectionId, 10)
+            await this.getCollectionFromId(
+              parseInt(this.$route.query.fatherCollectionId, 10)
             )
           )
         );
@@ -308,8 +308,8 @@ export default {
     },
   },
   computed: {
-    canDelete() {
-      return this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10))?.userId == this.$store.getters.getUser.id;
+    async canDelete() {
+      return (await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10)))?.userId == this.$store.getters.getUser.id;
     },
     isToUser() {
       return this.$store.getters.getUser.id == this.picto.userId;

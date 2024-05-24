@@ -1,6 +1,5 @@
 <template>
   <div>
-    <button @click="dispatchDownloadCollections()">DOWNLOAD COLLECTIONS</button>
     <div class="columns is-mobile noscroll">
       <div :class="!($route.params.fatherCollectionId == $store.getters.getSidebarId) && isSidebarUsed
         ? 'is-8-mobile is-9-tablet is-10-desktop is-10-widescreen is-10-fullhd column noMargins scrolling lessPadding'
@@ -155,7 +154,7 @@ export default {
   async mounted() {
     let query = { ...this.$route.query };
     if (
-      !this.$route.params.fatherCollectionId
+      !this.$route.query.fatherCollectionId
     ) {
       if (!this.$route.query.fatherCollectionId) {
         if (this.$store.getters.getRootId) {
@@ -274,7 +273,7 @@ export default {
       }
     },
     async fetchCollection(collectionId) {
-      const collection = this.getCollectionFromId(collectionId);
+      const collection = await this.getCollectionFromId(collectionId);
       // TODO Traiter differement !collection et !collection.pictos || !collection.collections
       if (
         (!collection ||
@@ -297,7 +296,7 @@ export default {
           res.data.partial = false;
 
           if (res.data.collections && !res.data.collections.length == 0) {
-            res.data.collections.map((collection) => {
+            res.data.collections.map(async (collection) => {
               if (collection.image) {
                 collection.image =
                   this.$config.apiURL + "/image/pictalk/" + collection.image;
@@ -312,7 +311,7 @@ export default {
               }
               collection.partial = true;
               // collectionIndex
-              if (!this.getCollectionFromId(collection.id)) {
+              if (!await this.getCollectionFromId(collection.id)) {
                 collectionsToCreate.push(collection);
               } else {
                 collectionsToEdit.push(collection);
@@ -334,7 +333,7 @@ export default {
             });
           }
 
-          if (!this.getCollectionFromId(res.data.id)) {
+          if (!await this.getCollectionFromId(res.data.id)) {
             collectionsToCreate.push(JSON.parse(JSON.stringify(res.data)));
           } else {
             collectionsToEdit.push(JSON.parse(JSON.stringify(res.data)));

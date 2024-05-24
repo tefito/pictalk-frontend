@@ -275,7 +275,7 @@ export default {
       if (
         this.$store.getters.getDragndrop &&
         this.$store.getters.getDragndrop.fatherCollectionId !=
-        parseInt(this.$route.params.fatherCollectionId)
+        parseInt(this.$route.query.fatherCollectionId)
       ) {
         const dragndrop = this.$store.getters.getDragndrop;
         if (this.$store.getters.getDragndrop) {
