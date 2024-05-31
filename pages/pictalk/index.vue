@@ -105,7 +105,8 @@ export default {
           this.sidebarPictos = await this.loadedSidebarPictos();
         }, delay);
       } else {
-        this.pictos = this.loadedPictos();
+        this.pictos = await this.loadedPictos();
+        this.sidebarPictos = await this.loadedSidebarPictos();
       }
     });
   },
@@ -286,87 +287,7 @@ export default {
       }
     },
     async fetchCollection(collectionId) {
-      const collection = await this.getCollectionFromId(collectionId);
-      // TODO Traiter differement !collection et !collection.pictos || !collection.collections
-      if (
-        (!collection ||
-          (!collection.pictos && !collection.collections) ||
-          collection?.partial) &&
-        navigator.onLine
-      ) {
-        try {
-          let pictosToEdit = [];
-          let pictosTocreate = [];
-          let collectionsToEdit = [];
-          let collectionsToCreate = [];
-          var res = await axios.get("/collection/find/" + collectionId);
-          if (res.data.image) {
-            res.data.image =
-              this.$config.apiURL + "/image/pictalk/" + res.data.image;
-          }
-          res.data.collection = true;
-
-          res.data.partial = false;
-
-          if (res.data.collections && !res.data.collections.length == 0) {
-            res.data.collections.map(async (collection) => {
-              if (collection.image) {
-                collection.image =
-                  this.$config.apiURL + "/image/pictalk/" + collection.image;
-              }
-              collection.collection = true;
-              collection.fatherCollectionId = res.data.id;
-              if (!collection.pictos) {
-                collection.pictos = [];
-              }
-              if (!collection.collections) {
-                collection.collections = [];
-              }
-              collection.partial = true;
-              // collectionIndex
-              if (!await this.getCollectionFromId(collection.id)) {
-                collectionsToCreate.push(collection);
-              } else {
-                collectionsToEdit.push(collection);
-              }
-            });
-          }
-          if (res.data.pictos && !res.data.pictos.length == 0) {
-            res.data.pictos.map((picto) => {
-              if (picto.image) {
-                picto.image =
-                  this.$config.apiURL + "/image/pictalk/" + picto.image;
-              }
-              picto.fatherCollectionId = res.data.id;
-              if (!this.getPictoFromId(picto.id)) {
-                pictosTocreate.push(picto);
-              } else {
-                pictosToEdit.push(picto);
-              }
-            });
-          }
-
-          if (!await this.getCollectionFromId(res.data.id)) {
-            collectionsToCreate.push(JSON.parse(JSON.stringify(res.data)));
-          } else {
-            collectionsToEdit.push(JSON.parse(JSON.stringify(res.data)));
-          }
-          if (collectionsToCreate.length > 0) {
-            this.$store.commit("addCollection", collectionsToCreate);
-          }
-          if (collectionsToEdit.length > 0) {
-            this.$store.commit("editCollection", collectionsToEdit);
-          }
-          if (pictosTocreate.length > 0) {
-            this.$store.commit("addPicto", pictosTocreate);
-          }
-          if (pictosToEdit.length > 0) {
-            this.$store.commit("editPicto", pictosToEdit);
-          }
-        } catch (error) {
-          console.log("error ", error);
-        }
-      }
+      const collection = await this.$store.dispatch("fetchCollection", collectionId);
       return collection;
     },
     async refreshPictos() {

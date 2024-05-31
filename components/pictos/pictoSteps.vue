@@ -617,6 +617,7 @@ export default {
           $nuxt.$emit("resyncPictoList", 200);
           this.$parent.close();
         } else {
+          console.log("isCollection: ", isCollection);
           await this.$store.dispatch(
             isCollection ? "editCollection" : "editPicto",
             {
@@ -641,7 +642,7 @@ export default {
               : this.$t("EditedPictogram"),
             type: "is-success",
           });
-          //$nuxt.$emit("resyncPictoList");
+          $nuxt.$emit("resyncPictoList");
           this.$parent.close();
         }
       } catch (err) {
@@ -659,8 +660,8 @@ export default {
       // Si meaning du language principal change
       // Si meaning vide
       const savedPicto = this.picto.collection
-        ? await this.getCollectionFromId(this.picto.id)
-        : await this.getPictoFromId(this.picto.id);
+        ? await this.$store.dispatch("getCollectionFromId", this.picto.id)
+        : await this.$store.dispatch("getPictoFromId", this.picto.id);
       if (
         !savedPicto.meaning[this.getUserLang] ||
         savedPicto.meaning[this.getUserLang] !=
@@ -670,18 +671,6 @@ export default {
       } else {
         return false;
       }
-    },
-    getCollectionFromId(id) {
-      const index = this.$store.getters.getCollections.findIndex(
-        (collection) => collection.id === id
-      );
-      return this.$store.getters.getCollections[index];
-    },
-    getPictoFromId(id) {
-      const index = this.$store.getters.getPictos.findIndex(
-        (picto) => picto.id === id
-      );
-      return this.$store.getters.getPictos[index];
     },
     async webImages(pictoSearch) {
       const regex = new RegExp("[$&+,:;=?@#|'<>.^*()%!-]", "g");

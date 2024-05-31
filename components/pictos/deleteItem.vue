@@ -24,7 +24,7 @@
     <footer class="modal-card-foot">
       <b-button class="button" type="button" @click="$parent.close()">{{
         $t("Close")
-        }}</b-button>
+      }}</b-button>
       <b-button data-cy="delete-picto-button" class="button is-primary" :loading="loading"
         @click="onSubmitted(meaningOrName)">{{ $t("Delete") }}</b-button>
     </footer>
@@ -52,7 +52,7 @@ export default {
       if (name == this.object.meaning[this.getUserLang]) {
         try {
           if (this.object.collection) {
-            const res = await this.$store.dispatch("removeCollection", {
+            await this.$store.dispatch("removeCollection", {
               collectionId: this.object.id,
               fatherCollectionId: parseInt(
                 this.$route.query.fatherCollectionId,
@@ -60,7 +60,7 @@ export default {
               ),
             });
           } else {
-            const res = await this.$store.dispatch("removePicto", {
+            await this.$store.dispatch("removePicto", {
               pictoId: this.object.id,
               fatherCollectionId: parseInt(
                 this.$route.query.fatherCollectionId,

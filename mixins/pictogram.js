@@ -115,20 +115,10 @@ export default {
       try {
         const sidebarId = this.$store.getters.getSidebarId;
 
-        let sidebar = JSON.parse(
-          JSON.stringify(
-            await this.getCollectionFromId(
-              parseInt(sidebarId, 10)
-            )
-          )
-        );
-        let currentCollection = JSON.parse(
-          JSON.stringify(
-            await this.getCollectionFromId(
-              parseInt(this.$route.query.fatherCollectionId, 10)
-            )
-          )
-        );
+        let sidebar = await this.getCollectionFromId(parseInt(sidebarId, 10));
+
+        let currentCollection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10))
+        console.log(sidebar, currentCollection);
         if (isPicto) {
           sidebar.pictos.push({
             id: collectionId,
@@ -249,7 +239,7 @@ export default {
       }
     },
     async getCollectionFromId(id) {
-      return this.$store.getters.getCollectionFromId(id);
+      return this.$store.dispatch("getCollectionFromId", id);
     },
     editPicto() {
       this.$buefy.modal.open({

@@ -70,24 +70,31 @@ export const mutations = {
   eraseSpeech(state) {
     state.pictoSpeech = [];
   },
-  addCollection(state, newCollections) {
+  async addCollection(state, newCollections) {
     if (!Array.isArray(newCollections)) {
       newCollections = new Array(newCollections);
     }
     // Dexie transition
-    getDexieDB().collection.bulkPut(newCollections);
+    await getDexieDB().collection.bulkPut(newCollections);
 
   },
-  removeCollection(state, removedCollection) {
+  async removeCollection(state, removedCollection) {
     // Dexie transition
-    getDexieDB().collection.delete(removedCollection.id);
+    await getDexieDB().collection.delete(removedCollection.id);
   },
-  editCollection(state, editedCollections) {
+  async editCollection(state, editedCollections) {
     if (!Array.isArray(editedCollections)) {
       editedCollections = new Array(editedCollections);
     }
-    // Dexie transition
-    getDexieDB().collection.bulkPut(editedCollections);
+    editedCollections = await Promise.all(editedCollections.map(async (collection) => {
+      const col = await getDexieDB().collection.get(collection.id)
+      Object.assign(col, collection);
+      col.collections = col.collections.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+      col.pictos = col.pictos.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+      return col;
+    }));
+    console.log(editedCollections);
+    return getDexieDB().collection.bulkPut(editedCollections);
   },
   async addPicto(state, pictos) {
     if (!Array.isArray(pictos)) {
@@ -102,34 +109,31 @@ export const mutations = {
         );
         if (collection && pictoIndex == -1) {
           collection.pictos.push(picto);
-          getDexieDB().collection.put(collection);
+          await getDexieDB().collection.put(collection);
         }
       }
     }
     // Dexie transition
     await getDexieDB().pictogram.bulkPut(pictos);
   },
-  editPicto(state, editedPictos) {
+  async editPicto(state, editedPictos) {
     if (!Array.isArray(editedPictos)) {
       editedPictos = new Array(editedPictos);
     }
-    // Dexie transition
-    getDexieDB().pictogram.bulkPut(editedPictos);
+    editedPictos = await Promise.all(editedPictos.map(async (picto) => {
+      const pct = await getDexieDB().pictogram.get(picto.id)
+      Object.assign(pct, picto);
+      return pct;
+    }));
+    await getDexieDB().pictogram.bulkPut(editedPictos);
   },
-  async removePicto(state, { pictoId, fatherCollectionId }) {
-    const collection = await getDexieDB().collection.get(fatherCollectionId);
-    collection.pictos.splice(pictoIndex, 1);
-    getDexieDB().collection.put(collection);
+  async resetCollections(state) {
     // Dexie transition
-    getDexieDB().pictogram.delete(pictoId);
+    await getDexieDB().collection.clear();
   },
-  resetCollections(state) {
+  async setCollections(state, collections) {
     // Dexie transition
-    getDexieDB().collection.clear();
-  },
-  setCollections(state, collections) {
-    // Dexie transition
-    getDexieDB().collection.bulkPut(collections);
+    await getDexieDB().collection.bulkPut(collections);
   },
   setToken(state, token) {
     state.token = token;
@@ -178,6 +182,16 @@ export const mutations = {
   }
 };
 export const actions = {
+  async fetchCollection(vuexContext, collectionId) {
+    const res = await axios.get("/collection/find/" + collectionId);
+    const collection = res.data;
+    collection.image = axios.defaults.baseURL + "/image/pictalk/" + collection.image;
+    collection.collection = true;
+    collection.partial = false;
+    await vuexContext.commit("addCollection", collection);
+    await parseAndUpdateEntireCollection(vuexContext, collection);
+    return vuexContext.dispatch('getCollectionFromId', collectionId);
+  },
   async moveToCollection(vuexContext, { moveToCollectionDto, fatherCollectionId }) {
     await axios
       .put(`/collection/move/${fatherCollectionId}`,
@@ -315,7 +329,10 @@ export const actions = {
   async removePicto(vuexContext, { pictoId, fatherCollectionId }) {
     const res = await axios
       .delete("/picto/", { params: { pictoId: pictoId, fatherId: fatherCollectionId } });
-    vuexContext.commit("removePicto", { pictoId, fatherCollectionId });
+    const parentCollection = await vuexContext.dispatch("getCollectionFromId", fatherCollectionId);
+    const pictoIndex = parentCollection.pictos.findIndex((pct) => pct.id == pictoId);
+    parentCollection.pictos.splice(pictoIndex, 1);
+    vuexContext.commit("editCollection", parentCollection);
     return res;
   },
   async alternatePictoStar(vuexContext, picto) {
@@ -390,6 +407,7 @@ export const actions = {
   },
   async editCollection(vuexContext, collection) {
     let formData = new FormData();
+    console.log("editedCollection: ", collection)
     if (collection.speech) {
       formData.append("speech", JSON.stringify(collection.speech));
     }
@@ -425,6 +443,8 @@ export const actions = {
           "Content-Type": "multipart/form-data"
         }
       })).data;
+    const nestedCollections = await Promise.all(editedCollection.collections.map((colle) => parseAndUpdateEntireCollection(vuexContext, colle)));
+    const nestedPictos = await Promise.all(editedCollection.pictos.map((pict) => parseAndUpdatePictogram(vuexContext, pict)));
     vuexContext.commit("editCollection", {
       ...editedCollection,
       ...(editedCollection.meaning && { meaning: editedCollection.meaning }),
@@ -433,19 +453,18 @@ export const actions = {
       image: axios.defaults.baseURL + "/image/pictalk/" + editedCollection.image,
       createdDate: editedCollection.createdDate,
       updatedDate: editedCollection.updatedDate,
-      collections: editedCollection.collections.map((colle) => parseAndUpdateEntireCollection(vuexContext, colle)),
-      pictos: editedCollection.pictos.map((pict) => parseAndUpdatePictogram(vuexContext, pict)),
+      collections: nestedCollections,
+      pictos: nestedPictos,
+      collection: true,
       ...(collection.pictohubId && { pictohubId: Number(collection.pictohubId) }),
     });
   },
   async removeCollection(vuexContext, { collectionId, fatherCollectionId }) {
     const res = await axios.delete("/collection/", { params: { collectionId: collectionId, fatherId: fatherCollectionId } });
-    const collectionIndex = vuexContext.getters.getCollections.findIndex((col) => col.id == fatherCollectionId);
-    const collection = vuexContext.getters.getCollections[collectionIndex];
-    const collectionCollectionsIndex = vuexContext.getters.getCollections[collectionIndex].collections.findIndex((col) => col.id == collectionId);
-    const editedCollection = JSON.parse(JSON.stringify(collection));
-    editedCollection.collections.splice(collectionCollectionsIndex, 1);
-    vuexContext.commit("editCollection", editedCollection);
+    const parentCollection = await vuexContext.dispatch("getCollectionFromId", fatherCollectionId);
+    const collectionIndex = parentCollection.collections.findIndex((col) => col.id == collectionId);
+    parentCollection.collections.splice(collectionIndex, 1);
+    vuexContext.commit("editCollection", parentCollection);
     return res;
   },
   async authenticateUser(vuexContext, authData) {
@@ -653,10 +672,9 @@ export const actions = {
           "Content-Type": 'application/x-www-form-urlencoded'
         }
       })).data;
-    parseAndUpdateEntireCollection(vuexContext, editedCollection);
+    await parseAndUpdateEntireCollection(vuexContext, editedCollection);
     vuexContext.commit("resetCopyCollectionId");
-    const index = editedCollection.collections.findIndex((coll) => coll.id == collectionId);
-    return editedCollection.collections[index];
+    return;
   },
   async copyPictoById(vuexContext, { pictoId, fatherCollectionId }) {
     const params = new URLSearchParams();
@@ -871,7 +889,10 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
     // TODO Est-ce qu'on peut recuperer fatherCollectionId d'une autre facon ?
     // SI la collection n'existe pas alors cela sera undefined...
     if (localCollection) {
+      console.log("localCollection: ", localCollection);
+      console.log("collection: ", collection);
       Object.assign(localCollection, collection);
+      console.log("localCollection after assign: ", localCollection);
       collection = localCollection;
       collection.fatherCollectionId = localCollection.fatherCollectionId;
     } else {
@@ -943,23 +964,28 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
   }
   if (!download) {
     if (collectionsToCreate.length > 0) {
-      vuexContext.commit("addCollection", collectionsToCreate);
+      await vuexContext.commit("addCollection", collectionsToCreate);
     }
     if (collectionsToEdit.length > 0) {
-      vuexContext.commit("editCollection", collectionsToEdit);
+      console.log("editCollection started");
+      await vuexContext.commit("editCollection", collectionsToEdit);
+      console.log("editCollection done")
     }
     if (pictosTocreate.length > 0) {
-      vuexContext.commit("addPicto", pictosTocreate);
+      await vuexContext.commit("addPicto", pictosTocreate);
     }
     if (pictosToEdit.length > 0) {
-      vuexContext.commit("editPicto", pictosToEdit);
+      await vuexContext.commit("editPicto", pictosToEdit);
     }
+    console.log("return collection: ");
     if (existsCollection && !updateCollection) {
       return localCollection;
     } else {
       return collection;
     }
+
   }
+  console.log("return {}: ");
   return { collectionsToCreate, collectionsToEdit, pictosTocreate, pictosToEdit, collectionsWithoutFatherCollectionId };
 }
 
@@ -971,10 +997,10 @@ async function parseAndUpdatePictogram(vuexContext, picto) {
       picto.image;
   }
   if (picto.meaning) {
-    picto.meaning = JSON.parse(picto.meaning);
+    picto.meaning = picto.meaning;
   }
   if (picto.speech) {
-    picto.speech = JSON.parse(picto.speech);
+    picto.speech = picto.speech;
   }
   if (!getPictoFromId(vuexContext, picto.id)) {
     vuexContext.commit("addPicto", picto);

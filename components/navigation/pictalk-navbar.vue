@@ -410,7 +410,7 @@ export default {
       this.fits = window.innerWidth > 600;
     },
     async getCollectionFromId(id) {
-      return this.$store.getters.getCollectionFromId(id)
+      return this.$store.dispatch("getCollectionFromId", id);
     },
     adminModeChoose() {
       if (this.admin) {
@@ -479,7 +479,7 @@ export default {
             */
             $nuxt.$emit("resyncPictoList");
           } else {
-            const copiedCollection = await this.$store.dispatch(
+            await this.$store.dispatch(
               "copyCollectionById",
               {
                 collectionId:
@@ -487,6 +487,7 @@ export default {
                 fatherCollectionId: this.$route.query.fatherCollectionId,
               }
             );
+            console.log("emitting resyncPictoList")
             //$nuxt.$emit("addPictogram", copiedCollection);
             $nuxt.$emit("resyncPictoList");
           }
@@ -509,13 +510,8 @@ export default {
         }
       } else if (this.$store.getters.getShortcutCollectionId?.collectionId) {
         try {
-          let collection = JSON.parse(
-            JSON.stringify(
-              await this.getCollectionFromId(
-                parseInt(this.$route.query.fatherCollectionId, 10)
-              )
-            )
-          );
+          let collection =
+            await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10));
           if (this.$store.getters.getShortcutCollectionId.isPicto) {
             collection.pictos.push({
               id: this.$store.getters.getShortcutCollectionId.collectionId,

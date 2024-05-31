@@ -68,8 +68,7 @@ export default {
   mixins: [pictogram],
   props: {
     picto: {
-      type: Object,
-      required: true,
+      type: Object, required: true,
     },
     publicMode: {
       type: Boolean,
@@ -82,8 +81,16 @@ export default {
       default: () => false,
     },
   },
-  computed: {
-    async isInSidebar() {
+  data() {
+    return {
+      isInSidebar: false,
+    };
+  },
+  async created() {
+    this.isInSidebar = await this.checkIsInSidebar();
+  },
+  methods: {
+    async checkIsInSidebar() {
       let sidebar =
         await this.getCollectionFromId(
           parseInt(this.$store.getters.getSidebarId, 10)
@@ -99,6 +106,7 @@ export default {
       }
     }
   }
+
 };
 </script>
 <style scoped>
