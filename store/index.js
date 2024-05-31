@@ -70,71 +70,6 @@ export const mutations = {
   eraseSpeech(state) {
     state.pictoSpeech = [];
   },
-  async addCollection(state, newCollections) {
-    if (!Array.isArray(newCollections)) {
-      newCollections = new Array(newCollections);
-    }
-    // Dexie transition
-    await getDexieDB().collection.bulkPut(newCollections);
-
-  },
-  async removeCollection(state, removedCollection) {
-    // Dexie transition
-    await getDexieDB().collection.delete(removedCollection.id);
-  },
-  async editCollection(state, editedCollections) {
-    if (!Array.isArray(editedCollections)) {
-      editedCollections = new Array(editedCollections);
-    }
-    editedCollections = await Promise.all(editedCollections.map(async (collection) => {
-      const col = await getDexieDB().collection.get(collection.id)
-      Object.assign(col, collection);
-      col.collections = col.collections.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
-      col.pictos = col.pictos.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
-      return col;
-    }));
-    console.log(editedCollections);
-    return getDexieDB().collection.bulkPut(editedCollections);
-  },
-  async addPicto(state, pictos) {
-    if (!Array.isArray(pictos)) {
-      pictos = new Array(pictos);
-    }
-    let collection;
-    for (let picto of pictos) {
-      collection = await getDexieDB().collection.get(picto.fatherCollectionId);
-      if (collection) {
-        const pictoIndex = collection.pictos.findIndex(
-          pct => pct.id === picto.id
-        );
-        if (collection && pictoIndex == -1) {
-          collection.pictos.push(picto);
-          await getDexieDB().collection.put(collection);
-        }
-      }
-    }
-    // Dexie transition
-    await getDexieDB().pictogram.bulkPut(pictos);
-  },
-  async editPicto(state, editedPictos) {
-    if (!Array.isArray(editedPictos)) {
-      editedPictos = new Array(editedPictos);
-    }
-    editedPictos = await Promise.all(editedPictos.map(async (picto) => {
-      const pct = await getDexieDB().pictogram.get(picto.id)
-      Object.assign(pct, picto);
-      return pct;
-    }));
-    await getDexieDB().pictogram.bulkPut(editedPictos);
-  },
-  async resetCollections(state) {
-    // Dexie transition
-    await getDexieDB().collection.clear();
-  },
-  async setCollections(state, collections) {
-    // Dexie transition
-    await getDexieDB().collection.bulkPut(collections);
-  },
   setToken(state, token) {
     state.token = token;
   },
@@ -182,13 +117,79 @@ export const mutations = {
   }
 };
 export const actions = {
+  async dbAddCollection(state, newCollections) {
+    if (!Array.isArray(newCollections)) {
+      newCollections = new Array(newCollections);
+    }
+    // Dexie transition
+    await getDexieDB().collection.bulkPut(newCollections);
+
+  },
+  async dbRemoveCollection(state, removedCollection) {
+    // Dexie transition
+    await getDexieDB().collection.delete(removedCollection.id);
+  },
+  async dbEditCollection(state, editedCollections) {
+    if (!Array.isArray(editedCollections)) {
+      editedCollections = new Array(editedCollections);
+    }
+    editedCollections = await Promise.all(editedCollections.map(async (collection) => {
+      const col = await getDexieDB().collection.get(collection.id)
+      Object.assign(col, collection);
+      col.collections = col.collections.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+      col.pictos = col.pictos.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+      return col;
+    }));
+    console.log(editedCollections);
+    return getDexieDB().collection.bulkPut(editedCollections);
+  },
+  async dbAddPicto(state, pictos) {
+    if (!Array.isArray(pictos)) {
+      pictos = new Array(pictos);
+    }
+    let collection;
+    for (let picto of pictos) {
+      collection = await getDexieDB().collection.get(picto.fatherCollectionId);
+      if (collection) {
+        const pictoIndex = collection.pictos.findIndex(
+          pct => pct.id === picto.id
+        );
+        if (collection && pictoIndex == -1) {
+          collection.pictos.push(picto);
+          await getDexieDB().collection.put(collection);
+        }
+      }
+    }
+    // Dexie transition
+    await getDexieDB().pictogram.bulkPut(pictos);
+  },
+  async dbEditPicto(state, editedPictos) {
+    if (!Array.isArray(editedPictos)) {
+      editedPictos = new Array(editedPictos);
+    }
+    editedPictos = await Promise.all(editedPictos.map(async (picto) => {
+      const pct = await getDexieDB().pictogram.get(picto.id)
+      Object.assign(pct, picto);
+      return pct;
+    }));
+    await getDexieDB().pictogram.bulkPut(editedPictos);
+  },
+  async dbResetCollections(state) {
+    // Dexie transition
+    await getDexieDB().collection.clear();
+  },
+  async dbSetCollections(state, collections) {
+    // Dexie transition
+    await getDexieDB().collection.bulkPut(collections);
+  },
+
   async fetchCollection(vuexContext, collectionId) {
     const res = await axios.get("/collection/find/" + collectionId);
     const collection = res.data;
     collection.image = axios.defaults.baseURL + "/image/pictalk/" + collection.image;
     collection.collection = true;
     collection.partial = false;
-    await vuexContext.commit("addCollection", collection);
+    await vuexContext.dispatch("dbAddCollection", collection);
     await parseAndUpdateEntireCollection(vuexContext, collection);
     return vuexContext.dispatch('getCollectionFromId', collectionId);
   },
@@ -214,17 +215,17 @@ export const actions = {
     } else if (moveToCollectionDto.sourcePictoId) {
       fatherCollection.pictos.splice(fatherCollection.pictos.findIndex((col) => col.id == moveToCollectionDto.sourcePictoId), 1)
     }
-    vuexContext.commit('editCollection', { ...fatherCollection });
+    vuexContext.dispatch('dbEditCollection', { ...fatherCollection });
     // ------- Add the new collection or pictogram to the target collection
 
     if (moveToCollectionDto.sourceCollectionId) {
       const collectionIndex = vuexContext.getters.getCollections.findIndex((col) => col.id == moveToCollectionDto.sourceCollectionId);
       const collection = vuexContext.getters.getCollections[collectionIndex];
-      vuexContext.commit('addCollection', { ...collection, fatherCollectionId: moveToCollectionDto.targetCollectionId });
+      vuexContext.dispatch('dbAddCollection', { ...collection, fatherCollectionId: moveToCollectionDto.targetCollectionId });
     } else if (moveToCollectionDto.sourcePictoId) {
       const pictoIndex = vuexContext.getters.getPictos.findIndex((picto) => picto.id == moveToCollectionDto.sourcePictoId);
       const picto = vuexContext.getters.getPictos[pictoIndex];
-      vuexContext.commit('addPicto', { ...picto, fatherCollectionId: moveToCollectionDto.targetCollectionId });
+      vuexContext.dispatch('dbAddPicto', { ...picto, fatherCollectionId: moveToCollectionDto.targetCollectionId });
     }
 
   },
@@ -282,7 +283,7 @@ export const actions = {
       updatedDate: newPicto.updatedDate,
       ...(picto.pictohubId && { pictohubId: Number(picto.pictohubId) }),
     }
-    vuexContext.commit("addPicto", editedNewPicto);
+    vuexContext.dispatch("dbAddPicto", editedNewPicto);
     return editedNewPicto;
   },
   async editPicto(vuexContext, picto) {
@@ -307,7 +308,7 @@ export const actions = {
         }
       })).data;
 
-    vuexContext.commit("editPicto", {
+    vuexContext.dispatch("dbEditPicto", {
       speech: picto.speech,
       meaning: picto.meaning,
       color: picto.color,
@@ -332,7 +333,7 @@ export const actions = {
     const parentCollection = await vuexContext.dispatch("getCollectionFromId", fatherCollectionId);
     const pictoIndex = parentCollection.pictos.findIndex((pct) => pct.id == pictoId);
     parentCollection.pictos.splice(pictoIndex, 1);
-    vuexContext.commit("editCollection", parentCollection);
+    vuexContext.dispatch("dbEditCollection", parentCollection);
     return res;
   },
   async alternatePictoStar(vuexContext, picto) {
@@ -344,7 +345,7 @@ export const actions = {
           "Content-Type": "multipart/form-data"
         }
       })).data;
-    vuexContext.commit("editPicto", {
+    vuexContext.dispatch("dbEditPicto", {
       priority: JSON.parse(editedPicto.priority),
       id: editedPicto.id
     });
@@ -358,7 +359,7 @@ export const actions = {
           "Content-Type": "multipart/form-data"
         }
       })).data;
-    vuexContext.commit("editCollection", {
+    vuexContext.dispatch("dbEditCollection", {
       priority: JSON.parse(editedCollection.priority),
       id: editedCollection.id
     });
@@ -402,7 +403,7 @@ export const actions = {
       updatedDate: newCollection.updatedDate,
       ...(collection.pictohubId && { pictohubId: Number(collection.pictohubId) }),
     };
-    vuexContext.commit("addCollection", editedNewCollection);
+    vuexContext.dispatch("dbAddCollection", editedNewCollection);
     return editedNewCollection;
   },
   async editCollection(vuexContext, collection) {
@@ -445,7 +446,7 @@ export const actions = {
       })).data;
     const nestedCollections = await Promise.all(editedCollection.collections.map((colle) => parseAndUpdateEntireCollection(vuexContext, colle)));
     const nestedPictos = await Promise.all(editedCollection.pictos.map((pict) => parseAndUpdatePictogram(vuexContext, pict)));
-    vuexContext.commit("editCollection", {
+    vuexContext.dispatch("dbEditCollection", {
       ...editedCollection,
       ...(editedCollection.meaning && { meaning: editedCollection.meaning }),
       ...(editedCollection.speech && { speech: editedCollection.speech }),
@@ -464,7 +465,7 @@ export const actions = {
     const parentCollection = await vuexContext.dispatch("getCollectionFromId", fatherCollectionId);
     const collectionIndex = parentCollection.collections.findIndex((col) => col.id == collectionId);
     parentCollection.collections.splice(collectionIndex, 1);
-    vuexContext.commit("editCollection", parentCollection);
+    vuexContext.dispatch("dbEditCollection", parentCollection);
     return res;
   },
   async authenticateUser(vuexContext, authData) {
@@ -650,16 +651,16 @@ export const actions = {
     console.log("Merged collections: ", count);
 
     if (collectionsToCreate.length > 0) {
-      vuexContext.commit("addCollection", collectionsToCreate);
+      vuexContext.dispatch("dbAddCollection", collectionsToCreate);
     }
     if (collectionsToEdit.length > 0) {
-      vuexContext.commit("editCollection", collectionsToEdit);
+      vuexContext.dispatch("dbEditCollection", collectionsToEdit);
     }
     if (pictosTocreate.length > 0) {
-      vuexContext.commit("addPicto", pictosTocreate);
+      vuexContext.dispatch("dbAddPicto", pictosTocreate);
     }
     if (pictosToEdit.length > 0) {
-      vuexContext.commit("editPicto", pictosToEdit);
+      vuexContext.dispatch("dbEditPicto", pictosToEdit);
     }
   },
   async copyCollectionById(vuexContext, { collectionId, fatherCollectionId }) {
@@ -964,18 +965,18 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
   }
   if (!download) {
     if (collectionsToCreate.length > 0) {
-      await vuexContext.commit("addCollection", collectionsToCreate);
+      await vuexContext.dispatch("dbAddCollection", collectionsToCreate);
     }
     if (collectionsToEdit.length > 0) {
       console.log("editCollection started");
-      await vuexContext.commit("editCollection", collectionsToEdit);
+      await vuexContext.dispatch("dbEditCollection", collectionsToEdit);
       console.log("editCollection done")
     }
     if (pictosTocreate.length > 0) {
-      await vuexContext.commit("addPicto", pictosTocreate);
+      await vuexContext.dispatch("dbAddPicto", pictosTocreate);
     }
     if (pictosToEdit.length > 0) {
-      await vuexContext.commit("editPicto", pictosToEdit);
+      await vuexContext.dispatch("dbEditPicto", pictosToEdit);
     }
     console.log("return collection: ");
     if (existsCollection && !updateCollection) {
@@ -1003,9 +1004,9 @@ async function parseAndUpdatePictogram(vuexContext, picto) {
     picto.speech = picto.speech;
   }
   if (!getPictoFromId(vuexContext, picto.id)) {
-    vuexContext.commit("addPicto", picto);
+    vuexContext.dispatch("dbAddPicto", picto);
   } else {
-    vuexContext.commit("editPicto", picto);
+    vuexContext.dispatch("dbEditPicto", picto);
   }
   return picto;
 }
