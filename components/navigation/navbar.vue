@@ -30,12 +30,12 @@
               <b-button v-else class="bolder customButton" tag="nuxt-link" :to="pictalkHome" type="is-primary"
                 icon-right="home"></b-button>
 
-              <<<<<<< HEAD <b-button class="bolder customButton" v-if="!isLogged" @click="openSignUpModal()"
-                type="is-success" outlined>{{ $t("SignUp") }}</b-button>
-                <b-button v-else class="bolder customButton" type="is-light" icon-right="logout" @click="onLogout" />
-                <b-button class="bolder customButton" outlined v-if="!isLogged" tag="nuxt-link"
-                  to="/public/pictalk?fatherCollectionId=346" type="is-primary" icon-right="arrow-right-box">{{
-                    $t("TryPictalk") }}</b-button>
+              <b-button class="bolder customButton" v-if="!isLogged" @click="openSignUpModal()" type="is-success"
+                outlined>{{ $t("SignUp") }}</b-button>
+              <b-button v-else class="bolder customButton" type="is-light" icon-right="logout" @click="onLogout" />
+              <b-button class="bolder customButton" outlined v-if="!isLogged" tag="nuxt-link"
+                to="/public/pictalk?fatherCollectionId=346" type="is-primary" icon-right="arrow-right-box">{{
+                  $t("TryPictalk") }}</b-button>
             </div>
           </b-navbar-item>
         </client-only>

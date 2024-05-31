@@ -3,7 +3,7 @@
     <template slot="brand">
       <b-tooltip position="is-bottom" multilined size="is-small" type="is-primary" :label="$t('TooltipReturn')"
         :delay="1000" :triggers="['hover']" style="margin-top: 3px">
-        <b-button :disabled="parseInt($route.params.fatherCollectionId) == $store.getters.getUser.root"
+        <b-button :disabled="parseInt($route.query.fatherCollectionId) == $store.getters.getUser.root"
           class="customButton" style="background-color: hsl(210, 100%, 60%); min-width: 80px"
           @click="navigateToParentCollection()" icon-right="arrow-left" />
       </b-tooltip>

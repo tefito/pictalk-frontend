@@ -80,8 +80,8 @@ export default {
       });
       if (this.picto.collection == true) {
         this.$router.push({
-          path: this.pictoLink,
-          query: { ...this.$route.query },
+          path: "/pictalk",
+          query: { ...this.$route.query, fatherCollectionId: this.picto.id },
         });
       }
     },

@@ -21,7 +21,7 @@
         <footer class="modal-card-foot">
           <b-button data-cy="signin-signin" class="is-primary" :loading="loading" @click="onSubmit">{{
             $t("LogIn")
-          }}</b-button>
+            }}</b-button>
         </footer>
       </div>
     </form>
@@ -60,7 +60,8 @@ export default {
           }
           this.$parent.close();
           this.$router.push({
-            path: "/pictalk/" + this.$store.getters.getRootId,
+            path: "/pictalk",
+            query: { ...this.$route.query, fatherCollectionId: this.$store.getters.getRootId },
           });
           if (this.$store.getters.getUser.notifications.length != 0) {
             this.$buefy.notification.open({

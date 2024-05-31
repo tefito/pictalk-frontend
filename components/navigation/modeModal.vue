@@ -23,10 +23,8 @@ export default {
     GoToRoot() {
       if (this.$store.getters.getRootId) {
         this.$router.push({
-          path: "/pictalk/" + this.$store.getters.getRootId,
-          query: {
-            isAdmin: this.$route.query.isAdmin,
-          },
+          path: "/pictalk",
+          query: { ...this.$route.query, fatherCollectionId: this.$store.getters.getRootId }
         });
       } else {
         this.$router.push({
@@ -41,7 +39,7 @@ export default {
     goTo(link) {
       this.$router.push({
         path: "/pictalk",
-        query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin, fatherCollectionId: link },
+        query: { ...this.$route.query, fatherCollectionId: link }
       });
       this.$parent.close();
     },

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="columns is-mobile noscroll">
-      <div :class="!($route.params.fatherCollectionId == $store.getters.getSidebarId) && isSidebarUsed
+      <div :class="!($route.query.fatherCollectionId == $store.getters.getSidebarId) && isSidebarUsed
         ? 'is-8-mobile is-9-tablet is-10-desktop is-10-widescreen is-10-fullhd column noMargins scrolling lessPadding'
         : 'is-12 column noMargins scrolling lessPadding'
         ">
@@ -19,7 +19,7 @@
             :srcset="require('@/assets/EmptyCollection3.png').srcSet" />
         </div>
 
-        <pictoList data-cy="cypress-pictoList" :pictos="pictos" :sidebar="false" :sidebarUsed="isSidebarUsed && $route.params.fatherCollectionId != $store.getters.getSidebarId
+        <pictoList data-cy="cypress-pictoList" :pictos="pictos" :sidebar="false" :sidebarUsed="isSidebarUsed && $route.query.fatherCollectionId != $store.getters.getSidebarId
           " v-if="!isPictoListPartial || isOnLine || !isPictoListEmpty" />
         <div v-else>
           <b-image data-cy="cypress-noConnection" style="aspect-ratio: 1/1" class="partialCollection" lazy
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <div v-if="!($route.params.fatherCollectionId == $store.getters.getSidebarId) && isSidebarUsed" class="
+      <div v-if="!($route.query.fatherCollectionId == $store.getters.getSidebarId) && isSidebarUsed" class="
           is-4-mobile
           is-3-tablet
           is-2-desktop
@@ -78,10 +78,16 @@ export default {
     sidebar: sidebar,
   },
   watch: {
+    async fatherCollectionId(fatherCollectionId, previousId) {
+      if (fatherCollectionId && fatherCollectionId != previousId) {
+        await this.fetchCollection(fatherCollectionId);
+        this.pictos = await this.loadedPictos();
+      }
+    },
     async sidebarPictoId(sidebarId, previousId) {
       if (sidebarId && sidebarId != previousId) {
         await this.fetchCollection(sidebarId);
-        this.sidebarPictos = this.loadedSidebarPictos();
+        this.sidebarPictos = await this.loadedSidebarPictos();
       }
     },
   },
@@ -139,6 +145,9 @@ export default {
     sidebarPictoId() {
       return this.$store.getters.getSidebarId;
     },
+    fatherCollectionId() {
+      return this.$route.query.fatherCollectionId;
+    },
     collectionColor() {
       if (this.collection) {
         if (this.collection.color) {
@@ -184,12 +193,14 @@ export default {
     this.pictos = await this.loadedPictos();
 
     if (this.$store.getters.getSidebarId) {
+      console.log("fetching sidebar");
+      console.log("sidebarId", this.$store.getters.getSidebarId);
       await this.fetchCollection(
         parseInt(this.$store.getters.getSidebarId, 10)
       );
     }
     this.sidebarPictos = await this.loadedSidebarPictos();
-
+    console.log("sidebarPictos", this.sidebarPictos);
     const user = this.$store.getters.getUser;
     if (!user.username) {
       try {
@@ -222,8 +233,10 @@ export default {
       );
     },
     async loadPictos(fatherCollectionId) {
-      const collectionList = this.$store.getters.getCollectionsFromFatherCollectionId(fatherCollectionId);
-      const pictos = this.$store.getters.getPictosFromFatherCollectionId(fatherCollectionId);
+      const collectionList = await this.$store.dispatch("getCollectionsFromFatherCollectionId", fatherCollectionId);
+      const pictos = await this.$store.dispatch("getPictosFromFatherCollectionId", fatherCollectionId);
+      console.log("pictos", pictos)
+      console.log("collectionList", collectionList)
       let items = await Promise.all([collectionList, pictos]);
       items = items[0].concat(items[1]) // Merge both arrays
       if (items) {
@@ -250,10 +263,10 @@ export default {
       this.$store.commit("removeSpeech");
     },
     async getCollectionFromId(id) {
-      return this.$store.getters.getCollectionFromId(id);
+      return this.$store.dispatch("getCollectionFromId", id);
     },
     async getPictoFromId(id) {
-      return this.$store.getters.getPictoFromId(id);
+      return this.$store.dispatch("getPictoFromId", id);
     },
     lostConnectivityNotification() {
       const notif = this.$buefy.notification.open({

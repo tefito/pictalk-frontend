@@ -262,6 +262,7 @@ export default {
           this.$router.push({
             query: {
               isAdmin: this.$route.query.isAdmin,
+              fatherCollectionId: this.$store.getters.getRootId,
             },
           });
         } else {

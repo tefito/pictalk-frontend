@@ -20,7 +20,7 @@ describe('Creates a collection', () => {
       cy.log('Collection created with id: ' + interception.response.body)
       cy.window().then((window) => {
         cy.deleteCollection(interception.response.body.id, parseInt(
-          window.$nuxt.$route.params.fatherCollectionId,
+          window.$nuxt.$route.query.fatherCollectionId,
           10
         ),);
       });

@@ -107,7 +107,7 @@ export const mutations = {
       }
     }
     // Dexie transition
-    getDexieDB().pictogram.bulkPut(pictos);
+    await getDexieDB().pictogram.bulkPut(pictos);
   },
   editPicto(state, editedPictos) {
     if (!Array.isArray(editedPictos)) {
@@ -528,6 +528,7 @@ export const actions = {
       localStorage.removeItem("token");
       localStorage.removeItem("tokenExpiration");
     }
+    getDexieDB().delete();
     vuexContext.commit("resetStore");
   },
   async getUser(vuexContext) {
@@ -755,19 +756,35 @@ export const actions = {
       notifications: notifications,
     });
     return notifications;
-  }
+  },
+  async getCollections(vuexContext) {
+    return getDexieDB().collection.toArray();
+  },
+  async getCollectionFromId(vuexContext, id) {
+    return getDexieDB().collection.get(id);
+  },
+  async getCollectionsFromFatherCollectionId(vuexContext, fatherCollectionId) {
+    const collection = await getDexieDB().collection.get(fatherCollectionId);
+    return Promise.all(collection.collections.map(async (collection) => {
+      return getDexieDB().collection.get(collection.id);
+    }));
+  },
+  async getPictos(state) {
+    return getDexieDB().pictogram.toArray();
+  },
+  async getPictoFromId(state, id) {
+    return getDexieDB().pictogram.get(id);
+  },
+  async getPictosFromFatherCollectionId(state, fatherCollectionId) {
+    const collection = await getDexieDB().collection.get(fatherCollectionId);
+    return Promise.all(collection.pictos.map(async (picto) => {
+      return getDexieDB().pictogram.get(picto.id)
+    }));
+  },
 }
 
 export const getters = {
-  getCollections(state) {
-    return getDexieDB().collection.toArray();
-  },
-  getCollectionFromId: (state) => (id) => {
-    return getDexieDB().collection.get(id);
-  },
-  getCollectionsFromFatherCollectionId: (state) => (fatherCollectionId) => {
-    return getDexieDB().collection.where({ fatherCollectionId: fatherCollectionId }).toArray();
-  },
+
   isAuthenticated(state) {
     return state.token != null;
   },
@@ -794,15 +811,6 @@ export const getters = {
   },
   getShortcutCollectionId(state) {
     return state.shortcutCollectionId;
-  },
-  async getPictos(state) {
-    return getDexieDB().pictogram.toArray();
-  },
-  getPictoFromId: (state) => (id) => {
-    return getDexieDB().pictogram.get(id);
-  },
-  getPictosFromFatherCollectionId: (state) => (fatherCollectionId) => {
-    return getDexieDB().pictogram.where({ fatherCollectionId: fatherCollectionId }).toArray();
   },
   getPublicCollections(state) {
     return state.public;
