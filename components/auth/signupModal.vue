@@ -54,7 +54,8 @@
                 <b-field class="column" :label="$t('PrincipalVoice')">
                   <b-select v-if="loadedVoices && loadedVoices.length > 1" v-model="voiceURI"
                     :placeholder="$t('SelectVoice')" required expanded :loading="loadingVoices" size="is-small">
-                    <option v-for="voice in loadedVoices" :value="voice.voiceURI" :key="voice.voiceURI">
+                    <option v-for="voice in loadedVoices" :value="voice.voiceURI"
+                      :key="voice.voiceURI + voice.name + Math.random()">
                       {{ getEmoji(voice.lang) }} {{ voice.name }}
                     </option>
                   </b-select>
@@ -69,7 +70,8 @@
                 <b-field v-if="showLanguages" class="column" :label="$t('Voices')">
                   <b-select v-model="voiceURIs" :placeholder="$t('SelectVoice')" required multiple expanded
                     native-size="6" size="is-small" :loading="loadingVoices">
-                    <option v-for="voice in loadedVoices" :value="voice.voiceURI" :key="voice.voiceURI">
+                    <option v-for="voice in loadedVoices" :value="voice.voiceURI"
+                      :key="voice.voiceURI + voice.name + Math.random()">
                       {{ getEmoji(voice.lang) }} {{ voice.name }}
                     </option>
                   </b-select>
@@ -313,7 +315,7 @@ export default {
     const bundles = this.$store.getters.getPublicBundles;
     this.publicBundles =
       await Promise.all(bundles.map(async (bundle) =>
-        his.$store.dispatch("getCollectionFromId", bundle.id)
+        this.$store.dispatch("getCollectionFromId", bundle.id)
       ));
     this.initialization = false;
     if (!this.$store.getters.getPublicBundles) {

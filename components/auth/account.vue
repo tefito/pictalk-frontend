@@ -8,13 +8,13 @@
           <br />
           <b-field>
             <b-switch id="account-pronounce-on-click" v-model="user.settings.pronounceClick">{{
-        $t("PronouncePictoOnClick")
-      }}</b-switch>
+              $t("PronouncePictoOnClick")
+              }}</b-switch>
           </b-field>
           <b-field>
             <b-switch id="account-enforced-security-mode" v-model="user.settings.securityMode">{{
-        $t("EnforcedSecurityMode")
-      }}</b-switch>
+              $t("EnforcedSecurityMode")
+              }}</b-switch>
           </b-field>
           <b-field :label="$t('PronounceShowDelay')">
             <b-slider id="account-pronounce-show-delay" lazy v-model="user.settings.pronounceShowDelay" :min="0"
@@ -74,8 +74,8 @@
           <hr />
           <b-field :label="$t('Analytics')">
             <b-switch id="account-enhanced-analytics" v-model="user.settings.analytics">{{
-        $t("AnalyticsText")
-      }}</b-switch>
+              $t("AnalyticsText")
+              }}</b-switch>
           </b-field>
           <br>
           <hr />
@@ -85,7 +85,7 @@
           </b-field>
           <b-field :label="$t('DeleteAccount')">
             <b-button id="account-delete-account" type="is-danger" icon-right="delete" @click="deleteAccount()"> {{
-        $t("DeleteAccountText") }}</b-button>
+              $t("DeleteAccountText") }}</b-button>
           </b-field>
           <br>
         </b-tab-item>
@@ -118,8 +118,8 @@
               {{ loadedVoicesFilterState ? $t("ShowMore") : $t("ShowLess") }}
             </b-button> -->
               <b-button class="speakButton" type="is-success" icon-right="volume-high" @click="
-        playSentenceInLanguage(getUserLang, voiceURI, pitch, rate)
-        "></b-button>
+                playSentenceInLanguage(getUserLang, voiceURI, pitch, rate)
+                "></b-button>
 
 
             </b-field>
@@ -135,33 +135,6 @@
               <installVoice></installVoice>
             </div>
           </div>
-          <!--
-          <b-button
-            v-if="!displayVoicesOrMultiLingual"
-            @click="displayVoices = !displayVoices"
-            type="is-ghost"
-            >{{ $t("SpeakMoreLanguage") }}</b-button
-          >
-
-          <b-field v-if="displayVoicesOrMultiLingual" :label="$t('Voices')">
-            <b-select
-              v-model="voiceURIs"
-              placeholder="Select language"
-              required
-              multiple
-              expanded
-              native-size="8"
-              :loading="loadingVoices"
-            >
-              <option
-                v-for="voice in loadedVoices"
-                :value="voice.voiceURI"
-                :key="voice.voiceURI"
-              >
-                {{ getEmoji(voice.lang) }} {{ voice.name }}
-              </option>
-            </b-select>
-          </b-field>  -->
           <hr />
         </b-tab-item>
         <b-tab-item style="width: 100%" icon="account-group">
@@ -190,9 +163,9 @@
           <br />
           <div class="box">
             <b>{{
-        "https://www.pictalk.org?directsharer=" +
-        $store.getters.getUser.username
-      }}</b>
+              "https://www.pictalk.org?directsharer=" +
+              $store.getters.getUser.username
+              }}</b>
           </div>
           <hr style="margin-top: 8px; margin-bottom: 8px" />
           <p class="title is-4">{{ $t("Groups") }}</p>
@@ -252,7 +225,7 @@
     <div class="footer container is-max-desktop">
       <b-button tag="nuxt-link" :to="'/pictalk' + admin" class="menuButtons">{{
         $t("Cancel")
-      }}</b-button>
+        }}</b-button>
       <b-button id="account-save" class="menuButtons" type="is-info" icon-left="content-save" :loading="loadingSave"
         @click="onSave(user.username, user.password, user.language)">{{ $t("Save") }}</b-button>
     </div>
