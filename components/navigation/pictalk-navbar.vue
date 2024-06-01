@@ -15,7 +15,8 @@
           alt="Logo of a web app that help speach-disabled people" />
       </b-navbar-item>
       <div :style="this.$route.path.includes('pictalk') ? '' : 'display:none'" class="columns is-mobile margins">
-        <div v-if="$route.query.isAdmin && !checkCopyCollectionId" class="column noPadding dropdown">
+        <div v-if="$route.query.isAdmin && !checkCopyCollectionId && this.$route.path.includes('pictalk')"
+          class="column noPadding dropdown">
           <b-dropdown :disabled="!isEditorFatherId && !isToUserFatherId" id="nav-create" class="column"
             :mobile-modal="false" trap-focus :triggers="['click', 'hover']" aria-role="list">
             <template #trigger>
