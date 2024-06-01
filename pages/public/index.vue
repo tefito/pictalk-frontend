@@ -1,48 +1,24 @@
 <template>
   <div>
     <client-only>
-    <b-field class="searchBar">
-      <b-input
-        v-model="search"
-        :placeholder="$t('SearchPictoPlaceholder')"
-        clearable
-        expanded
-        style="min-width: 70vw"
-        @keyup.native.enter="searchFirst()"
-      >
-      </b-input>
-      <b-button
-        type="is-info"
-        @click="searchFirst()"
-        icon-right="magnify"
-        :loading="loading"
-      />
-    </b-field>
+      <b-field class="searchBar">
+        <b-input v-model="search" :placeholder="$t('SearchPictoPlaceholder')" clearable expanded style="min-width: 70vw"
+          @keyup.native.enter="searchFirst()">
+        </b-input>
+        <b-button type="is-info" @click="searchFirst()" icon-right="magnify" :loading="loading" />
+      </b-field>
 
-    <pictoList
-      class="publicList"
-      :pictos="pictos"
-      :publicMode="true"
-      :sidebar="false"
-      :sidebarUsed="false"
-    />
-    <div class="searchBottom">
-      <b-button
-        v-if="more"
-        class="searchButton"
-        type="is-info is-light is-text"
-        @click="searchMore()"
-        icon-right="magnify"
-        rounded
-        :loading="loading"
-      >
-        {{ $t("MoreItems") }}
-      </b-button>
-    </div>
-  </client-only>
+      <pictoList class="publicList" :pictos="pictos" :publicMode="true" :sidebar="false" :sidebarUsed="false" />
+      <div class="searchBottom">
+        <b-button v-if="more" class="searchButton" type="is-info is-light is-text" @click="searchMore()"
+          icon-right="magnify" rounded :loading="loading">
+          {{ $t("MoreItems") }}
+        </b-button>
+      </div>
+    </client-only>
   </div>
 </template>
-<script >
+<script>
 import pictoList from "@/components/pictos/pictoList";
 import pictoBar from "@/components/pictos/pictoBar";
 export default {
@@ -109,12 +85,9 @@ export default {
     },
     loadedPictos() {
       if (!this.search) {
-        return this.$store.getters.getPublicCollections.map((id) => {
-          const index = this.$store.getters.getCollections.findIndex(
-            (collection) => collection.id === id
-          );
-          return this.$store.getters.getCollections[index];
-        });
+        return Promise.all(this.$store.getters.getPublicCollections.map(async (id) => {
+          return this.$store.dispatch("getCollectionFromId", id);
+        }));
       } else {
         return this.pictos;
       }
@@ -150,14 +123,17 @@ export default {
   margin-right: auto;
   margin-left: auto;
 }
+
 .publicList {
   margin: 20px;
 }
+
 .searchBottom {
   width: 100vw;
   position: fixed;
   bottom: 2vh;
 }
+
 .searchButton {
   display: flex;
   margin-left: auto;

@@ -42,8 +42,8 @@
                     </div>
                   </div>
                   <div v-else><b>{{ directSharerUrlEncoded }}</b></div>
-                  <b-button class="is-danger" icon-left="delete"
-                    @click="removeDirectSharer()">{{ $t('SignupSupervisorRemove') }}</b-button>
+                  <b-button class="is-danger" icon-left="delete" @click="removeDirectSharer()">{{
+                    $t('SignupSupervisorRemove') }}</b-button>
                 </div>
               </b-step-item>
               <b-step-item clickable :label="$t('Language')" icon="translate">
@@ -65,7 +65,7 @@
                   </div>
                 </b-field>
                 <b-button @click="showLanguages = !showLanguages" type="is-ghost">{{
-                  $t('SpeakMoreLanguage')}}</b-button>
+                  $t('SpeakMoreLanguage') }}</b-button>
                 <b-field v-if="showLanguages" class="column" :label="$t('Voices')">
                   <b-select v-model="voiceURIs" :placeholder="$t('SelectVoice')" required multiple expanded
                     native-size="6" size="is-small" :loading="loadingVoices">
@@ -132,11 +132,11 @@
                     {{ $t("IHaveRead") }}
                     <nuxt-link to="/legal-infos/terms-of-use/">{{
                       $t("TermsOfUse")
-                      }} </nuxt-link>
+                    }} </nuxt-link>
                     {{ $t("And") }}
                     <nuxt-link to="/legal-infos/privacy-policy/">{{
                       $t("PrivacyPolicy")
-                      }}</nuxt-link>.
+                    }}</nuxt-link>.
                   </p>
                 </div>
               </b-step-item>
@@ -154,8 +154,8 @@
                   {{ $t('VerifyAccountText') }}
                 </p>
 
-                <b-button type="is-text" :loading="mailLoading"
-                  @click="sendAnotherMail()">{{ $t("VerificationMoreMail") }}</b-button>
+                <b-button type="is-text" :loading="mailLoading" @click="sendAnotherMail()">{{ $t("VerificationMoreMail")
+                  }}</b-button>
               </b-step-item>
             </b-steps>
           </div>
@@ -182,8 +182,8 @@
                       terms,
                       passwordConfirmation
                     )
-                    ">{{ $t("SignUp") }}</b-button><b-button v-else id="signupmodal-verify" class="is-success fullWidth"
-                  :disabled="(notSignedUp) || (verificationToken.length != 40)" @click="
+                    ">{{ $t("SignUp") }}</b-button><b-button v-else id="signupmodal-verify"
+                  class="is-success fullWidth" :disabled="(notSignedUp) || (verificationToken.length != 40)" @click="
                     onVerify()
                     ">{{ $t("VerifyAccountOK") }}</b-button>
               </div>
@@ -238,6 +238,7 @@ export default {
   },
   data() {
     return {
+      publicBundles: [],
       selectedBundle: null,
       username: "",
       password: "",
@@ -288,17 +289,6 @@ export default {
     step1Parameters() {
       return `${this.username}|${this.password}|${this.passwordConfirmation}`;
     },
-    publicBundles() {
-      const publicBundles = this.$store.getters.getPublicBundles;
-      if (publicBundles) {
-        return publicBundles.map((bundle) => {
-          const index = this.$store.getters.getCollections.findIndex(
-            (collection) => collection.id === bundle.id
-          );
-          return this.$store.getters.getCollections[index];
-        });
-      }
-    },
     directSharerUrlEncoded() {
       return this.$route.query.directsharer;
     },
@@ -319,6 +309,12 @@ export default {
     this.selectedBundle = this.$store.getters.getPublicBundles
       ? this.$store.getters.getPublicBundles[0].id
       : null;
+
+    const bundles = this.$store.getters.getPublicBundles;
+    this.publicBundles =
+      await Promise.all(bundles.map(async (bundle) =>
+        his.$store.dispatch("getCollectionFromId", bundle.id)
+      ));
     this.initialization = false;
     if (!this.$store.getters.getPublicBundles) {
       await this.$store.dispatch("getPublicBundles");
