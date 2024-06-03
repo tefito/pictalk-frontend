@@ -190,17 +190,16 @@ export default {
       await this.fetchCollection(
         parseInt(this.$route.query.fatherCollectionId, 10)
       );
+      this.pictos = await this.loadedPictos();
     }
-    this.pictos = await this.loadedPictos();
 
     if (this.$store.getters.getSidebarId) {
-      console.log("fetching sidebar");
-      console.log("sidebarId", this.$store.getters.getSidebarId);
       await this.fetchCollection(
         parseInt(this.$store.getters.getSidebarId, 10)
       );
+      this.sidebarPictos = await this.loadedSidebarPictos();
     }
-    this.sidebarPictos = await this.loadedSidebarPictos();
+
     console.log("sidebarPictos", this.sidebarPictos);
     const user = this.$store.getters.getUser;
     if (!user.username) {
