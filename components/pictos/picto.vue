@@ -20,7 +20,8 @@
       'drop-area': isDropZone,
       'containing notification pictobackground pictogram': true,
     }">
-      <div id="pictogram-image-wrapper" :style="`width:100%; background-color:${this.picto.color}; border-radius:6px`">
+      <div id="pictogram-image-wrapper"
+        :style="`width:100%; position: relative; background-color:${this.picto.color}; border-radius:6px`">
         <div v-if="$route.query.isAdmin && !publicMode" class="actions container" @click.self="addToSpeech()">
           <div class="offline subtitle" v-if="!isOnline">
             <b-icon icon="web-cancel" />
@@ -500,7 +501,7 @@ export default {
 
 .actions {
   border-radius: 6px;
-  width: calc(100% - 1.2rem);
+  width: 100%;
   position: absolute;
   color: white;
   z-index: 2;
@@ -620,8 +621,7 @@ export default {
 }
 
 .notification {
-  /* padding: 0rem; */
-  padding-bottom: 0.1rem;
+  padding: 0.6rem 0.6rem 0.1rem;
 }
 
 .smallMargin {
