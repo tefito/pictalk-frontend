@@ -3,12 +3,12 @@
 		<h2 class="title is-1">Terms of Service</h2>
 		<p>
 			These Terms of Service govern your use of the website located at
-			<a href="https://www.pictalk.org">https://www.pictalk.org</a> and
+			<a href="https://application.pictalk.org">https://application.pictalk.org</a> and
 			any related services provided by Pictalk.
 		</p>
 		<p>
 			By accessing
-			<a href="https://www.pictalk.org">https://www.pictalk.org</a>, you
+			<a href="https://application.pictalk.org">https://application.pictalk.org</a>, you
 			agree to abide by these Terms of Service and to comply with all
 			applicable laws and regulations. If you do not agree with these
 			Terms of Service, you are prohibited from using or accessing this
