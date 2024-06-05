@@ -961,9 +961,7 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
       await vuexContext.dispatch("dbAddCollection", collectionsToCreate);
     }
     if (collectionsToEdit.length > 0) {
-      console.log("editCollection started");
       await vuexContext.dispatch("dbEditCollection", collectionsToEdit);
-      console.log("editCollection done")
     }
     if (pictosTocreate.length > 0) {
       await vuexContext.dispatch("dbAddPicto", pictosTocreate);
@@ -971,7 +969,6 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
     if (pictosToEdit.length > 0) {
       await vuexContext.dispatch("dbEditPicto", pictosToEdit);
     }
-    console.log("return collection: ");
     if (existsCollection && !updateCollection) {
       return localCollection;
     } else {
@@ -979,7 +976,6 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
     }
 
   }
-  console.log("return {}: ");
   return { collectionsToCreate, collectionsToEdit, pictosTocreate, pictosToEdit, collectionsWithoutFatherCollectionId };
 }
 

@@ -328,7 +328,6 @@ export default {
     },
     async isEditorFatherId() {
       const collection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10));
-      console.log(collection);
       return collection?.editors.find((editor) => editor == this.$store.getters.getUser.username) != undefined;
     },
     async isToUserFatherId() {
@@ -351,6 +350,7 @@ export default {
       });
     },
     navigateToParentCollection() {
+      actionsHistory
       const speechCollectionArray = this.$store.getters.getSpeech.filter((picto) => !picto.sidebar && picto.collection);
       const speechCollectionArrayBeforePosition = speechCollectionArray.slice(0, speechCollectionArray.findIndex((picto) => picto.id == parseInt(this.$route.query.fatherCollectionId)));
       if (speechCollectionArrayBeforePosition.length < 1) {
