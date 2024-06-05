@@ -286,8 +286,20 @@ export default {
       }
     },
     async fetchCollection(collectionId) {
-      const collection = await this.$store.dispatch("fetchCollection", collectionId);
-      return collection;
+      try {
+        const collection = await this.$store.dispatch("fetchCollection", collectionId);
+        return collection;
+      } catch (error) {
+        const notif = this.$buefy.notification.open({
+          duration: 4500,
+          message: this.$t("LostConnectivity"),
+          position: "is-top-right",
+          type: "is-danger",
+          hasIcon: true,
+          iconSize: "is-small",
+          icon: "airplane",
+        });
+      }
     },
     async refreshPictos() {
       try {

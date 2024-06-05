@@ -11,6 +11,14 @@ if (process.client) {
     pictogram: 'id, fatherCollectionId, public, userId',
     collection: 'id, collection, fatherCollectionId, partial, public, userId',
   });
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().then(granted => {
+      if (granted)
+        console.log('Storage will not be cleared except for hard drive space shortage, or explicit user action.');
+      else
+        console.log('Storage may be cleared by the UA under storage pressure.');
+    });
+  }
   db.open().catch(function (e) {
     console.error("Open failed: " + e.stack);
   });
@@ -23,5 +31,13 @@ export function createDatabaseForUser(username) {
     pictogram: 'id, fatherCollectionId, public, userId',
     collection: 'id, collection, fatherCollectionId, partial, public, userId',
   });
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().then(granted => {
+      if (granted)
+        console.log('Storage will not be cleared except for hard drive space shortage, or explicit user action.');
+      else
+        console.log('Storage may be cleared by the UA under storage pressure.');
+    });
+  }
   return db.open();
 }
