@@ -1,5 +1,17 @@
 export let db;
-if (process.client) {
+
+export async function getDatabase() {
+  if (db.isOpen()) {
+    console.log("Database is already open");
+    return db;
+  } else {
+    console.log("Database is not open")
+    await db.open();
+    return db;
+  }
+}
+
+function initializeDatabase() {
   const Dexie = require('dexie').Dexie;
   let username = 'default';
   const data = JSON.parse(window.localStorage.getItem('pictalk-data'));
@@ -41,3 +53,5 @@ export function createDatabaseForUser(username) {
   }
   return db.open();
 }
+
+initializeDatabase();

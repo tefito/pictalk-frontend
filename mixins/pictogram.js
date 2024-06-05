@@ -80,7 +80,6 @@ export default {
       });
       if (this.picto.collection == true) {
         this.$router.push({
-          path: "/pictalk",
           query: { ...this.$route.query, fatherCollectionId: this.picto.id },
         });
       }

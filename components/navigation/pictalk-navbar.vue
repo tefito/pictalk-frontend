@@ -261,6 +261,14 @@ export default {
     }
   },
   watch: {
+    "$route.query.fatherCollectionId": function (newVal, oldVal) {
+      if (newVal != oldVal) {
+        if (!newVal) return;
+        console.log("navigation changed")
+        this.$store.commit("pushNavigation", newVal);
+        console.log(this.$store.getters.getNavigation)
+      }
+    },
     $route(to, from) {
       if (to.path.includes("pictalk")) {
         this.icon = "home";
@@ -350,10 +358,9 @@ export default {
       });
     },
     navigateToParentCollection() {
-      actionsHistory
-      const speechCollectionArray = this.$store.getters.getSpeech.filter((picto) => !picto.sidebar && picto.collection);
-      const speechCollectionArrayBeforePosition = speechCollectionArray.slice(0, speechCollectionArray.findIndex((picto) => picto.id == parseInt(this.$route.query.fatherCollectionId)));
-      if (speechCollectionArrayBeforePosition.length < 1) {
+      const navigation = this.$store.getters.getNavigation
+      console.log("navigation", navigation)
+      if (navigation.length < 2) {
         if (this.publicMode) {
           this.$router.push(
             {
@@ -374,9 +381,10 @@ export default {
           }
         }
       } else {
+        console.log("navigating to", navigation[navigation.length - 2])
         this.$router.push({
           path: this.publicMode ? "/public/pictalk" : "/pictalk",
-          query: { ...this.$route.query, fatherCollectionId: speechCollectionArrayBeforePosition[speechCollectionArrayBeforePosition.length - 1]?.id },
+          query: { ...this.$route.query, fatherCollectionId: navigation[navigation.length - 2] },
         });
       }
     },

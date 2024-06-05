@@ -11,8 +11,8 @@
           icon-left="folder-account" class="fullWidth customButton" />
       </div>
       <div class="option">
-        <b-button style="background-color: hsl(154, 100%, 70%)" :label="$t('PublicCollections')"
-          @click="goTo('/public/')" icon-left="web" class="fullWidth customButton" />
+        <b-button style="background-color: hsl(154, 100%, 70%)" :label="$t('PublicCollections')" @click="goToPublic()"
+          icon-left="web" class="fullWidth customButton" />
       </div>
     </section>
   </div>
@@ -43,6 +43,12 @@ export default {
       });
       this.$parent.close();
     },
+    goToPublic() {
+      this.$router.push({
+        path: "/public/pictalk",
+      });
+      this.$parent.close();
+    }
   },
   computed: {
     sharedLink() {

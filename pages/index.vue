@@ -267,7 +267,6 @@ export default {
       }
     }
   },
-  middleware: ["check-auth"],
   methods: {
     openSignUpModal() {
       this.$buefy.modal.open({

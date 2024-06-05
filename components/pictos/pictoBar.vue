@@ -223,6 +223,7 @@ export default {
           }
         } else {
           if (pictalkSpeech.length <= 1) {
+            this.$store.commit("resetNavigation");
             if (this.publicMode) {
               this.$router.push("/public/pictalk?fatherCollectionId=346");
             } else {
@@ -253,6 +254,7 @@ export default {
       this.$store.commit("removeSpeech");
     },
     eraseSpeech() {
+      this.$store.commit("resetNavigation");
       if (this.publicMode) {
         this.$router.push("/public/pictalk?fatherCollectionId=346");
         this.$store.commit("eraseSpeech");

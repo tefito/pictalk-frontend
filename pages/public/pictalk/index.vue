@@ -42,6 +42,26 @@ export default {
         return "#f5f5f5";
       }
     },
+    sidebarPictoId() {
+      return this.$store.getters.getSidebarId;
+    },
+    fatherCollectionId() {
+      return this.$route.query.fatherCollectionId;
+    },
+  },
+  watch: {
+    async fatherCollectionId(fatherCollectionId, previousId) {
+      if (fatherCollectionId && fatherCollectionId != previousId) {
+        await this.fetchCollection(fatherCollectionId);
+        this.pictos = await this.loadedPictos();
+      }
+    },
+    async sidebarPictoId(sidebarId, previousId) {
+      if (sidebarId && sidebarId != previousId) {
+        await this.fetchCollection(sidebarId);
+        this.sidebarPictos = await this.loadedSidebarPictos();
+      }
+    },
   },
   async fetch() {
     if (process.client) {
@@ -71,6 +91,7 @@ export default {
         const collection = await this.$store.dispatch("fetchCollection", collectionId);
         return collection;
       } catch (error) {
+        console.log(error);
         const notif = this.$buefy.notification.open({
           duration: 4500,
           message: this.$t("LostConnectivity"),

@@ -1,10 +1,8 @@
 import axios from "axios";
 import Cookie from "js-cookie";
 
-function getDexieDB() {
-  if (process.client) {
-    return require('~/plugins/dexieDB').db;
-  }
+async function getDexieDB() {
+  return require('~/plugins/dexieDB').getDatabase();
 }
 
 export const strict = false;
@@ -21,6 +19,7 @@ axios.interceptors.request.use((config) => {
 },);
 
 export const state = () => ({
+  navigation: [],
   token: null,
   pictoSpeech: [],
   public: [],
@@ -38,6 +37,7 @@ export const state = () => ({
 
 export const mutations = {
   resetStore(state) {
+    state.navigation = [];
     state.pictoSpeech = [];
     state.rootId = null;
     state.copyCollectionId = null;
@@ -114,6 +114,17 @@ export const mutations = {
   },
   setDragndrop(state, dragndrop) {
     state.dragndrop = dragndrop;
+  },
+  pushNavigation(state, navigation) {
+    if (state.navigation[state.navigation.length - 1] == navigation) return;
+    state.navigation.push(navigation);
+  },
+  resetNavigation(state) {
+    if (state.user.root) {
+      state.navigation = [String(state.user.root)];
+    } else {
+      state.navigation = [];
+    }
   }
 };
 export const actions = {
@@ -121,66 +132,70 @@ export const actions = {
     if (!Array.isArray(newCollections)) {
       newCollections = new Array(newCollections);
     }
+    const db = await getDexieDB();
     // Dexie transition
-    await getDexieDB().collection.bulkPut(newCollections);
+    await db.collection.bulkPut(newCollections);
 
   },
   async dbRemoveCollection(state, removedCollection) {
-    // Dexie transition
-    await getDexieDB().collection.delete(removedCollection.id);
+    const db = await getDexieDB();
+    await db.collection.delete(removedCollection.id);
   },
   async dbEditCollection(state, editedCollections) {
     if (!Array.isArray(editedCollections)) {
       editedCollections = new Array(editedCollections);
     }
+    const db = await getDexieDB();
     editedCollections = await Promise.all(editedCollections.map(async (collection) => {
-      const col = await getDexieDB().collection.get(collection.id)
+      const col = await db.collection.get(collection.id)
       Object.assign(col, collection);
       col.collections = col.collections.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
       col.pictos = col.pictos.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
       return col;
     }));
     console.log(editedCollections);
-    return getDexieDB().collection.bulkPut(editedCollections);
+    return db.collection.bulkPut(editedCollections);
   },
   async dbAddPicto(state, pictos) {
     if (!Array.isArray(pictos)) {
       pictos = new Array(pictos);
     }
     let collection;
+    const db = await getDexieDB();
     for (let picto of pictos) {
-      collection = await getDexieDB().collection.get(picto.fatherCollectionId);
+      collection = await db.collection.get(picto.fatherCollectionId);
       if (collection) {
         const pictoIndex = collection.pictos.findIndex(
           pct => pct.id === picto.id
         );
         if (collection && pictoIndex == -1) {
           collection.pictos.push(picto);
-          await getDexieDB().collection.put(collection);
+          await db.collection.put(collection);
         }
       }
     }
     // Dexie transition
-    await getDexieDB().pictogram.bulkPut(pictos);
+    await db.pictogram.bulkPut(pictos);
   },
   async dbEditPicto(state, editedPictos) {
     if (!Array.isArray(editedPictos)) {
       editedPictos = new Array(editedPictos);
     }
+    const db = await getDexieDB();
     editedPictos = await Promise.all(editedPictos.map(async (picto) => {
-      const pct = await getDexieDB().pictogram.get(picto.id)
+      const pct = await db.pictogram.get(picto.id)
       Object.assign(pct, picto);
       return pct;
     }));
-    await getDexieDB().pictogram.bulkPut(editedPictos);
+    await db.pictogram.bulkPut(editedPictos);
   },
   async dbResetCollections(state) {
-    // Dexie transition
-    await getDexieDB().collection.clear();
+    const db = await getDexieDB();
+    await db.collection.clear();
   },
   async dbSetCollections(state, collections) {
-    // Dexie transition
-    await getDexieDB().collection.bulkPut(collections);
+    const db = await getDexieDB();
+    await db.collection.bulkPut(collections);
   },
 
   async fetchCollection(vuexContext, collectionId) {
@@ -226,11 +241,12 @@ export const actions = {
     await vuexContext.dispatch('dbEditCollection', { ...targetCollection });
 
   },
-  resetCollections(vuexContext) {
+  async resetCollections(vuexContext) {
     vuexContext.commit("resetCollections");
 
     // Dexie transition
-    getDexieDB().collection.clear();
+    const db = await getDexieDB();
+    await db.collection.clear();
   },
   async getPublicBundles(vuexContext) {
     try {
@@ -516,12 +532,9 @@ export const actions = {
         }
         expirationDate = jwtExpirationDate.split("=")[1];
       }
-    } else if (process.client) {
+    } else {
       token = localStorage.getItem("token");
       expirationDate = localStorage.getItem("tokenExpiration");
-    } else {
-      token = null;
-      expirationDate = null;
     }
     if (new Date().getTime() > +expirationDate || !token) {
       vuexContext.dispatch("logout");
@@ -537,7 +550,8 @@ export const actions = {
       Cookie.set("expirationDate", expirationDate, { sameSite: 'none', secure: true, expires: 7 });
     }
   },
-  logout(vuexContext) {
+  async logout(vuexContext) {
+    console.log("Logging out")
     vuexContext.commit("clearToken");
     Cookie.remove("jwt");
     Cookie.remove("expirationDate");
@@ -545,7 +559,11 @@ export const actions = {
       localStorage.removeItem("token");
       localStorage.removeItem("tokenExpiration");
     }
-    getDexieDB().delete();
+    // Check if dexie db is different from the default one
+    if (vuexContext.state.user.username) {
+      const db = await getDexieDB();
+      db.delete();
+    }
     vuexContext.commit("resetStore");
   },
   async getUser(vuexContext) {
@@ -770,27 +788,33 @@ export const actions = {
     return notifications;
   },
   async getCollections(vuexContext) {
-    return getDexieDB().collection.toArray();
+    const db = await getDexieDB();
+    return db.collection.toArray();
   },
   async getCollectionFromId(vuexContext, id) {
-    return getDexieDB().collection.get(id);
+    const db = await getDexieDB();
+    return db.collection.get(id);
   },
   async getCollectionsFromFatherCollectionId(vuexContext, fatherCollectionId) {
-    const collection = await getDexieDB().collection.get(fatherCollectionId);
+    const db = await getDexieDB();
+    const collection = await db.collection.get(fatherCollectionId);
     return Promise.all(collection.collections.map(async (collection) => {
-      return getDexieDB().collection.get(collection.id);
+      return db.collection.get(collection.id);
     }));
   },
   async getPictos(state) {
-    return getDexieDB().pictogram.toArray();
+    const db = await getDexieDB();
+    return db.pictogram.toArray();
   },
   async getPictoFromId(state, id) {
-    return getDexieDB().pictogram.get(id);
+    const db = await getDexieDB();
+    return db.pictogram.get(id);
   },
   async getPictosFromFatherCollectionId(state, fatherCollectionId) {
-    const collection = await getDexieDB().collection.get(fatherCollectionId);
+    const db = await getDexieDB();
+    const collection = await db.collection.get(fatherCollectionId);
     return Promise.all(collection.pictos.map(async (picto) => {
-      return getDexieDB().pictogram.get(picto.id)
+      return db.pictogram.get(picto.id)
     }));
   },
 }
@@ -845,6 +869,9 @@ export const getters = {
   getTtsBoundarySupport(state) {
     return state.ttsBoundarySupport;
   },
+  getNavigation(state) {
+    return state.navigation;
+  }
 };
 
 async function parseAndUpdateEntireCollection(vuexContext, collection, download = false) {
@@ -1001,10 +1028,10 @@ async function parseAndUpdatePictogram(vuexContext, picto) {
 }
 
 async function getCollectionFromId(vuexContext, id) {
-  // Dexie transition 
-  return getDexieDB().collection.get(id);
+  const db = await getDexieDB();
+  return db.collection.get(id);
 }
 async function getPictoFromId(vuexContext, id) {
-  // Dexie transition
-  return getDexieDB().pictogram.get(id);
+  const db = await getDexieDB();
+  return db.pictogram.get(id);
 }
