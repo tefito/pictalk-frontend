@@ -92,7 +92,6 @@ export default {
       const pictos = await this.$store.dispatch("getPictosFromFatherCollectionId", fatherCollectionId);
       let items = await Promise.all([collectionList, pictos]);
       items = items[0].concat(items[1]) // Merge both arrays
-      console.log(items)
       if (items) {
         let sortedItems = this.sorting(items);
         sortedItems.map((picto) => {
