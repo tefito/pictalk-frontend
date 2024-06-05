@@ -88,8 +88,8 @@ export default {
       );
     },
     async loadPictos(fatherCollectionId) {
-      const collectionList = this.$store.getters.getCollectionsFromFatherCollectionId(fatherCollectionId);
-      const pictos = this.$store.getters.getPictosFromFatherCollectionId(fatherCollectionId);
+      const collectionList = await this.$store.dispatch("getCollectionsFromFatherCollectionId", fatherCollectionId);
+      const pictos = await this.$store.dispatch("getPictosFromFatherCollectionId", fatherCollectionId);
       let items = await Promise.all([collectionList, pictos]);
       items = items[0].concat(items[1]) // Merge both arrays
       console.log(items)
