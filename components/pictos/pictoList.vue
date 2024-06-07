@@ -2,18 +2,20 @@
   <div class="margins">
     <div v-if="sidebar
     " style="padding-top: 9px" />
-    <div class="columns is-multiline is-mobile even">
-      <picto :class="sidebar
-        ? 'column is-12'
-        : sidebarUsed
-          ? 'column is-6-mobile is-4-tablet is-3-desktop is-3-widescreen is-one-fifth-fullhd'
-          : customPictoSize
-        " v-for="(picto, index) in getFilteredPictoList" :key="index" :picto="picto" :publicMode="publicMode"
-        :sidebarMode="sidebar" :ref="picto.collection ? 'dragCollection' : 'dragPictogram'" />
-      <div data-cy="cypress-empty-column"
-        class="column is-one-third-mobile is-one-quarter-tablet is-one-quarter-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+    <transition name="fade" mode="out-in">
+      <div :key="$route.query.fatherCollectionId" class="columns is-multiline is-mobile even">
+        <picto :class="sidebar
+          ? 'column is-12'
+          : sidebarUsed
+            ? 'column is-6-mobile is-4-tablet is-3-desktop is-3-widescreen is-one-fifth-fullhd'
+            : customPictoSize
+          " v-for="(picto, index) in getFilteredPictoList" :key="picto.id" :picto="picto" :publicMode="publicMode"
+          :sidebarMode="sidebar" :ref="picto.collection ? 'dragCollection' : 'dragPictogram'" />
+        <div data-cy="cypress-empty-column"
+          class="column is-one-third-mobile is-one-quarter-tablet is-one-quarter-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+        </div>
       </div>
-    </div>
+    </transition>
 
     <div v-if="canReturn && dragndropId" class="drag-return"
       v-on="{ dragover: onDragOver, dragleave: onDragLeave, drop: onDrop }"></div>
@@ -39,101 +41,6 @@ export default {
     };
   },
   methods: {
-    getItemSizeX() {
-      let mainContainerWidth = document.getElementById('pictoList-main')?.clientWidth;
-      if (!mainContainerWidth) {
-        return 50;
-      }
-      if (this.sidebar) {
-        const sidebarSize = window.innerWidth - mainContainerWidth - 7;
-
-        console.log("Sidebar size: ", (sidebarSize) / this.getRowCount(this.getDeviceType))
-        return (sidebarSize) / this.getRowCount(this.getDeviceType);
-      } else {
-        console.log("Main container width is: ", mainContainerWidth)
-        console.log("Item size is: ", ((mainContainerWidth) / this.getRowCount(this.getDeviceType)))
-        console.log("Item count is: ", this.getRowCount(this.getDeviceType))
-        return ((mainContainerWidth) / this.getRowCount(this.getDeviceType)) - 7 - 10;
-      }
-    },
-    getItemSizeY() {
-      let mainContainerWidth = document.getElementById('pictoList-main')?.clientWidth;
-      if (!mainContainerWidth) {
-        return 50;
-      }
-      if (this.sidebar) {
-        const sidebarSize = window.innerWidth - mainContainerWidth - (0.7 * window.innerWidth / 100) - 3;
-
-        console.log("Sidebar size: ", (sidebarSize) / this.getRowCount(this.getDeviceType))
-        return (sidebarSize) / this.getRowCount(this.getDeviceType);
-      } else {
-        console.log("Main container width is: ", mainContainerWidth)
-        console.log("Item size is: ", ((mainContainerWidth) / this.getRowCount(this.getDeviceType)))
-        console.log("Item count is: ", this.getRowCount(this.getDeviceType))
-        return ((mainContainerWidth) / this.getRowCount(this.getDeviceType));
-      }
-    },
-    getRowCount(deviceType) {
-      if (this.sidebar) {
-        return 1;
-      }
-      let rowNumber;
-      console.log("Pronunciation show size", this.$store.getters.getUser.settings?.pronounceShowSize)
-      if (!this.$store.getters.getUser.settings?.pronounceShowSize && this.$store.getters.getUser.settings?.pronounceShowSize != 0) {
-        if (deviceType == 'mobile') {
-          rowNumber = 3;
-        } else if (deviceType == 'tablet') {
-          rowNumber = 4;
-        } else if (deviceType == 'desktop') {
-          rowNumber = 5;
-        } else if (deviceType == 'widescreen') {
-          rowNumber = 6;
-        } else {
-          rowNumber = 6;
-        }
-      }
-      if (this.$store.getters.getUser.settings?.pronounceShowSize == 0) {
-        if (deviceType == 'mobile') {
-          rowNumber = 4;
-        } else if (deviceType == 'tablet') {
-          rowNumber = 5;
-        } else if (deviceType == 'desktop') {
-          rowNumber = 6;
-        } else if (deviceType == 'widescreen') {
-          rowNumber = 6;
-        } else {
-          rowNumber = 6;
-        }
-      } else if (this.$store.getters.getUser.settings?.pronounceShowSize == 1) {
-        if (deviceType == 'mobile') {
-          rowNumber = 3;
-        } else if (deviceType == 'tablet') {
-          rowNumber = 4;
-        } else if (deviceType == 'desktop') {
-          rowNumber = 5;
-        } else if (deviceType == 'widescreen') {
-          rowNumber = 6;
-        } else {
-          rowNumber = 6;
-        }
-      } else if (this.$store.getters.getUser.settings?.pronounceShowSize == 2) {
-        if (deviceType == 'mobile') {
-          rowNumber = 2;
-        } else if (deviceType == 'tablet') {
-          rowNumber = 3;
-        } else if (deviceType == 'desktop') {
-          rowNumber = 4;
-        } else if (deviceType == 'widescreen') {
-          rowNumber = 5;
-        } else {
-          rowNumber = 5;
-        }
-      }
-      console.log("Device type is: ", deviceType)
-      console.log("Row number is: ", rowNumber)
-      return rowNumber;
-    },
-
     onDragOver(ev) {
       ev.preventDefault();
       ev.dataTransfer.dropEffect = "move";
@@ -177,19 +84,6 @@ export default {
     },
   },
   computed: {
-    getDeviceType() {
-      if (window.innerWidth < 768) {
-        return 'mobile';
-      } else if (window.innerWidth < 1024) {
-        return 'tablet';
-      } else if (window.innerWidth < 1216) {
-        return 'desktop';
-      } else if (window.innerWidth < 1408) {
-        return 'widescreen';
-      } else {
-        return 'fullhd';
-      }
-    },
     getFilteredPictoList() {
       return this.pictos.filter((picto) => picto?.meaning && (picto.meaning[this.getUserLang] || picto.meaning == ""));
     },
@@ -223,6 +117,16 @@ export default {
 };
 </script>
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .1s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .even {
   justify-content: space-between;
 }
