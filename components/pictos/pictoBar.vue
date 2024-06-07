@@ -225,7 +225,7 @@ export default {
           if (pictalkSpeech.length <= 1) {
             this.$store.commit("resetNavigation");
             if (this.publicMode) {
-              this.$router.push("/public/pictalk?fatherCollectionId=346");
+              this.$router.push("/public?fatherCollectionId=346");
             } else {
               if (this.$store.getters.getRootId) {
                 this.$router.push({
@@ -240,7 +240,7 @@ export default {
           } else {
             this.$router.push({
               path:
-                (this.publicMode ? "/public/pictalk" : "/pictalk/"),
+                (this.publicMode ? "/public" : "/pictalk/"),
               query: { ...this.$route.query, fatherCollectionId: pictalkSpeech[pictalkSpeech.length - 2]?.id },
             });
           }
@@ -256,7 +256,7 @@ export default {
     eraseSpeech() {
       this.$store.commit("resetNavigation");
       if (this.publicMode) {
-        this.$router.push("/public/pictalk?fatherCollectionId=346");
+        this.$router.push("/public?fatherCollectionId=346");
         this.$store.commit("eraseSpeech");
       } else {
         this.$store.commit("eraseSpeech");

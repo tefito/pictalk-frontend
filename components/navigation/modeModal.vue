@@ -45,7 +45,7 @@ export default {
     },
     goToPublic() {
       this.$router.push({
-        path: "/public/pictalk",
+        path: "/public",
       });
       this.$parent.close();
     }

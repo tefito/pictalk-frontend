@@ -226,7 +226,7 @@ export default {
         });
       } else {
         this.$router.push({
-          path: "/public/pictalk?fatherCollectionId=346"
+          path: "/public?fatherCollectionId=346"
         });
       }
     }

@@ -1,24 +1,35 @@
 <template>
   <div>
-    <client-only>
-      <b-field class="searchBar">
+    <clientOnly>
+      <b-field v-if="!$route.query.fatherCollectionId" class="searchBar">
         <b-input v-model="search" :placeholder="$t('SearchPictoPlaceholder')" clearable expanded style="min-width: 70vw"
           @keyup.native.enter="searchFirst()">
         </b-input>
         <b-button type="is-info" @click="searchFirst()" icon-right="magnify" :loading="loading" />
       </b-field>
 
-      <pictoList class="publicList" :pictos="pictos" :publicMode="true" :sidebar="false" :sidebarUsed="false" />
-      <div class="searchBottom">
+      <div class="is-widescreen" style="margin-right: 0.5rem; margin-left: 0.5rem">
+        <pictoList :publicMode="true" :pictos="pictos" :sidebar="false" :sidebarUsed="false" />
+      </div>
+      <div v-if="!$route.query.fatherCollectionId" class="searchBottom">
         <b-button v-if="more" class="searchButton" type="is-info is-light is-text" @click="searchMore()"
           icon-right="magnify" rounded :loading="loading">
           {{ $t("MoreItems") }}
         </b-button>
       </div>
-    </client-only>
+      <div class="contenant">
+        <pictoBar :style="loadSpeech.length != 0
+          ? 'bottom: 2px'
+          : 'transform: translateY(105%);'
+          " class="pictobar sidebar slide-up" :publicMode="true" :pictos="loadSpeech"
+          :collectionColor="collectionColor" />
+      </div>
+      <div class="filler"></div>
+    </clientOnly>
   </div>
 </template>
 <script>
+import axios from "axios";
 import pictoList from "@/components/pictos/pictoList";
 import pictoBar from "@/components/pictos/pictoBar";
 export default {
@@ -29,25 +40,66 @@ export default {
     pictoList: pictoList,
     pictoBar: pictoBar,
   },
-  created() {
-    this.$store.commit("eraseSpeech");
+  computed: {
+    querySearchParameter() {
+      return this.$route.query.search;
+    },
+    loadSpeech() {
+      return this.$store.getters.getSpeech;
+    },
+    isLogged() {
+      return this.$store.getters.getUser.username == !undefined;
+    },
+    collectionColor() {
+      if (this.collection) {
+        if (this.collection.color) {
+          return this.collection.color;
+        } else {
+          return "#f5f5f5";
+        }
+      } else {
+        return "#f5f5f5";
+      }
+    },
+    sidebarPictoId() {
+      return this.$store.getters.getSidebarId;
+    },
+    fatherCollectionId() {
+      return this.$route.query.fatherCollectionId;
+    },
   },
-  mounted() {
-    this.per_page =
-      window.innerWidth > 767 ? (window.innerWidth > 1407 ? 48 : 30) : 15;
-    if (this.querySearchParameter != "") {
-      this.search = this.querySearchParameter;
-      this.searchFirst();
+  watch: {
+    async fatherCollectionId(fatherCollectionId, previousId) {
+      if (fatherCollectionId && fatherCollectionId != previousId) {
+        console.log("fatherCollectionId", fatherCollectionId, previousId);
+        await this.fetchCollection(fatherCollectionId);
+        this.pictos = await this.loadedPictos();
+      }
+    },
+    async sidebarPictoId(sidebarId, previousId) {
+      if (sidebarId && sidebarId != previousId) {
+        await this.fetchCollection(sidebarId);
+        this.sidebarPictos = await this.loadedSidebarPictos();
+      }
+    },
+  },
+  async fetch() {
+    if (this.$route.query.fatherCollectionId) {
+      await this.fetchCollection(
+        parseInt(this.$route.query.fatherCollectionId, 10)
+      );
+      this.pictos = await this.loadedPictos();
     }
   },
   data() {
     return {
+      isPicto: true,
+      pictos: [],
       search: "",
       page: 1,
       per_page: 15,
       loading: false,
       more: false,
-      pictos: [],
       per_page_options: [15, 30, 50],
     };
   },
@@ -75,74 +127,82 @@ export default {
       this.page = 1;
       this.pictos = await this.searchPublic();
     },
-  },
-  computed: {
-    querySearchParameter() {
-      return this.$route.query.search;
+    sorting(items) {
+      let sortedItems = items.sort(function (itemA, itemB) {
+        return new Date(itemA.createdDate) - new Date(itemB.createdDate);
+      });
+      return sortedItems;
     },
-    isLogged() {
-      return this.$store.getters.getUser.username == !undefined;
-    },
-    loadedPictos() {
-      if (!this.search) {
-        return Promise.all(this.$store.getters.getPublicCollections.map(async (id) => {
-          return this.$store.dispatch("getCollectionFromId", id);
-        }));
-      } else {
-        return this.pictos;
+    async fetchCollection(collectionId) {
+      try {
+        const collection = await this.$store.dispatch("fetchCollection", collectionId);
+        return collection;
+      } catch (error) {
+        console.log(error);
+        const notif = this.$buefy.notification.open({
+          duration: 4500,
+          message: this.$t("LostConnectivity"),
+          position: "is-top-right",
+          type: "is-danger",
+          hasIcon: true,
+          iconSize: "is-small",
+          icon: "airplane",
+        });
       }
     },
-    loadSpeech() {
-      return this.$store.getters.getSpeech;
+    loadedPictos() {
+      return this.loadPictos(
+        parseInt(this.$route.query.fatherCollectionId, 10)
+      );
     },
-  },
-  head() {
-    const i18nHead = this.$nuxtI18nHead({ addSeoAttributes: true });
-    return {
-      htmlAttrs: {
-        title: this.$t("TitlePublic"),
-        ...i18nHead.htmlAttrs,
-      },
-      title: this.$t("TitlePublic"),
-      meta: [
-        {
-          hid: "descriptionPublic",
-          name: "description",
-          content: this.$t("DescriptionPublic"),
-        },
-        ...i18nHead.meta,
-      ],
-    };
+    async loadPictos(fatherCollectionId) {
+      const collectionList = await this.$store.dispatch("getCollectionsFromFatherCollectionId", fatherCollectionId);
+      const pictos = await this.$store.dispatch("getPictosFromFatherCollectionId", fatherCollectionId);
+      let items = await Promise.all([collectionList, pictos]);
+      items = items[0].concat(items[1]) // Merge both arrays
+      if (items) {
+        let sortedItems = this.sorting(items);
+        sortedItems.map((picto) => {
+          if (picto?.starred === true) {
+            picto.priority = 1;
+          } else if (picto?.starred === false) {
+            picto.priority = 10;
+          }
+        });
+        return sortedItems.sort((a, b) => a.priority - b.priority);
+      } else {
+        return [];
+      }
+    },
+    removeSpeech() {
+      this.$store.commit("removeSpeech");
+    },
+    async getCollectionFromId(id) {
+      return this.$store.dispatch("getCollectionFromId", id);
+    },
+    async getPictoFromId(id) {
+      return this.$store.dispatch("getPictoFromId", id);
+    },
   },
 };
 </script>
 <style scoped>
-.searchBar {
-  width: 80vw;
-  display: flex;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.publicList {
-  margin: 20px;
-}
-
-.searchBottom {
-  width: 100vw;
+.pictobar {
+  bottom: 2px;
+  margin: 0 auto;
+  width: 99vw;
+  max-height: 20%;
   position: fixed;
-  bottom: 2vh;
+  max-width: 767px;
+  z-index: 4;
 }
 
-.searchButton {
+.filler {
+  padding-bottom: 20%;
+}
+
+.contenant {
   display: flex;
-  margin-left: auto;
-  margin-right: auto;
-  border: solid;
-  border-width: 1px;
-  border-color: #3e8ed0;
-  width: 30vw;
-  min-width: 240px;
-  max-width: 450px;
+  justify-content: center;
 }
 </style>

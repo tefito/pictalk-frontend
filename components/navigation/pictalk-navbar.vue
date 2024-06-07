@@ -364,7 +364,7 @@ export default {
         if (this.publicMode) {
           this.$router.push(
             {
-              path: "/public/pictalk",
+              path: "/public",
               query: { ...this.$route.query, fatherCollectionId: 346 },
             });
         } else {
@@ -383,7 +383,7 @@ export default {
       } else {
         console.log("navigating to", navigation[navigation.length - 2])
         this.$router.push({
-          path: this.publicMode ? "/public/pictalk" : "/pictalk",
+          path: this.publicMode ? "/public" : "/pictalk",
           query: { ...this.$route.query, fatherCollectionId: navigation[navigation.length - 2] },
         });
       }
