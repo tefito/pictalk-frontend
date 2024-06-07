@@ -3,7 +3,7 @@
     <div v-if="sidebar
     " style="padding-top: 9px" />
     <transition name="fade" mode="out-in">
-      <div :key="$route.query.fatherCollectionId" class="columns is-multiline is-mobile even">
+      <div :key="getFilteredPictoList.length" class="columns is-multiline is-mobile even">
         <picto :class="sidebar
           ? 'column is-12'
           : sidebarUsed
@@ -16,7 +16,6 @@
         </div>
       </div>
     </transition>
-
     <div v-if="canReturn && dragndropId" class="drag-return"
       v-on="{ dragover: onDragOver, dragleave: onDragLeave, drop: onDrop }"></div>
     <div id="return" class="return">
