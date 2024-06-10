@@ -2,7 +2,6 @@ export let db;
 
 export async function getDatabase() {
   if (db.isOpen()) {
-    console.log("Database is already open");
     return db;
   } else {
     console.log("Database is not open")

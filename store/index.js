@@ -910,10 +910,7 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
     // TODO Est-ce qu'on peut recuperer fatherCollectionId d'une autre facon ?
     // SI la collection n'existe pas alors cela sera undefined...
     if (localCollection) {
-      console.log("localCollection: ", localCollection);
-      console.log("collection: ", collection);
       Object.assign(localCollection, collection);
-      console.log("localCollection after assign: ", localCollection);
       collection = localCollection;
       collection.fatherCollectionId = localCollection.fatherCollectionId;
     } else {
