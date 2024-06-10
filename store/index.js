@@ -751,7 +751,6 @@ export const actions = {
     if (notificationsRequest.status !== 200) return;
 
     const notifications = notificationsRequest.data;
-    console.log(notifications)
     if (notifications?.length != vuexContext.getters.getUser.notifications.length) {
       vuexContext.dispatch("downloadCollections");
     }
@@ -775,7 +774,6 @@ export const actions = {
           }
           notification.image = (await getCollectionFromId(vuexContext, parseInt(notification.affected, 10)))?.image;
         }
-        resolve();
       }
     });
     // Mettre les notifications dans user

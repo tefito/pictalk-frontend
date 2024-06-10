@@ -560,6 +560,10 @@ export default {
         }
       }
     },
+    async getNotificationImage(notification) {
+      const collection = await this.getCollectionFromId(parseInt(notification.affected, 10));
+      return collection?.image;
+    },
     notificationGoToCollectionOrReturn(notification) {
       if (
         notification.operation == "unshare" ||
