@@ -80,7 +80,7 @@ Cypress.Commands.add(
           color: "#F1F1F1",
           share: 1,
           fatherCollectionId: parseInt(
-            window.$nuxt.$route.params.fatherCollectionId,
+            window.$nuxt.$route.query.fatherCollectionId,
             10
           ),
           image: uploadedImage,

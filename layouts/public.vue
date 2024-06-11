@@ -8,7 +8,6 @@
     </client-only>
   </div>
 </template>
-
 <script>
 import navbar from "@/components/navigation/navbar";
 import popupModal from "@/components/auth/popupModal";
@@ -62,7 +61,7 @@ export default {
   },
   destroyed() {
     clearTimeout(this.popupTimeout);
-  },
+  }
 };
 </script>
 

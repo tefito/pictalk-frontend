@@ -20,7 +20,7 @@
         </section>
         <footer class="modal-card-foot">
           <b-button data-cy="signin-signin" class="is-primary" :loading="loading" @click="onSubmit">{{
-      $t("LogIn")
+            $t("LogIn")
             }}</b-button>
         </footer>
       </div>
@@ -29,7 +29,6 @@
 </template>
 <script>
 import signup from "@/components/auth/signupModal";
-import { SoundHelper } from "@/utils/sounds";
 export default {
   data() {
     return {
@@ -51,18 +50,24 @@ export default {
         if (res.status == 201) {
           await this.$store.dispatch("getUser");
 
+          try {
+            if (process.client) {
+              const createDatabaseForUser = require("~/plugins/dexieDB").createDatabaseForUser;
+              createDatabaseForUser(this.$store.getters.getUser.username);
+            }
+          } catch (err) {
+            console.log(err);
+          }
           this.$parent.close();
           this.$router.push({
-            path: "/pictalk/" + this.$store.getters.getRootId,
+            path: "/pictalk",
+            query: { ...this.$route.query, fatherCollectionId: this.$store.getters.getRootId },
           });
           if (this.$store.getters.getUser.notifications.length != 0) {
-            SoundHelper.playNotification();
             this.$buefy.notification.open({
               message: this.$t("UnreadNotifications"),
               type: "is-info",
             });
-          } else {
-            SoundHelper.playAccountCreation();
           }
         }
       } catch (error) {

@@ -18,7 +18,7 @@ describe('Edits a collection', () => {
       cy.get('[data-cy="cy-' + createdCollection.id + '"]').contains('Edited')
       cy.window().then((window) => {
         cy.deleteCollection(createdCollection.id, parseInt(
-          window.$nuxt.$route.params.fatherCollectionId,
+          window.$nuxt.$route.query.fatherCollectionId,
           10
         ));
       });

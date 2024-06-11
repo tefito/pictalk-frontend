@@ -29,7 +29,6 @@
   </div>
 </template>
 <script>
-import { SoundHelper } from "@/utils/sounds";
 import lang from "@/mixins/lang";
 export default {
   mixins: [lang],
@@ -65,18 +64,18 @@ export default {
       if (input == this.name) {
         try {
           if (this.object.collection) {
-            const res = await this.$store.dispatch("removeCollection", {
+            await this.$store.dispatch("removeCollection", {
               collectionId: this.object.id,
               fatherCollectionId: parseInt(
-                this.$route.params.fatherCollectionId,
+                this.$route.query.fatherCollectionId,
                 10
               ),
             });
           } else {
-            const res = await this.$store.dispatch("removePicto", {
+            await this.$store.dispatch("removePicto", {
               pictoId: this.object.id,
               fatherCollectionId: parseInt(
-                this.$route.params.fatherCollectionId,
+                this.$route.query.fatherCollectionId,
                 10
               ),
             });
@@ -85,20 +84,17 @@ export default {
             message: this.$t("DeletedSuccess"),
             type: "is-success",
           });
-          SoundHelper.playPictogramDelete();
           $nuxt.$emit("resyncPictoList");
           this.$parent.close();
           return;
         } catch (ex) {
           console.log(ex);
-          SoundHelper.playError();
           this.$buefy.toast.open({
             message: this.$t("SomeThingBadHappened"),
             type: "is-danger",
           });
         }
       } else {
-        SoundHelper.playError();
         this.$buefy.toast.open({
           message: this.$t("DeleteNotCorrespond"),
           type: "is-danger",

@@ -48,7 +48,6 @@ import deviceInfos from "@/mixins/deviceInfos";
 import emoji from "@/mixins/emoji";
 import tts from "@/mixins/tts";
 import lang from "@/mixins/lang";
-import { SoundHelper } from "@/utils/sounds";
 export default {
   mixins: [emoji, tts, deviceInfos, lang],
   methods: {
@@ -144,7 +143,6 @@ export default {
       try {
         const data = [new ClipboardItem({ [this.preGeneratedBlob.type]: this.preGeneratedBlob })];
         navigator.clipboard.write(data);
-        SoundHelper.playSentenceCopy();
         const notif = this.$buefy.toast.open({
           message: this.$t("CopySucces"),
           type: "is-success",
@@ -153,13 +151,11 @@ export default {
         console.log(e);
         try {
           this.copyPictosToClipboardLegacy(pictos);
-          SoundHelper.playSentenceCopy();
           const notif = this.$buefy.toast.open({
             message: this.$t("CopySucces"),
             type: "is-success",
           });
         } catch (e) {
-          SoundHelper.playError()
           const notif = this.$buefy.toast.open({
             message: this.$t("CopyError"),
             type: "is-danger",
@@ -182,7 +178,7 @@ export default {
     },
     triggerRemoveSpeechDrag() {
       if (
-        this.$route.params.fatherCollectionId != this.$store.getters.getRootId
+        this.$route.query.fatherCollectionId != this.$store.getters.getRootId
       ) {
         // Remove until previous pictalk collection
         const pictalkSpeech = this.$store.getters.getSpeech.filter(
@@ -227,17 +223,16 @@ export default {
           }
         } else {
           if (pictalkSpeech.length <= 1) {
+            this.$store.commit("resetNavigation");
             if (this.publicMode) {
-              this.$router.push("/public/346");
+              this.$router.push("/public?fatherCollectionId=346");
             } else {
               if (this.$store.getters.getRootId) {
                 this.$router.push({
-                  path: "/pictalk/" + this.$store.getters.getRootId,
-                  query: { ...this.$route.query },
+                  query: { ...this.$route.query, fatherCollectionId: this.$store.getters.getRootId },
                 });
               } else {
                 this.$router.push({
-                  path: "/pictalk/",
                   query: { ...this.$route.query },
                 });
               }
@@ -245,9 +240,8 @@ export default {
           } else {
             this.$router.push({
               path:
-                (this.publicMode ? "/public/" : "/pictalk/") +
-                pictalkSpeech[pictalkSpeech.length - 2]?.id,
-              query: { ...this.$route.query },
+                (this.publicMode ? "/public" : "/pictalk/"),
+              query: { ...this.$route.query, fatherCollectionId: pictalkSpeech[pictalkSpeech.length - 2]?.id },
             });
           }
         }
@@ -257,31 +251,24 @@ export default {
           return;
         }
       }
-      try {
-        SoundHelper.playSentenceReturn();
-      } catch (e) {
-        console.log(e)
-      }
-
       this.$store.commit("removeSpeech");
     },
     eraseSpeech() {
-      SoundHelper.playSentenceErase();
+      this.$store.commit("resetNavigation");
       if (this.publicMode) {
-        this.$router.push("/public/346");
+        this.$router.push("/public?fatherCollectionId=346");
         this.$store.commit("eraseSpeech");
       } else {
         this.$store.commit("eraseSpeech");
         if (this.$store.getters.getRootId) {
           this.$router.push({
-            path: "/pictalk/" + this.$store.getters.getRootId,
             query: {
               isAdmin: this.$route.query.isAdmin,
+              fatherCollectionId: this.$store.getters.getRootId,
             },
           });
         } else {
           this.$router.push({
-            path: "/pictalk",
             query: {
               isAdmin: this.$route.query.isAdmin,
             },

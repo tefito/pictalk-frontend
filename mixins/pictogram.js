@@ -10,7 +10,7 @@ export default {
   methods: {
     async setShortcutCollectionIdDirectlyToRoot(item, isPicto) {
       let collection = JSON.parse(
-        JSON.stringify(this.getCollectionFromId(this.$store.getters.getRootId))
+        JSON.stringify(await this.getCollectionFromId(this.$store.getters.getRootId))
       );
       if (isPicto) {
         collection.pictos.push(item);
@@ -64,6 +64,15 @@ export default {
       });
       this.$store.commit("resetCopyCollectionId");
     },
+    sidebarClick() {
+      if (this.picto.collection == true) {
+        this.$router.push({
+          query: { ...this.$route.query, fatherCollectionId: this.picto.id },
+        });
+      } else {
+        this.addToSpeech();
+      }
+    },
     async addToSpeech() {
       this.$store.commit("addSpeech", {
         ...this.picto,
@@ -71,8 +80,7 @@ export default {
       });
       if (this.picto.collection == true) {
         this.$router.push({
-          path: this.pictoLink,
-          query: { ...this.$route.query },
+          query: { ...this.$route.query, fatherCollectionId: this.picto.id },
         });
       }
     },
@@ -106,20 +114,10 @@ export default {
       try {
         const sidebarId = this.$store.getters.getSidebarId;
 
-        let sidebar = JSON.parse(
-          JSON.stringify(
-            this.getCollectionFromId(
-              parseInt(sidebarId, 10)
-            )
-          )
-        );
-        let currentCollection = JSON.parse(
-          JSON.stringify(
-            this.getCollectionFromId(
-              parseInt(this.$route.params.fatherCollectionId, 10)
-            )
-          )
-        );
+        let sidebar = await this.getCollectionFromId(parseInt(sidebarId, 10));
+
+        let currentCollection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10))
+        console.log(sidebar, currentCollection);
         if (isPicto) {
           sidebar.pictos.push({
             id: collectionId,
@@ -173,15 +171,15 @@ export default {
 
         let sidebar = JSON.parse(
           JSON.stringify(
-            this.getCollectionFromId(
+            await this.getCollectionFromId(
               parseInt(sidebarId, 10)
             )
           )
         );
         let currentCollection = JSON.parse(
           JSON.stringify(
-            this.getCollectionFromId(
-              parseInt(this.$route.params.fatherCollectionId, 10)
+            await this.getCollectionFromId(
+              parseInt(this.$route.query.fatherCollectionId, 10)
             )
           )
         );
@@ -239,11 +237,8 @@ export default {
         });
       }
     },
-    getCollectionFromId(id) {
-      const index = this.$store.getters.getCollections.findIndex(
-        (collection) => collection.id === id
-      );
-      return this.$store.getters.getCollections[index];
+    async getCollectionFromId(id) {
+      return this.$store.dispatch("getCollectionFromId", id);
     },
     editPicto() {
       this.$buefy.modal.open({
@@ -302,8 +297,8 @@ export default {
     },
   },
   computed: {
-    canDelete() {
-      return this.getCollectionFromId(parseInt(this.$route.params.fatherCollectionId, 10))?.userId == this.$store.getters.getUser.id;
+    async canDelete() {
+      return (await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10)))?.userId == this.$store.getters.getUser.id;
     },
     isToUser() {
       return this.$store.getters.getUser.id == this.picto.userId;

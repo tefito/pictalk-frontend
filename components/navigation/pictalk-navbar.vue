@@ -3,7 +3,7 @@
     <template slot="brand">
       <b-tooltip position="is-bottom" multilined size="is-small" type="is-primary" :label="$t('TooltipReturn')"
         :delay="1000" :triggers="['hover']" style="margin-top: 3px">
-        <b-button :disabled="parseInt($route.params.fatherCollectionId) == $store.getters.getUser.root"
+        <b-button :disabled="parseInt($route.query.fatherCollectionId) == $store.getters.getUser.root"
           class="customButton" style="background-color: hsl(210, 100%, 60%); min-width: 80px"
           @click="navigateToParentCollection()" icon-right="arrow-left" />
       </b-tooltip>
@@ -15,7 +15,8 @@
           alt="Logo of a web app that help speach-disabled people" />
       </b-navbar-item>
       <div :style="this.$route.path.includes('pictalk') ? '' : 'display:none'" class="columns is-mobile margins">
-        <div v-if="$route.query.isAdmin && !checkCopyCollectionId" class="column noPadding dropdown">
+        <div v-if="$route.query.isAdmin && !checkCopyCollectionId && this.$route.path.includes('pictalk')"
+          class="column noPadding dropdown">
           <b-dropdown :disabled="!isEditorFatherId && !isToUserFatherId" id="nav-create" class="column"
             :mobile-modal="false" trap-focus :triggers="['click', 'hover']" aria-role="list">
             <template #trigger>
@@ -84,16 +85,16 @@
                       <div class="media-content noPadding centered">
                         <p class="title is-6 notifTitle">
                           <a :href="'mailto:' + notification.username" class="subtitle is-6 mailto">{{
-        notification.username
-          .split("@")[0]
-          .replace(".", " ")
-      }}</a>
+                            notification.username
+                              .split("@")[0]
+                              .replace(".", " ")
+                          }}</a>
                           {{ notificationText(notification) }}
                         </p>
                         <figure class="image is-64x64">
                           <img @click="
-        notificationGoToCollectionOrReturn(notification)
-        " :src="getNotificationImage(notification)" alt="Placeholder image" />
+                            notificationGoToCollectionOrReturn(notification)
+                            " :src="getNotificationImage(notification)" alt="Placeholder image" />
                         </figure>
                         <p class="title is-6 notifTitle greyback">
                           <!--<b-icon
@@ -218,6 +219,11 @@ export default {
       }, 60000);
     }
   },
+  async fetch() {
+    if (process.client) {
+      this.notifications = await this.$store.dispatch("getNotifications");
+    }
+  },
   data() {
     return {
       icon: "",
@@ -227,6 +233,7 @@ export default {
       fits: false,
       offlineReadyTotal: null,
       offlineReadyProgress: null,
+      notifications: [],
     };
   },
   destroyed() {
@@ -254,6 +261,14 @@ export default {
     }
   },
   watch: {
+    "$route.query.fatherCollectionId": function (newVal, oldVal) {
+      if (newVal != oldVal) {
+        if (!newVal) return;
+        console.log("navigation changed")
+        this.$store.commit("pushNavigation", newVal);
+        console.log(this.$store.getters.getNavigation)
+      }
+    },
     $route(to, from) {
       if (to.path.includes("pictalk")) {
         this.icon = "home";
@@ -319,16 +334,19 @@ export default {
     sidebarLink() {
       return "/pictalk/" + this.$store.getters.getSidebarId + this.admin;
     },
-    isEditorFatherId() {
-      return this.getCollectionFromId(parseInt(this.$route.params.fatherCollectionId, 10))?.editors.find(
-        (editor) => editor == this.$store.getters.getUser.username
-      ) != undefined
+    async isEditorFatherId() {
+      const collection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10));
+      return collection?.editors.find((editor) => editor == this.$store.getters.getUser.username) != undefined;
     },
-    isToUserFatherId() {
-      return this.getCollectionFromId(parseInt(this.$route.params.fatherCollectionId, 10))?.userId == this.$store.getters.getUser.id
+    async isToUserFatherId() {
+      const collection = await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10))
+      return collection?.userId == this.$store.getters.getUser.id
     }
   },
   methods: {
+    getUserNotifications() {
+      return this.$store.getters.getUser.notifications;
+    },
     showRestoreItemModal() {
       this.$buefy.modal.open({
         parent: this,
@@ -340,46 +358,42 @@ export default {
       });
     },
     navigateToParentCollection() {
-      const speechCollectionArray = this.$store.getters.getSpeech.filter((picto) => !picto.sidebar && picto.collection);
-      const speechCollectionArrayBeforePosition = speechCollectionArray.slice(0, speechCollectionArray.findIndex((picto) => picto.id == parseInt(this.$route.params.fatherCollectionId)));
-      if (speechCollectionArrayBeforePosition.length < 1) {
+      const navigation = this.$store.getters.getNavigation
+      console.log("navigation", navigation)
+      if (navigation.length < 2) {
         if (this.publicMode) {
-          this.$router.push("/public/346");
+          this.$router.push(
+            {
+              path: "/public",
+              query: { ...this.$route.query, fatherCollectionId: 346 },
+            });
         } else {
           if (this.$store.getters.getRootId) {
             this.$router.push({
-              path: "/pictalk/" + this.$store.getters.getRootId,
-              query: { ...this.$route.query },
+              path: "/pictalk",
+              query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin, fatherCollectionId: this.$store.getters.getRootId },
             });
           } else {
             this.$router.push({
-              path: "/pictalk/",
-              query: { ...this.$route.query },
+              path: "/pictalk",
+              query: { ...this.$route.query, isAdmin: this.$route.query.isAdmin },
             });
           }
         }
       } else {
+        console.log("navigating to", navigation[navigation.length - 2])
         this.$router.push({
-          path:
-            (this.publicMode ? "/public/" : "/pictalk/") +
-            speechCollectionArrayBeforePosition[speechCollectionArrayBeforePosition.length - 1]?.id,
-          query: { ...this.$route.query },
+          path: this.publicMode ? "/public" : "/pictalk",
+          query: { ...this.$route.query, fatherCollectionId: navigation[navigation.length - 2] },
         });
       }
     },
     isAdministrator() {
       return this.$store.getters.getUser.admin;
     },
-    getUserNotifications() {
-      return this.$store.getters.getUser.notifications;
-    },
     cancelCopy() {
       this.$store.commit("resetCopyCollectionId");
       this.$store.commit("resetShortcutCollectionId");
-    },
-    getNotificationImage(notification) {
-      return this.getCollectionFromId(parseInt(notification.affected, 10))
-        ?.image;
     },
     openFeedbackModal() {
       this.$buefy.modal.open({
@@ -404,11 +418,8 @@ export default {
     fitsBigger() {
       this.fits = window.innerWidth > 600;
     },
-    getCollectionFromId(id) {
-      const index = this.$store.getters.getCollections.findIndex(
-        (collection) => collection.id === id
-      );
-      return this.$store.getters.getCollections[index];
+    async getCollectionFromId(id) {
+      return this.$store.dispatch("getCollectionFromId", id);
     },
     adminModeChoose() {
       if (this.admin) {
@@ -470,21 +481,22 @@ export default {
           if (this.$store.getters.getCopyCollectionId.isPicto) {
             const copiedPicto = await this.$store.dispatch("copyPictoById", {
               pictoId: this.$store.getters.getCopyCollectionId.collectionId,
-              fatherCollectionId: this.$route.params.fatherCollectionId,
+              fatherCollectionId: this.$route.query.fatherCollectionId,
             });
             /*
             $nuxt.$emit("addPictogram", copiedPicto);
             */
             $nuxt.$emit("resyncPictoList");
           } else {
-            const copiedCollection = await this.$store.dispatch(
+            await this.$store.dispatch(
               "copyCollectionById",
               {
                 collectionId:
                   this.$store.getters.getCopyCollectionId.collectionId,
-                fatherCollectionId: this.$route.params.fatherCollectionId,
+                fatherCollectionId: this.$route.query.fatherCollectionId,
               }
             );
+            console.log("emitting resyncPictoList")
             //$nuxt.$emit("addPictogram", copiedCollection);
             $nuxt.$emit("resyncPictoList");
           }
@@ -507,13 +519,8 @@ export default {
         }
       } else if (this.$store.getters.getShortcutCollectionId?.collectionId) {
         try {
-          let collection = JSON.parse(
-            JSON.stringify(
-              this.getCollectionFromId(
-                parseInt(this.$route.params.fatherCollectionId, 10)
-              )
-            )
-          );
+          let collection =
+            await this.getCollectionFromId(parseInt(this.$route.query.fatherCollectionId, 10));
           if (this.$store.getters.getShortcutCollectionId.isPicto) {
             collection.pictos.push({
               id: this.$store.getters.getShortcutCollectionId.collectionId,
@@ -553,6 +560,10 @@ export default {
         }
       }
     },
+    async getNotificationImage(notification) {
+      const collection = await this.getCollectionFromId(parseInt(notification.affected, 10));
+      return collection?.image;
+    },
     notificationGoToCollectionOrReturn(notification) {
       if (
         notification.operation == "unshare" ||
@@ -561,8 +572,7 @@ export default {
         return;
       } else {
         this.$router.push({
-          path: "/pictalk/" + notification.affected,
-          query: { ...this.$route.query },
+          query: { ...this.$route.query, fatherCollectionId: notification.affected },
         });
       }
     },

@@ -13,7 +13,7 @@
         :arrow-hover="false" animated="fade" :interval="15000" :autoplay="carouselAutoplay">
         <b-carousel-item class="containing">
           <div class="slightly-rounded placeholder" :style="`aspect-ratio: 16/9; background-image: url(${require('@/assets/Usages2.png').placeholder
-          })`">
+            })`">
             <img class="slightly-rounded" loading="lazy" :srcset="require('@/assets/Usages2.png').srcSet"
               alt="screenshots of the Pictalk application running on different devices" />
           </div>
@@ -226,7 +226,7 @@ export default {
         });
       } else {
         this.$router.push({
-          path: "/public/" + "346",
+          path: "/public?fatherCollectionId=346"
         });
       }
     }
@@ -267,7 +267,6 @@ export default {
       }
     }
   },
-  middleware: ["check-auth"],
   methods: {
     openSignUpModal() {
       this.$buefy.modal.open({

@@ -16,27 +16,28 @@
     : {}
     ">
     <div :id="picto.id" :collection="picto.collection" :class="{
-    'has-background': picto.collection,
-    'drop-area': isDropZone,
-    'containing notification pictobackground pictogram': true,
-  }">
-      <div id="pictogram-image-wrapper" :style="`width:100%; background-color:${this.picto.color}; border-radius:6px`">
+      'has-background': picto.collection,
+      'drop-area': isDropZone,
+      'containing notification pictobackground pictogram': true,
+    }">
+      <div id="pictogram-image-wrapper"
+        :style="`width:100%; position: relative; background-color:${this.picto.color}; border-radius:6px`">
         <div v-if="$route.query.isAdmin && !publicMode" class="actions container" @click.self="addToSpeech()">
           <div class="offline subtitle" v-if="!isOnline">
             <b-icon icon="web-cancel" />
           </div>
           <div v-if="isOnline" class="head-actions" @click.self="addToSpeech()" v-on="picto.collection &&
-    !publicMode &&
-    !sidebarMode &&
-    $route.query.isAdmin &&
-    isDropZone
-    ? { dragover: onDragOver, dragleave: onDragLeave, drop: onDrop }
-    : {}
-    ">
+            !publicMode &&
+            !sidebarMode &&
+            $route.query.isAdmin &&
+            isDropZone
+            ? { dragover: onDragOver, dragleave: onDragLeave, drop: onDrop }
+            : {}
+            ">
             <div v-if="!publicMode && !sidebarMode && $route.query.isAdmin" :draggable="!publicMode && !sidebarMode && $route.query.isAdmin
-    ? true
-    : false
-    " @dragstart="onDragStart" @dragend="onDragEnd">
+              ? true
+              : false
+              " @dragstart="onDragStart" @dragend="onDragEnd">
               <b-tooltip :label="$t('DragAndDrop')" :delay="500" position="is-bottom">
                 <b-icon class="large-icon icon" icon="drag"></b-icon>
               </b-tooltip>
@@ -51,52 +52,52 @@
           </div>
           <div v-if="!dragndropId && isOnline" class="main-actions" @click.self="addToSpeech()">
             <div v-on="(isEditor || isToUser) && isOnline ? { click: editPicto } : {}
-    ">
+              ">
               <b-tooltip :label="$t('Edit')" :delay="500" position="is-bottom">
                 <b-icon class="medium-icon icon" v-bind:style="(isEditor || isToUser) && isOnline
-    ? 'justify-self: end; color: hsl(210, 100%, 75%)'
-    : 'justify-self: end; color: hsl(210, 100%, 75%); opacity: 0.5'
-    " icon="pencil" />
+                  ? 'justify-self: end; color: hsl(210, 100%, 75%)'
+                  : 'justify-self: end; color: hsl(210, 100%, 75%); opacity: 0.5'
+                  " icon="pencil" />
               </b-tooltip>
             </div>
             <div v-if="picto.collection" v-on="picto.collection && isOnline
-    ? {
-      click: () =>
-        setCopyCollectionId(picto.id, !picto.collection),
-    }
-    : {}
-    ">
+              ? {
+                click: () =>
+                  setCopyCollectionId(picto.id, !picto.collection),
+              }
+              : {}
+              ">
               <b-tooltip :label="$t('CopyPicto')" :delay="500" position="is-bottom">
                 <b-icon class="medium-icon icon" v-bind:style="picto.collection && isOnline
-    ? 'justify-self: end; color: hsl(45, 100%, 75%)'
-    : 'justify-self: end; color: hsl(45, 100%, 75%); opacity: 0.5'
-    " icon="vector-arrange-below" />
+                  ? 'justify-self: end; color: hsl(45, 100%, 75%)'
+                  : 'justify-self: end; color: hsl(45, 100%, 75%); opacity: 0.5'
+                  " icon="vector-arrange-below" />
               </b-tooltip>
             </div>
             <div v-if="picto.collection" v-on="(isEditor || isToUser || isViewer) &&
-    picto.collection &&
-    isOnline
-    ? {
-      click: () =>
-        setShortcutCollectionId(picto.id, !picto.collection),
-    }
-    : {}
-    ">
+              picto.collection &&
+              isOnline
+              ? {
+                click: () =>
+                  setShortcutCollectionId(picto.id, !picto.collection),
+              }
+              : {}
+              ">
               <b-tooltip :label="$t('LinkPicto')" :delay="500" position="is-bottom">
                 <b-icon class="medium-icon icon" v-bind:style="(isEditor || isToUser || isViewer) &&
-    picto.collection &&
-    isOnline
-    ? 'justify-self: start; color: hsl(140, 100%, 75%)'
-    : 'justify-self: start; color: hsl(140, 100%, 75%); opacity: 0.5'
-    " icon="vector-link" />
+                  picto.collection &&
+                  isOnline
+                  ? 'justify-self: start; color: hsl(140, 100%, 75%)'
+                  : 'justify-self: start; color: hsl(140, 100%, 75%); opacity: 0.5'
+                  " icon="vector-link" />
               </b-tooltip>
             </div>
             <div v-if="!sidebarMode" v-on="isOnline && canDelete ? { click: deletePicto } : {}">
               <b-tooltip :label="$t('DeletePicto')" :delay="500" position="is-bottom">
                 <b-icon class="medium-icon icon" v-bind:style="isOnline && canDelete
-    ? 'justify-self: start; color: hsl(0, 100%, 75%)'
-    : 'justify-self: start; color: hsl(0, 100%, 75%); opacity: 0.5'
-    " icon="delete" />
+                  ? 'justify-self: start; color: hsl(0, 100%, 75%)'
+                  : 'justify-self: start; color: hsl(0, 100%, 75%); opacity: 0.5'
+                  " icon="delete" />
               </b-tooltip>
             </div>
           </div>
@@ -113,21 +114,21 @@
         <img draggable="false" :class="{ image: true, nopointerevents: $route.query.isAdmin }"
           :srcset="pictoOrUndefinedImage" :alt="picto.meaning[getUserLang]" @click.self="addToSpeech()" width="100%"
           crossorigin="anonymous" v-bind:style="this.picto.color != '#ffffff00'
-    ? `border: solid; border-color: ${this.picto.color}; border-width: 10px;`
-    : ''
-    " />
+            ? `border: solid; border-color: ${this.picto.color}; border-width: 10px;`
+            : ''
+            " />
         <b-skeleton class="skeleton-wrapper" height="100%" :active="skeleton" />
       </div>
       <div class="meaning" v-bind:style="customFontSize ? 'font-size: 1rem;' : 'font-size: 0.6rem;'
-    ">
+        ">
         {{ picto.meaning[getUserLang] }}
       </div>
       <div v-if="publicMode && $store.getters.getUser && $store.getters.isAuthenticated
-    " class="adminMenu adminoption columns smallMargin">
+      " class="adminMenu adminoption columns smallMargin">
         <div class="column noMargin is-mobile">
           <b-button :disabled="!isOnline" type="is-success" icon-right="plus" @click="
-    setShortcutCollectionIdDirectlyToRoot(picto, !picto.collection)
-    " />
+            setShortcutCollectionIdDirectlyToRoot(picto, !picto.collection)
+            " />
         </div>
       </div>
     </div>
@@ -151,7 +152,7 @@ export default {
       timer: 0,
       publishLoad: false,
       dragImage: undefined,
-      skeleton: true,
+      skeleton: false,
     };
   },
   props: {
@@ -275,14 +276,14 @@ export default {
       if (
         this.$store.getters.getDragndrop &&
         this.$store.getters.getDragndrop.fatherCollectionId !=
-        parseInt(this.$route.params.fatherCollectionId)
+        parseInt(this.$route.query.fatherCollectionId)
       ) {
         const dragndrop = this.$store.getters.getDragndrop;
         if (this.$store.getters.getDragndrop) {
           this.$store.commit("setDragndrop", undefined);
         }
         await this.moveToCollection(
-          parseInt(this.$route.params.fatherCollectionId),
+          parseInt(this.$route.query.fatherCollectionId),
           dragndrop
         );
       }
@@ -296,7 +297,7 @@ export default {
       // Add different types of drag data
       this.$store.commit("setDragndrop", {
         draggedPictoId: this.picto.id,
-        fatherCollectionId: parseInt(this.$route.params.fatherCollectionId),
+        fatherCollectionId: parseInt(this.$route.query.fatherCollectionId),
         isCollection: this.picto.collection,
       });
       ev.dataTransfer.dropEffect = "move";
@@ -353,11 +354,6 @@ export default {
     },
     dragndropId() {
       return this.$store.getters.getDragndrop?.draggedPictoId;
-    },
-    pictoLink() {
-      return this.publicMode
-        ? String("/public/" + this.picto.id)
-        : String("/pictalk/" + this.picto.id);
     },
   },
 };
@@ -505,7 +501,7 @@ export default {
 
 .actions {
   border-radius: 6px;
-  width: calc(100% - 1.2rem);
+  width: 100%;
   position: absolute;
   color: white;
   z-index: 2;
@@ -625,8 +621,7 @@ export default {
 }
 
 .notification {
-  padding: 0.6rem;
-  padding-bottom: 0.1rem;
+  padding: 0.6rem 0.6rem 0.1rem;
 }
 
 .smallMargin {

@@ -1,6 +1,6 @@
 import pkg from './package.json'
 export default {
-  ssr: true,
+  ssr: false,
   target: 'static',
   server: {
     host: '0.0.0.0', // default: localhost,
@@ -11,9 +11,6 @@ export default {
   publicRuntimeConfig: {
     apiURL: process.env.API_URL || "http://localhost:3001",
     clientVersion: pkg.version,
-  },
-  generate: {
-    fallback: true
   },
   meta: {
     ogTitle: false,
@@ -59,7 +56,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ["@/plugins/baseURL", { src: '@/plugins/vuex-persistedstate', mode: 'client' }, { src: '@/plugins/matomo', mode: 'client' }],
+  plugins: ["@/plugins/baseURL", { src: '@/plugins/vuex-persistedstate', mode: 'client' }, { src: '@/plugins/matomo', mode: 'client' }, { src: '@/plugins/dexieDB', mode: 'client' }],
   /*
    ** Nuxt.js dev-modules
    */
@@ -212,7 +209,7 @@ export default {
     workbox: {
       /*
       dev: true,
-
+  
       config: {
         debug: true
       },*/
@@ -279,12 +276,17 @@ export default {
       config.resolve.alias["vue"] = "vue/dist/vue.common";
       config.resolve.symlinks = false;
       config.module.rules.push({
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto',
+      });
+      config.module.rules.push({
         test: /\.(ogg|mp3|wav|mpe?g)$/i,
         loader: 'file-loader',
         options: {
           name: '[path][name].[ext]'
         }
-      })
+      });
     },
     transpile: ['merge-images-horizontally-with-text'],
   },

@@ -85,18 +85,6 @@ export default {
   destroyed() {
     clearInterval(this.intervalId);
   },
-  mounted() {
-    this.intervalId = setInterval(async () => {
-      if (window.navigator.onLine) {
-        try {
-          await this.$nuxt.$store.dispatch("getUser");
-        } catch (err) {
-          clearInterval(this.intervalId);
-          console.log(err);
-        }
-      }
-    }, 1200000); // 20 minutes
-  },
 };
 </script>
 

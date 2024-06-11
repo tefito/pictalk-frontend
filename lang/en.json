@@ -419,5 +419,8 @@
   "clickHere": "click here",
   "Feedback2": "Your opinion matters ✊",
   "FeedbackSurvey2": "We are in 2024 and it's time your opinions count ✊! We've built Pictalk thanks to the feedbacks of the community and we need yours now. We are working hard on the next version of Pictalk and we want to make sure no user is left behind 👤. Please take 5 minutes to fill this survey, we count on you 🫵.",
-  "FeedbackSurvey2Link": "You can find the link to the survey in the orange button with a bug symbol in the menu bar."
+  "FeedbackSurvey2Link": "You can find the link to the survey in the orange button with a bug symbol in the menu bar.",
+  "ErrorTitle": "An error occurred",
+  "ErrorSubtitle": "Sometimes things don't go as planned and errors occur, especially after updates. Please note that bugs are automatically reported to us. If the issue persists, send us an email or reach us in Facebook or Instagram. Click the button below to try to fix the error.",
+  "ErrorButton": "Try to fix the error"
 }

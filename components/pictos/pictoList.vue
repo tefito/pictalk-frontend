@@ -2,19 +2,20 @@
   <div class="margins">
     <div v-if="sidebar
     " style="padding-top: 9px" />
-    <div class="columns is-multiline is-mobile even">
-      <picto :class="sidebar
-        ? 'column is-12'
-        : sidebarUsed
-          ? 'column is-6-mobile is-4-tablet is-3-desktop is-3-widescreen is-one-fifth-fullhd'
-          : customPictoSize
-        " v-for="(picto, index) in getFilteredPictoList" :key="index" :picto="picto" :publicMode="publicMode"
-        :sidebarMode="sidebar" :ref="picto.collection ? 'dragCollection' : 'dragPictogram'" />
-      <div data-cy="cypress-empty-column"
-        class="column is-one-third-mobile is-one-quarter-tablet is-one-quarter-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+    <transition name="fade" mode="out-in">
+      <div :key="getFilteredPictoList.length" class="columns is-multiline is-mobile even">
+        <picto :class="sidebar
+          ? 'column is-12'
+          : sidebarUsed
+            ? 'column is-6-mobile is-4-tablet is-3-desktop is-3-widescreen is-one-fifth-fullhd'
+            : customPictoSize
+          " v-for="(picto, index) in getFilteredPictoList" :key="picto.id" :picto="picto" :publicMode="publicMode"
+          :sidebarMode="sidebar" :ref="picto.collection ? 'dragCollection' : 'dragPictogram'" />
+        <div data-cy="cypress-empty-column"
+          class="column is-one-third-mobile is-one-quarter-tablet is-one-quarter-desktop is-one-quarter-widescreen is-one-fifth-fullhd">
+        </div>
       </div>
-    </div>
-
+    </transition>
     <div v-if="canReturn && dragndropId" class="drag-return"
       v-on="{ dragover: onDragOver, dragleave: onDragLeave, drop: onDrop }"></div>
     <div id="return" class="return">
@@ -31,11 +32,11 @@ export default {
   name: "pictoList",
   mixins: [lang, links],
   components: {
-    picto,
+    picto
   },
   data() {
     return {
-      timer: 0,
+      timer: 0
     };
   },
   methods: {
@@ -96,7 +97,7 @@ export default {
     canReturn() {
       return (
         this.$store.getters.getRootId !=
-        parseInt(this.$route.params.fatherCollectionId)
+        parseInt(this.$route.query.fatherCollectionId)
       );
     },
     customPictoSize() {
@@ -115,6 +116,16 @@ export default {
 };
 </script>
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .1s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .even {
   justify-content: space-between;
 }
