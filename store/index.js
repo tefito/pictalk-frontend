@@ -153,7 +153,6 @@ export const actions = {
       col.pictos = col.pictos.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
       return col;
     }));
-    console.log(editedCollections);
     return db.collection.bulkPut(editedCollections);
   },
   async dbAddPicto(state, pictos) {
@@ -421,7 +420,6 @@ export const actions = {
   },
   async editCollection(vuexContext, collection) {
     let formData = new FormData();
-    console.log("editedCollection: ", collection)
     if (collection.speech) {
       formData.append("speech", JSON.stringify(collection.speech));
     }
@@ -551,7 +549,6 @@ export const actions = {
     }
   },
   async logout(vuexContext) {
-    console.log("Logging out")
     vuexContext.commit("clearToken");
     Cookie.remove("jwt");
     Cookie.remove("expirationDate");
@@ -626,7 +623,6 @@ export const actions = {
     let pictosToEdit = [];
     let collectionsWithoutFatherCollectionId = [];
     toUpdate = await Promise.all(toUpdate);
-    console.log(toUpdate)
     for (let update of toUpdate) {
       collectionsToCreate = collectionsToCreate.concat(update.collectionsToCreate);
       collectionsToEdit = collectionsToEdit.concat(update.collectionsToEdit);
@@ -635,14 +631,12 @@ export const actions = {
       collectionsWithoutFatherCollectionId = collectionsWithoutFatherCollectionId.concat(update.collectionsWithoutFatherCollectionId);
     }
     if (collectionsWithoutFatherCollectionId.length > 0) {
-      console.log("DownloadCollections, collectionsWithoutFatherCollectionId: ", collectionsWithoutFatherCollectionId);
     }
     // We can find the collectionsWithoutFatherCollectionId in the collectionsToCreate or to edit
     let count = 0;
     for (let collection of collectionsWithoutFatherCollectionId) {
       const index = collectionsToCreate.findIndex((col) => col.id == collection.id);
       if (index != -1) {
-        console.log("Merging collection with id: ", collection.id);
         collectionsToCreate[index].fatherCollectionId = collection.fatherCollectionId;
         collectionsToCreate.splice(index, 1);
         collectionsToCreate.push(collection);
@@ -651,7 +645,6 @@ export const actions = {
       if (index == -1) {
         const index2 = collectionsToEdit.findIndex((col) => col.id == collection.id);
         if (index2 != -1) {
-          console.log("Merging collection with id: ", collection.id);
           collectionsToEdit[index2].fatherCollectionId = collection.fatherCollectionId;
           collectionsToEdit.splice(index2, 1);
           collectionsToEdit.push(collection);
@@ -659,7 +652,6 @@ export const actions = {
         }
       }
     }
-    console.log("Merged collections: ", count);
 
     if (collectionsToCreate.length > 0) {
       await vuexContext.dispatch("dbAddCollection", collectionsToCreate);
@@ -750,11 +742,11 @@ export const actions = {
     const notificationsRequest = await axios.get("/user/notification");
     if (notificationsRequest.status !== 200) return;
 
-    const notifications = notificationsRequest.data;
+    let notifications = notificationsRequest.data;
     if (notifications?.length != vuexContext.getters.getUser.notifications.length) {
       vuexContext.dispatch("downloadCollections");
     }
-    notifications?.forEach(async (notification) => {
+    notifications = await Promise.all(notifications?.map(async (notification) => {
       if (notification.meaning) {
         try {
           notification.meaning = JSON.parse(notification?.meaning)
@@ -763,19 +755,15 @@ export const actions = {
         }
       }
       if (notification.affected) {
-        if (!getCollectionFromId(vuexContext, parseInt(notification.affected, 10))) {
-          var res = await axios.get("/collection/find/" + parseInt(notification.affected, 10));
-          parseAndUpdateEntireCollection(vuexContext, res.data);
+        let collection = await getCollectionFromId(vuexContext, parseInt(notification.affected, 10));
+        if (!collection) {
+          await vuexContext.dispatch('fetchCollection', parseInt(notification.affected, 10));
         }
-        if (notification.affected) {
-          if (!await getCollectionFromId(vuexContext, parseInt(notification.affected, 10))) {
-            var res = await axios.get("/collection/find/" + parseInt(notification.affected, 10));
-            await parseAndUpdateEntireCollection(vuexContext, res.data);
-          }
-          notification.image = (await getCollectionFromId(vuexContext, parseInt(notification.affected, 10)))?.image;
-        }
+        collection = await getCollectionFromId(vuexContext, parseInt(notification.affected, 10));
+        notification.image = collection?.image;
       }
-    });
+      return notification;
+    }));
     // Mettre les notifications dans user
     let user = { ...vuexContext.getters.getUser };
     user.notifications = notifications;
@@ -923,8 +911,8 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
     }
   }
   if (collection.pictos && !collection.pictos.length == 0) {
-    collection.pictos.map((picto) => {
-      let localPicto = getPictoFromId(vuexContext, picto.id);
+    await Promise.all(collection.pictos.map(async (picto) => {
+      let localPicto = await getPictoFromId(vuexContext, picto.id);
       let existsPicto = localPicto?.id == picto.id;
       let updatePicto = (localPicto?.updatedDate != picto.updatedDate) && existsPicto;
       if (!existsPicto || updatePicto) {
@@ -943,11 +931,11 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
         }
       }
 
-    });
+    }));
   }
   if (collection.collections && !collection.collections.length == 0) {
-    collection.collections.map((col) => {
-      let localCollections = getCollectionFromId(vuexContext, col.id);
+    await Promise.all(collection.collections.map(async (col) => {
+      let localCollections = await getCollectionFromId(vuexContext, col.id);
       let existsCollections = localCollections?.id == col.id;
       let updateCollection = (localCollections?.updatedDate != col.updatedDate) && existsCollections;
       const partialCollection = localCollections?.partial;
@@ -976,7 +964,7 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
           collectionsToEdit.push(col);
         }
       }
-    });
+    }));
   }
   if (!download) {
     if (collectionsToCreate.length > 0) {

@@ -224,10 +224,10 @@ export default {
     async dispatchDownloadCollections() {
       await this.$store.dispatch("downloadCollections");
     },
-    loadedSidebarPictos() {
+    async loadedSidebarPictos() {
       return this.loadPictos(this.$store.getters.getSidebarId);
     },
-    loadedPictos() {
+    async loadedPictos() {
       return this.loadPictos(
         parseInt(this.$route.query.fatherCollectionId, 10)
       );

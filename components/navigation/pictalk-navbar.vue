@@ -70,15 +70,15 @@
               :class="'customButton ' + colorClass" />
           </b-tooltip>
 
-          <b-tooltip v-if="getUserNotifications() && getUserNotifications().length != 0" position="is-bottom" multilined
-            size="is-small" type="is-primary" :label="$t('TooltipNotifications')" :delay="1000" :triggers="['hover']">
+          <b-tooltip v-if="notifications && notifications.length != 0" position="is-bottom" multilined size="is-small"
+            type="is-primary" :label="$t('TooltipNotifications')" :delay="1000" :triggers="['hover']">
             <b-dropdown position="is-bottom-left" aria-role="menu" trap-focus append-to-body
               class="notificationsdrop"><template #trigger>
                 <b-button style="background-color: hsl(0, 100%, 100%); color: #ff5757" icon-right="bell-alert"
                   class="customButton" />
               </template>
               <b-dropdown-item aria-role="menu-item" :focusable="false" custom class="lessPadding limitHeight">
-                <div v-for="notification in getUserNotifications()" :key="notification.operation + Math.random()"
+                <div v-for="notification in notifications" :key="notification.operation + Math.random()"
                   class="card lessPadding notification">
                   <div class="card-content noPadding">
                     <div class="media">
@@ -94,7 +94,7 @@
                         <figure class="image is-64x64">
                           <img @click="
                             notificationGoToCollectionOrReturn(notification)
-                            " :src="getNotificationImage(notification)" alt="Placeholder image" />
+                            " :src="notification.image" alt="Placeholder image" />
                         </figure>
                         <p class="title is-6 notifTitle greyback">
                           <!--<b-icon
@@ -221,7 +221,9 @@ export default {
   },
   async fetch() {
     if (process.client) {
+      console.log(this.notifications)
       this.notifications = await this.$store.dispatch("getNotifications");
+      console.log(this.notifications)
     }
   },
   data() {
@@ -561,7 +563,9 @@ export default {
       }
     },
     async getNotificationImage(notification) {
+      console.log(notification.affected);
       const collection = await this.getCollectionFromId(parseInt(notification.affected, 10));
+      console.log("collection", collection);
       return collection?.image;
     },
     notificationGoToCollectionOrReturn(notification) {
