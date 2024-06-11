@@ -163,7 +163,7 @@
           <br />
           <div class="box">
             <b>{{
-              "https://www.pictalk.org?directsharer=" +
+              "https://application.pictalk.org?directsharer=" +
               $store.getters.getUser.username
               }}</b>
           </div>

@@ -11,14 +11,12 @@
       <img class="image" :src="object.image" :alt="object.meaning" width="40%" crossorigin="anonymous" style="" />
       <br />
       <br />
-      <b-field :label="$t('PleaseType1') +
-        ' <' +
-        object.meaning[getUserLang] +
-        '> ' +
-        $t('PleaseType2')
-        ">
-        <b-input data-cy="delete-picto-meaning" v-model="meaningOrName" :placeholder="object.meaning[getUserLang]"
-          @keyup.native.enter="onSubmitted(meaningOrName)"></b-input>
+      {{ $t("PleaseType1") }} <strong style="font-size:large; margin: 0 1rem;">{{ name
+        }}</strong> {{
+          $t("PleaseType2") }}
+      <b-field>
+        <b-input data-cy="delete-picto-meaning" v-model="lowerCaseInput" :placeholder="name"
+          @keyup.native.enter="onSubmitted(lowerCaseInput)"></b-input>
       </b-field>
     </section>
     <footer class="modal-card-foot">
@@ -26,7 +24,7 @@
         $t("Close")
       }}</b-button>
       <b-button data-cy="delete-picto-button" class="button is-primary" :loading="loading"
-        @click="onSubmitted(meaningOrName)">{{ $t("Delete") }}</b-button>
+        @click="onSubmitted(lowerCaseInput)">{{ $t("Delete") }}</b-button>
     </footer>
   </div>
 </template>
@@ -40,16 +38,30 @@ export default {
       required: true,
     },
   },
+  computed: {
+    lowerCaseInput: {
+      get() {
+        return this.input;
+      },
+      set(value) {
+        this.input = value.trim().toLowerCase().replace(/\s/g, "-");
+      }
+    }
+  },
   data() {
     return {
-      meaningOrName: "",
+      input: "",
       loading: false,
+      name: ""
     };
   },
+  created() {
+    this.name = this.object.meaning[this.getUserLang].trim().toLowerCase().replace(/\s/g, "-");
+  },
   methods: {
-    async onSubmitted(name) {
+    async onSubmitted(input) {
       this.loading = true;
-      if (name == this.object.meaning[this.getUserLang]) {
+      if (input == this.name) {
         try {
           if (this.object.collection) {
             await this.$store.dispatch("removeCollection", {
