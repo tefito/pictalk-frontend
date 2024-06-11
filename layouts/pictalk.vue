@@ -75,7 +75,7 @@ export default {
               icon: "gift",
             });
             setTimeout(() => {
-              window.location.reload(true)
+              this.$router.push('/').then(() => window.location.reload(true));
             }, 4500);
           }
         });
