@@ -284,15 +284,7 @@ export default {
         const collection = await this.$store.dispatch("fetchCollection", collectionId);
         return collection;
       } catch (error) {
-        const notif = this.$buefy.notification.open({
-          duration: 4500,
-          message: this.$t("LostConnectivity"),
-          position: "is-top-right",
-          type: "is-danger",
-          hasIcon: true,
-          iconSize: "is-small",
-          icon: "airplane",
-        });
+        console.log("error ", error);
       }
     },
     async refreshPictos() {

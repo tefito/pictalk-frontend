@@ -194,11 +194,6 @@ export default {
           }
         };
       }
-      if (window.navigator.onLine) {
-        try {
-          await this.$store.dispatch("getNotifications");
-        } catch (err) { }
-      }
       this.intervalId = setInterval(async () => {
         if (window.navigator.onLine) {
           try {
@@ -221,9 +216,7 @@ export default {
   },
   async fetch() {
     if (process.client) {
-      console.log(this.notifications)
       this.notifications = await this.$store.dispatch("getNotifications");
-      console.log(this.notifications)
     }
   },
   data() {
