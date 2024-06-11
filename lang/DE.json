@@ -419,5 +419,8 @@
     "clickHere": "hier klicken",
     "Feedback2": "Ihre Meinung zählt ✊",
     "FeedbackSurvey2": "Wir schreiben das Jahr 2024 und es ist Zeit, dass Ihre Meinung zählt ✊! Wir haben Pictalk dank der Rückmeldungen aus der Community aufgebaut und brauchen jetzt eure. Wir arbeiten hart an der nächsten Version von Pictalk und wir wollen sicherstellen, dass kein Nutzer zurückgelassen wird 👤. Bitte nehmen Sie sich 5 Minuten Zeit, um diese Umfrage auszufüllen, wir zählen auf Sie 🫵.",
-    "FeedbackSurvey2Link": "Den Link zur Umfrage finden Sie in der orangefarbenen Schaltfläche mit dem Käfersymbol in der Menüleiste."
+    "FeedbackSurvey2Link": "Den Link zur Umfrage finden Sie in der orangefarbenen Schaltfläche mit dem Käfersymbol in der Menüleiste.",
+    "ErrorTitle": "Es ist ein Fehler aufgetreten",
+    "ErrorSubtitle": "Manchmal laufen die Dinge nicht wie geplant und es treten Fehler auf, insbesondere nach Updates. Bitte beachten Sie, dass Fehler automatisch an uns gemeldet werden. Wenn das Problem weiterhin besteht, senden Sie uns eine E-Mail oder erreichen Sie uns auf Facebook oder Instagram. Klicken Sie auf die Schaltfläche unten, um zu versuchen, den Fehler zu beheben.",
+    "ErrorButton": "Versuchen Sie, den Fehler zu beheben"
 }
