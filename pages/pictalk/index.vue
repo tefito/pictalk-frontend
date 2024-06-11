@@ -46,7 +46,7 @@
         <b-image style="aspect-ratio: 1/1" v-if="sidebarPictos.length == 0" class="emptyCollection2" lazy
           alt="An empty cardboard box that represents an empty collection with no pictograms"
           :srcset="require('@/assets/EmptyCollection3.png').srcSet" />
-        <pictoList :pictos="sidebarPictos" :sidebar="true" v-if="isOnLine" />
+        <pictoList :pictos="sidebarPictos" :sidebar="true" />
       </div>
     </div>
     <div class="contenant">
@@ -67,11 +67,6 @@ export default {
   nuxtI18n: false,
   layout: "pictalk",
   mixins: [lang],
-  data: {
-    return: {
-      priority_timer: 0,
-    }
-  },
   components: {
     pictoList: pictoList,
     pictoBar: pictoBar,
@@ -213,6 +208,7 @@ export default {
   },
   data() {
     return {
+      priority_timer: 0,
       isPicto: true,
       sidebarExpanded: false,
       sidebarPictos: [],
