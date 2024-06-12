@@ -422,5 +422,11 @@
   "FeedbackSurvey2Link": "You can find the link to the survey in the orange button with a bug symbol in the menu bar.",
   "ErrorTitle": "An error occurred",
   "ErrorSubtitle": "Sometimes things don't go as planned and errors occur, especially after updates. Please note that bugs are automatically reported to us. If the issue persists, send us an email or reach us in Facebook or Instagram. Click the button below to try to fix the error.",
-  "ErrorButton": "Try to fix the error"
+  "ErrorButton": "Try to fix the error",
+  "pictalkMoving": "Pictalk is moving to a new website.",
+  "pictalkMovingLink": "It's here !",
+  "pictalkMovingDisclamer": "No panic, the application stays online and you'll soon have a new home page",
+  "pictalkMovingWhy": "Why this change ?",
+  "pictalkMovingWhyText": "We're making new applications and we want to regroup them in one place.",
+  "pictalkMovingCTA": "Discover the new website"
 }

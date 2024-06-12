@@ -10,10 +10,10 @@
       <template slot="start">
         <b-navbar-item id="index" tag="nuxt-link" :to="localePath('/')" :class="navtabs.index">
           <b class="bolder">{{ $t("Home") }}</b></b-navbar-item>
-        <b-navbar-item id="news" tag="nuxt-link" :to="localePath('/news')" :class="navtabs.news"><b class="bolder">{{
+        <!-- <b-navbar-item id="news" tag="nuxt-link" :to="localePath('/news')" :class="navtabs.news"><b class="bolder">{{
           $t("News") }}</b> &#127881;</b-navbar-item>
         <b-navbar-item id="informations" tag="nuxt-link" :to="localePath('/informations')"
-          :class="navtabs.informations"><b class="bolder">{{ $t("Informations") }}</b> 👐</b-navbar-item>
+          :class="navtabs.informations"><b class="bolder">{{ $t("Informations") }}</b> 👐</b-navbar-item> -->
         <b-navbar-item id="tutorials" tag="nuxt-link" :to="localePath('/tutorials/')" :class="navtabs.tutorials"><b
             class="bolder">{{ $t("Tutorial") }}</b> 🚀</b-navbar-item>
       </template>
@@ -35,7 +35,7 @@
               <b-button v-else class="bolder customButton" type="is-light" icon-right="logout" @click="onLogout" />
               <b-button class="bolder customButton" outlined v-if="!isLogged" tag="nuxt-link"
                 to="/public?fatherCollectionId=346" type="is-primary" icon-right="arrow-right-box">{{
-                  $t("TryPictalk") }}</b-button>
+          $t("TryPictalk") }}</b-button>
             </div>
           </b-navbar-item>
         </client-only>
