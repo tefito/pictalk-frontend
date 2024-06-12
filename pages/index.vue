@@ -71,13 +71,11 @@
             <div style="white-space: nowrap;" class="title is-4 isPictalkColor">{{ $t('CommunicateDemo') }}</div>
           </section>
         </b-carousel-item>
-        <client-only>
-          <b-carousel-item v-show="this.getUserLang == 'fr'" class="containing">
-            <video id="pictalk-video" preload="none" style="aspect-ratio: 16/9; width: 100%; height: 99.1%;"
-              alt="video of Alex talking about pictalk" :src="require('@/static/pictalk.mp4')" controls muted
-              :poster="require('@/assets/pictalk-video-poster.webp')" class="slightly-rounded"></video>
-          </b-carousel-item>
-        </client-only>
+        <b-carousel-item v-show="this.getUserLang == 'fr'" class="containing">
+          <video id="pictalk-video" preload="none" style="aspect-ratio: 16/9; width: 100%; height: 99.1%;"
+            alt="video of Alex talking about pictalk" :src="require('@/static/pictalk.mp4')" controls muted
+            :poster="require('@/assets/pictalk-video-poster.webp')" class="slightly-rounded"></video>
+        </b-carousel-item>
         <b-carousel-item class="containing">
           <b-image style="aspect-ratio: 16/9;" alt="A device running Pictalk sharing pictograms with another device"
             :srcset="require('@/assets/Share.png').srcSet" :placeholder="require('@/assets/Share.png').placeholder"
@@ -272,38 +270,36 @@ export default {
     }
   },
   mounted() {
-    if (process.client) {
-      if (this.getUserLang == "fr") {
-        const video = document.getElementById("pictalk-video");
-        if (video) {
-          video.addEventListener("ended", () => {
-            this.carouselAutoplay = true;
-            this.ended = true;
-          });
-          video.addEventListener("play", () => {
-            this.carouselAutoplay = false;
-          });
-          video.addEventListener("pause", () => {
-            this.carouselAutoplay = true;
-          });
-          let observer = new IntersectionObserver(
-            (entries) => {
-              entries.forEach((entry) => {
-                if (entry.intersectionRatio !== 1) {
-                  video.pause();
-                  this.carouselAutoplay = true;
-                } else {
-                  if (this.ended == false) {
-                    video.play();
-                    this.carouselAutoplay = false;
-                  }
+    if (this.getUserLang == "fr") {
+      const video = document.getElementById("pictalk-video");
+      if (video) {
+        video.addEventListener("ended", () => {
+          this.carouselAutoplay = true;
+          this.ended = true;
+        });
+        video.addEventListener("play", () => {
+          this.carouselAutoplay = false;
+        });
+        video.addEventListener("pause", () => {
+          this.carouselAutoplay = true;
+        });
+        let observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.intersectionRatio !== 1) {
+                video.pause();
+                this.carouselAutoplay = true;
+              } else {
+                if (this.ended == false) {
+                  video.play();
+                  this.carouselAutoplay = false;
                 }
-              });
-            },
-            { threshold: 0.2 }
-          );
-          observer.observe(video);
-        }
+              }
+            });
+          },
+          { threshold: 0.2 }
+        );
+        observer.observe(video);
       }
     }
   },

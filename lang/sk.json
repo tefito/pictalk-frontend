@@ -417,5 +417,8 @@
     "clickHere": "kliknite sem",
     "Feedback2": "Na vašom názore záleží ✊",
     "FeedbackSurvey2": "Sme v roku 2024 a je načase, aby sa vaše názory počítali ✊! Pictalk sme vybudovali vďaka spätnej väzbe komunity a teraz potrebujeme tú vašu. Na ďalšej verzii Pictalku usilovne pracujeme a chceme sa uistiť, že žiadny používateľ nezostane pozadu 👤. Venujte prosím 5 minút vyplneniu tohto dotazníka, počítame s vami 🫵.",
-    "FeedbackSurvey2Link": "Prepojenie na prieskum nájdete v oranžovom tlačidle so symbolom chyby na paneli ponúk."
+    "FeedbackSurvey2Link": "Prepojenie na prieskum nájdete v oranžovom tlačidle so symbolom chyby na paneli ponúk.",
+    "ErrorTitle": "Vyskytla sa chyba",
+    "ErrorSubtitle": "Niekedy veci nejdú podľa plánu a dochádza k chybám, najmä po aktualizáciách. Upozorňujeme, že chyby sa nám hlásia automaticky. Ak problém pretrváva, pošlite nám e-mail alebo nás oslovte na Facebooku alebo Instagrame. Kliknutím na tlačidlo nižšie sa pokúste chybu odstrániť.",
+    "ErrorButton": "Pokúste sa opraviť chybu"
 }

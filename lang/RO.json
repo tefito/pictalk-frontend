@@ -419,5 +419,8 @@
     "clickHere": "click aici",
     "Feedback2": "Opinia ta contează",
     "FeedbackSurvey2": "Suntem în 2024 și e timpul ca părerile voastre să conteze ✊! Am construit Pictalk datorită feedback-urilor comunității și acum avem nevoie de ale voastre. Lucrăm din greu la următoarea versiune de Pictalk și vrem să ne asigurăm că niciun utilizator nu este lăsat în urmă 👤. Vă rugăm să vă luați 5 minute pentru a completa acest sondaj, ne bazăm pe voi 🫵.",
-    "FeedbackSurvey2Link": "Linkul către sondaj se găsește în butonul portocaliu cu simbolul unei insecte din bara de meniu."
+    "FeedbackSurvey2Link": "Linkul către sondaj se găsește în butonul portocaliu cu simbolul unei insecte din bara de meniu.",
+    "ErrorTitle": "S-a produs o eroare",
+    "ErrorSubtitle": "Uneori, lucrurile nu decurg conform planului și apar erori, în special după actualizări. Vă rugăm să rețineți că erorile ne sunt raportate automat. Dacă problema persistă, trimiteți-ne un e-mail sau contactați-ne pe Facebook sau Instagram. Faceți clic pe butonul de mai jos pentru a încerca să remediați eroarea.",
+    "ErrorButton": "Încercați să remediați eroarea"
 }
