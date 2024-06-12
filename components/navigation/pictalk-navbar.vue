@@ -171,53 +171,51 @@ export default {
     Security,
   },
   async created() {
-    if (process.client) {
-      if ('BroadcastChannel' in window) {
-        const bc = new BroadcastChannel("offline-ready");
-        bc.onmessage = (event) => {
-          if (event.isTrusted) {
-            this.offlineReadyTotal = event.data.total;
-            this.offlineReadyProgress = event.data.progress;
-          }
-        };
-        const bc1 = new BroadcastChannel("authenticated-webworker");
-        console.log("Posting message to webworker")
-        if (this.$store.getters.getJwtFromCookie && this.$store.getters.getJwtExpDateFromCookie) {
-          bc1.postMessage({ jwt: this.$store.getters.getJwtFromCookie, expDate: this.$store.getters.getJwtExpDateFromCookie });
+    if ('BroadcastChannel' in window) {
+      const bc = new BroadcastChannel("offline-ready");
+      bc.onmessage = (event) => {
+        if (event.isTrusted) {
+          this.offlineReadyTotal = event.data.total;
+          this.offlineReadyProgress = event.data.progress;
         }
-        bc1.onmessage = (event) => {
-          console.log("Received authenticated event from webworker")
-          if (event.isTrusted) {
-            if (event.data === "authenticated") {
-              bc1.postMessage({ jwt: this.$store.getters.getJwtFromCookie, expDate: this.$store.getters.getJwtExpDateFromCookie });
-            }
-          }
-        };
+      };
+      const bc1 = new BroadcastChannel("authenticated-webworker");
+      console.log("Posting message to webworker")
+      if (this.$store.getters.getJwtFromCookie && this.$store.getters.getJwtExpDateFromCookie) {
+        bc1.postMessage({ jwt: this.$store.getters.getJwtFromCookie, expDate: this.$store.getters.getJwtExpDateFromCookie });
       }
-      this.intervalId = setInterval(async () => {
-        if (window.navigator.onLine) {
-          try {
-            let notifCount = this.$store.getters.getUser.notifications.length;
-            await this.$store.dispatch("getNotifications");
-            if (notifCount < this.$store.getters.getUser.notifications.length) {
-              this.$buefy.notification.open({
-                message: this.$t("UnreadNotifications"),
-                type: "is-info",
-              });
-            }
-          } catch (err) {
-            console.log(err);
-            clearInterval(this.intervalId);
-            return [];
+      bc1.onmessage = (event) => {
+        console.log("Received authenticated event from webworker")
+        if (event.isTrusted) {
+          if (event.data === "authenticated") {
+            bc1.postMessage({ jwt: this.$store.getters.getJwtFromCookie, expDate: this.$store.getters.getJwtExpDateFromCookie });
           }
         }
-      }, 60000);
+      };
     }
+    this.intervalId = setInterval(async () => {
+      if (window.navigator.onLine) {
+        try {
+          let notifCount = this.$store.getters.getUser.notifications.length;
+          await this.$store.dispatch("getNotifications");
+          if (notifCount < this.$store.getters.getUser.notifications.length) {
+            this.$buefy.notification.open({
+              message: this.$t("UnreadNotifications"),
+              type: "is-info",
+            });
+          }
+        } catch (err) {
+          console.log(err);
+          clearInterval(this.intervalId);
+          return [];
+        }
+      }
+    }, 60000);
+
   },
   async fetch() {
-    if (process.client) {
-      this.notifications = await this.$store.dispatch("getNotifications");
-    }
+    this.notifications = await this.$store.dispatch("getNotifications");
+
   },
   data() {
     return {

@@ -147,7 +147,10 @@ export const actions = {
     }
     const db = await getDexieDB();
     editedCollections = await Promise.all(editedCollections.map(async (collection) => {
-      const col = await db.collection.get(collection.id)
+      let col = await db.collection.get(collection.id)
+      if (!col) {
+        col = collection;
+      }
       Object.assign(col, collection);
       col.collections = col.collections.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
       col.pictos = col.pictos.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
@@ -250,7 +253,8 @@ export const actions = {
   async getPublicBundles(vuexContext) {
     try {
       let publicBundles = (await axios.get('/collection/levels')).data;
-      publicBundles = Object.keys(publicBundles).map((key) => { parseAndUpdateEntireCollection(vuexContext, publicBundles[key]); return { id: publicBundles[key].id, level: key } });
+      await Promise.all(Object.keys(publicBundles).map(async (key) => parseAndUpdateEntireCollection(vuexContext, publicBundles[key])));
+      publicBundles = Object.keys(publicBundles).map((key) => { return { id: publicBundles[key].id, level: key } });
       //publicBundles = publicBundles.map((bundle) => { parseAndUpdateEntireCollection(vuexContext, bundle); bundle.level = bundle; return bundle.id; });
       vuexContext.commit('setPublicBundles', publicBundles);
       return publicBundles;
@@ -552,10 +556,8 @@ export const actions = {
     vuexContext.commit("clearToken");
     Cookie.remove("jwt");
     Cookie.remove("expirationDate");
-    if (process.client) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("tokenExpiration");
-    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("tokenExpiration");
     // Check if dexie db is different from the default one
     if (vuexContext.state.user.username) {
       const db = await getDexieDB();
@@ -861,6 +863,9 @@ export const getters = {
 };
 
 async function parseAndUpdateEntireCollection(vuexContext, collection, download = false) {
+  if (collection.id == 346) {
+    console.log(collection);
+  }
   let pictosToEdit = [];
   let pictosTocreate = [];
   let collectionsToEdit = [];
@@ -979,12 +984,14 @@ async function parseAndUpdateEntireCollection(vuexContext, collection, download 
     if (pictosToEdit.length > 0) {
       await vuexContext.dispatch("dbEditPicto", pictosToEdit);
     }
+    if (collectionsWithoutFatherCollectionId.length > 0) {
+      await vuexContext.dispatch("dbEditCollection", collectionsWithoutFatherCollectionId);
+    }
     if (existsCollection && !updateCollection) {
       return localCollection;
     } else {
       return collection;
     }
-
   }
   return { collectionsToCreate, collectionsToEdit, pictosTocreate, pictosToEdit, collectionsWithoutFatherCollectionId };
 }

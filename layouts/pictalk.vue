@@ -22,62 +22,60 @@ export default {
     };
   },
   async created() {
-    if (process.client) {
 
-      // Matomo tag manager
-      var _mtm = window._mtm = window._mtm || [];
-      _mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
-      var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-      g.async = true; g.src = 'https://analytics.picmind.org//js/container_V1sL8eXl.js'; s.parentNode.insertBefore(g, s);
+    // Matomo tag manager
+    var _mtm = window._mtm = window._mtm || [];
+    _mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
+    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+    g.async = true; g.src = 'https://analytics.picmind.org//js/container_V1sL8eXl.js'; s.parentNode.insertBefore(g, s);
 
-      if ('BroadcastChannel' in window) {
-        const bc2 = new BroadcastChannel("sync");
-        bc2.onmessage = (event) => {
-          if (event.isTrusted) {
-            this.$store.dispatch("downloadCollections", event.data.collections);
-          }
-        };
-      }
-      if (!this.$store.getters.getUser.username) {
-        try {
-          await this.$store.dispatch("getUser");
-        } catch (err) {
-          console.log(err);
-          throw new Error(err);
+    if ('BroadcastChannel' in window) {
+      const bc2 = new BroadcastChannel("sync");
+      bc2.onmessage = (event) => {
+        if (event.isTrusted) {
+          this.$store.dispatch("downloadCollections", event.data.collections);
         }
+      };
+    }
+    if (!this.$store.getters.getUser.username) {
+      try {
+        await this.$store.dispatch("getUser");
+      } catch (err) {
+        console.log(err);
+        throw new Error(err);
       }
+    }
+    if (
+      this.$store.getters.isAuthenticated &&
+      this.$store.getters.getUser &&
+      this.$store.getters.getUser.displayLanguage.match(/[a-z]{2}/g)
+    ) {
       if (
-        this.$store.getters.isAuthenticated &&
-        this.$store.getters.getUser &&
-        this.$store.getters.getUser.displayLanguage.match(/[a-z]{2}/g)
+        this.$i18n.locale.code != this.$store.getters.getUser.displayLanguage
       ) {
-        if (
-          this.$i18n.locale.code != this.$store.getters.getUser.displayLanguage
-        ) {
-          this.$i18n.setLocale(this.$store.getters.getUser.displayLanguage);
+        this.$i18n.setLocale(this.$store.getters.getUser.displayLanguage);
+      }
+    }
+    const workbox = await window.$workbox;
+    if (workbox) {
+      workbox.addEventListener('installed', (event) => {
+        // If we don't do this we'll be displaying the notification after the initial installation, which isn't perferred.
+        if (event.isUpdate) {
+          const notif = this.$buefy.notification.open({
+            duration: 4500,
+            message: this.$t("NewVersionAvailable"),
+            position: "is-top-right",
+            type: "is-success",
+            hasIcon: true,
+            iconSize: "is-small",
+            iconSize: "medium",
+            icon: "gift",
+          });
+          setTimeout(() => {
+            this.$router.push('/').then(() => window.location.reload(true));
+          }, 4500);
         }
-      }
-      const workbox = await window.$workbox;
-      if (workbox) {
-        workbox.addEventListener('installed', (event) => {
-          // If we don't do this we'll be displaying the notification after the initial installation, which isn't perferred.
-          if (event.isUpdate) {
-            const notif = this.$buefy.notification.open({
-              duration: 4500,
-              message: this.$t("NewVersionAvailable"),
-              position: "is-top-right",
-              type: "is-success",
-              hasIcon: true,
-              iconSize: "is-small",
-              iconSize: "medium",
-              icon: "gift",
-            });
-            setTimeout(() => {
-              this.$router.push('/').then(() => window.location.reload(true));
-            }, 4500);
-          }
-        });
-      }
+      });
     }
   },
   destroyed() {

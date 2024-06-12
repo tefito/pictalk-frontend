@@ -20,7 +20,7 @@
       <footer class="modal-card-foot">
         <b-button data-cy="signin-signin" class="is-primary" :loading="loading" @click="onSubmit">{{
           $t("LogIn")
-        }}</b-button>
+          }}</b-button>
       </footer>
     </div>
   </form>
@@ -49,10 +49,9 @@ export default {
           await this.$store.dispatch("getUser");
 
           try {
-            if (process.client) {
-              const createDatabaseForUser = require("~/plugins/dexieDB").createDatabaseForUser;
-              createDatabaseForUser(this.$store.getters.getUser.username);
-            }
+            const createDatabaseForUser = require("~/plugins/dexieDB").createDatabaseForUser;
+            createDatabaseForUser(this.$store.getters.getUser.username);
+
           } catch (err) {
             console.log(err);
           }

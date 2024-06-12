@@ -230,38 +230,36 @@ export default {
     }
   },
   mounted() {
-    if (process.client) {
-      if (this.getUserLang == "fr") {
-        const video = document.getElementById("pictalk-video");
-        if (video) {
-          video.addEventListener("ended", () => {
-            this.carouselAutoplay = true;
-            this.ended = true;
-          });
-          video.addEventListener("play", () => {
-            this.carouselAutoplay = false;
-          });
-          video.addEventListener("pause", () => {
-            this.carouselAutoplay = true;
-          });
-          let observer = new IntersectionObserver(
-            (entries) => {
-              entries.forEach((entry) => {
-                if (entry.intersectionRatio !== 1) {
-                  video.pause();
-                  this.carouselAutoplay = true;
-                } else {
-                  if (this.ended == false) {
-                    video.play();
-                    this.carouselAutoplay = false;
-                  }
+    if (this.getUserLang == "fr") {
+      const video = document.getElementById("pictalk-video");
+      if (video) {
+        video.addEventListener("ended", () => {
+          this.carouselAutoplay = true;
+          this.ended = true;
+        });
+        video.addEventListener("play", () => {
+          this.carouselAutoplay = false;
+        });
+        video.addEventListener("pause", () => {
+          this.carouselAutoplay = true;
+        });
+        let observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.intersectionRatio !== 1) {
+                video.pause();
+                this.carouselAutoplay = true;
+              } else {
+                if (this.ended == false) {
+                  video.play();
+                  this.carouselAutoplay = false;
                 }
-              });
-            },
-            { threshold: 0.2 }
-          );
-          observer.observe(video);
-        }
+              }
+            });
+          },
+          { threshold: 0.2 }
+        );
+        observer.observe(video);
       }
     }
   },

@@ -16,7 +16,7 @@
               </div>
               <b-field :label="$t('Email')">
                 <b-input ref="email" type="email" maxlength="64" v-model="username"
-                  :placeholder="$t('PlaceHolderEmail')" required pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+                  :placeholder="$t('PlaceHolderEmail')" required
                   :validation-message="$t('ValidationMessageEmail')"></b-input>
               </b-field>
               <b-field :label="$t('Password')">
@@ -27,7 +27,7 @@
               </b-field>
               <b-field :label="$t('ConfirmPassword')">
                 <b-input type="password" password-reveal :placeholder="$t('PlaceHolderPassword')" required minlength="8"
-                  :pattern="password.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')" v-model="passwordConfirmation"
+                  :pattern="password.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$')" v-model="passwordConfirmation"
                   :validation-message="$t('ValidationMessagePasswordConfirmation')"></b-input>
               </b-field>
               <div v-if="directSharerUrlEncoded" class="box">
@@ -179,8 +179,8 @@
                     terms,
                     passwordConfirmation
                   )
-                  ">{{ $t("SignUp") }}</b-button><b-button v-else id="signupmodal-verify"
-                class="is-success fullWidth" :disabled="(notSignedUp) || (verificationToken.length != 40)" @click="
+                  ">{{ $t("SignUp") }}</b-button><b-button v-else id="signupmodal-verify" class="is-success fullWidth"
+                :disabled="(notSignedUp) || (verificationToken.length != 40)" @click="
                   onVerify()
                   ">{{ $t("VerifyAccountOK") }}</b-button>
             </div>
@@ -302,15 +302,20 @@ export default {
       this.password = this.credentials.password;
     }
     await this.$store.dispatch("getPublicBundles");
+    console.log(JSON.parse(JSON.stringify(this.$store.getters.getPublicBundles)));
     this.selectedBundle = this.$store.getters.getPublicBundles
       ? this.$store.getters.getPublicBundles[0].id
       : null;
 
     const bundles = this.$store.getters.getPublicBundles;
+    console.log(JSON.parse(JSON.stringify(bundles)));
     this.publicBundles =
-      await Promise.all(bundles.map(async (bundle) =>
-        this.$store.dispatch("getCollectionFromId", bundle.id)
+      await Promise.all(bundles.map(async (bundle) => {
+        console.log(JSON.parse(JSON.stringify(bundle)));
+        return this.$store.dispatch("getCollectionFromId", bundle.id)
+      }
       ));
+    console.log(JSON.parse(JSON.stringify(this.publicBundles)));
     this.initialization = false;
     if (!this.$store.getters.getPublicBundles) {
       await this.$store.dispatch("getPublicBundles");
