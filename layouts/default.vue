@@ -68,22 +68,20 @@ export default {
   },
   middleware: ["axios"],
   created() {
-    if (process.client) {
-      // Matomo tag manager
-      var _mtm = window._mtm = window._mtm || [];
-      _mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
-      var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-      g.async = true; g.src = 'https://analytics.picmind.org//js/container_V1sL8eXl.js'; s.parentNode.insertBefore(g, s);
+    // Matomo tag manager
+    var _mtm = window._mtm = window._mtm || [];
+    _mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
+    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+    g.async = true; g.src = 'https://analytics.picmind.org//js/container_V1sL8eXl.js'; s.parentNode.insertBefore(g, s);
+    if (
+      this.$store.getters.isAuthenticated &&
+      this.$store.getters.getUser &&
+      this.$store.getters.getUser.displayLanguage.match(/[a-z]{2}/g)
+    ) {
       if (
-        this.$store.getters.isAuthenticated &&
-        this.$store.getters.getUser &&
-        this.$store.getters.getUser.displayLanguage.match(/[a-z]{2}/g)
+        this.$i18n.locale.code != this.$store.getters.getUser.displayLanguage
       ) {
-        if (
-          this.$i18n.locale.code != this.$store.getters.getUser.displayLanguage
-        ) {
-          this.$i18n.setLocale(this.$store.getters.getUser.displayLanguage);
-        }
+        this.$i18n.setLocale(this.$store.getters.getUser.displayLanguage);
       }
     }
   },
