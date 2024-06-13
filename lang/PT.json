@@ -422,5 +422,11 @@
     "FeedbackSurvey2Link": "Pode encontrar a ligação para o inquérito no botão cor de laranja com o símbolo de um inseto na barra de menu.",
     "ErrorTitle": "Ocorreu um erro",
     "ErrorSubtitle": "Por vezes, as coisas não correm como planeado e ocorrem erros, especialmente após actualizações. Tenha em atenção que os erros são-nos comunicados automaticamente. Se o problema persistir, envie-nos um e-mail ou contacte-nos através do Facebook ou do Instagram. Clique no botão abaixo para tentar corrigir o erro.",
-    "ErrorButton": "Tentar corrigir o erro"
+    "ErrorButton": "Tentar corrigir o erro",
+    "pictalkMovingLink": "Está aqui!",
+    "pictalkMovingDisclamer": "Não entre em pânico, a aplicação permanece em linha e em breve terá uma nova página inicial",
+    "pictalkMoving": "O Pictalk está a mudar para um novo sítio Web.",
+    "pictalkMovingWhy": "Porquê esta mudança?",
+    "pictalkMovingWhyText": "Estamos a expandir o nosso conjunto de aplicações e queremos ter um novo sítio para as reunir. Neste novo sítio, poderá encontrar os vários artigos do nosso blogue, tutoriais, actualizações sobre as aplicações e tudo o que estiver relacionado com o projeto! Além disso, pode agora utilizar a nossa nova aplicação de organização do tempo: Agenda CAA. ",
+    "pictalkMovingCTA": "Descubra o novo sítio Web"
 }
