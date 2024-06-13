@@ -44,11 +44,12 @@
       </div>
     </template>
     <template slot="start">
-      <b-navbar-dropdown data-cy="pictalk-navbar-dropdown" :label="$t('Menu')">
+      <b-navbar-item tag="nuxt-link" to="/"> {{ $t("Home") }}</b-navbar-item>
+      <!-- <b-navbar-dropdown data-cy="pictalk-navbar-dropdown" :label="$t('Menu')">
         <b-navbar-item tag="nuxt-link" to="/"> {{ $t("Home") }}</b-navbar-item>
         <b-navbar-item tag="nuxt-link" to="/news">{{ $t("News") }} &#127881;</b-navbar-item>
         <b-navbar-item tag="nuxt-link" to="/informations">{{ $t("Informations") }} 👐</b-navbar-item>
-      </b-navbar-dropdown>
+      </b-navbar-dropdown> -->
       <b-navbar-item tag="nuxt-link" to="/tutorials">{{ $t("Tutorial") }} 🚀</b-navbar-item>
     </template>
     <template slot="end">
@@ -85,16 +86,16 @@
                       <div class="media-content noPadding centered">
                         <p class="title is-6 notifTitle">
                           <a :href="'mailto:' + notification.username" class="subtitle is-6 mailto">{{
-                            notification.username
-                              .split("@")[0]
-                              .replace(".", " ")
-                          }}</a>
+        notification.username
+          .split("@")[0]
+          .replace(".", " ")
+      }}</a>
                           {{ notificationText(notification) }}
                         </p>
                         <figure class="image is-64x64">
                           <img @click="
-                            notificationGoToCollectionOrReturn(notification)
-                            " :src="notification.image" alt="Placeholder image" />
+        notificationGoToCollectionOrReturn(notification)
+        " :src="notification.image" alt="Placeholder image" />
                         </figure>
                         <p class="title is-6 notifTitle greyback">
                           <!--<b-icon
