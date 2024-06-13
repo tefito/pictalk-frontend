@@ -422,5 +422,11 @@
     "FeedbackSurvey2Link": "Linkul către sondaj se găsește în butonul portocaliu cu simbolul unei insecte din bara de meniu.",
     "ErrorTitle": "S-a produs o eroare",
     "ErrorSubtitle": "Uneori, lucrurile nu decurg conform planului și apar erori, în special după actualizări. Vă rugăm să rețineți că erorile ne sunt raportate automat. Dacă problema persistă, trimiteți-ne un e-mail sau contactați-ne pe Facebook sau Instagram. Faceți clic pe butonul de mai jos pentru a încerca să remediați eroarea.",
-    "ErrorButton": "Încercați să remediați eroarea"
+    "ErrorButton": "Încercați să remediați eroarea",
+    "pictalkMoving": "Pictalk se mută pe un nou site web.",
+    "pictalkMovingLink": "A sosit!",
+    "pictalkMovingDisclamer": "Nu vă panicați, aplicația rămâne online și veți avea în curând o nouă pagină de start",
+    "pictalkMovingWhy": "De ce această schimbare?",
+    "pictalkMovingCTA": "Descoperiți noul site",
+    "pictalkMovingWhyText": "Ne extindem suita noastră de aplicații și dorim să avem un nou site care să le reunească pe toate. Pe acest nou site, veți putea găsi diferitele noastre articole de pe blog, tutoriale, actualizări ale aplicațiilor și tot ceea ce are legătură cu proiectul! În plus, puteți utiliza acum noua noastră aplicație de organizare a timpului: Agenda CAA. "
 }
