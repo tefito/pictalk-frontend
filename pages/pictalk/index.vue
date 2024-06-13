@@ -195,7 +195,6 @@ export default {
       this.sidebarPictos = await this.loadedSidebarPictos();
     }
 
-    console.log("sidebarPictos", this.sidebarPictos);
     const user = this.$store.getters.getUser;
     if (!user.username) {
       try {
