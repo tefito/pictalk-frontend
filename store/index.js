@@ -119,6 +119,9 @@ export const mutations = {
     if (state.navigation[state.navigation.length - 1] == navigation) return;
     state.navigation.push(navigation);
   },
+  popNavigation(state) {
+    state.navigation.pop();
+  },
   resetNavigation(state) {
     if (state.user.root) {
       state.navigation = [String(state.user.root)];

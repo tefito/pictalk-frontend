@@ -352,7 +352,6 @@ export default {
     },
     navigateToParentCollection() {
       const navigation = this.$store.getters.getNavigation
-      console.log("navigation", navigation)
       if (navigation.length < 2) {
         if (this.publicMode) {
           this.$router.push(
@@ -374,10 +373,10 @@ export default {
           }
         }
       } else {
-        console.log("navigating to", navigation[navigation.length - 2])
+        this.$store.commit("popNavigation");
         this.$router.push({
           path: this.publicMode ? "/public" : "/pictalk",
-          query: { ...this.$route.query, fatherCollectionId: navigation[navigation.length - 2] },
+          query: { ...this.$route.query, fatherCollectionId: navigation[navigation.length - 1] },
         });
       }
     },
