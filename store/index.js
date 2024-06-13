@@ -119,6 +119,9 @@ export const mutations = {
     if (state.navigation[state.navigation.length - 1] == navigation) return;
     state.navigation.push(navigation);
   },
+  popNavigation(state) {
+    state.navigation.pop();
+  },
   resetNavigation(state) {
     if (state.user.root) {
       state.navigation = [String(state.user.root)];
@@ -133,13 +136,30 @@ export const actions = {
       newCollections = new Array(newCollections);
     }
     const db = await getDexieDB();
-    // Dexie transition
-    await db.collection.bulkPut(newCollections);
-
+    let collection;
+    let toModify = [];
+    // Merge with the newCollections array
+    toModify = toModify.concat(newCollections);
+    for (let newCollection of newCollections) {
+      if (newCollection.fatherCollectionId) {
+        collection = await db.collection.get(newCollection.fatherCollectionId);
+        if (collection) {
+          const collectionIndex = collection.collections.findIndex(
+            col => col.id === newCollection.id
+          );
+          if (collection && collectionIndex == -1) {
+            collection.collections.push({ id: newCollection.id });
+            toModify.push(collection);
+          }
+        }
+      }
+    }
+    await db.collection.bulkPut(toModify);
+    return;
   },
   async dbRemoveCollection(state, removedCollection) {
     const db = await getDexieDB();
-    await db.collection.delete(removedCollection.id);
+    return db.collection.delete(removedCollection.id);
   },
   async dbEditCollection(state, editedCollections) {
     if (!Array.isArray(editedCollections)) {
@@ -177,7 +197,7 @@ export const actions = {
       }
     }
     // Dexie transition
-    await db.pictogram.bulkPut(pictos);
+    return db.pictogram.bulkPut(pictos);
   },
   async dbEditPicto(state, editedPictos) {
     if (!Array.isArray(editedPictos)) {
@@ -189,15 +209,15 @@ export const actions = {
       Object.assign(pct, picto);
       return pct;
     }));
-    await db.pictogram.bulkPut(editedPictos);
+    return db.pictogram.bulkPut(editedPictos);
   },
   async dbResetCollections(state) {
     const db = await getDexieDB();
-    await db.collection.clear();
+    return db.collection.clear();
   },
   async dbSetCollections(state, collections) {
     const db = await getDexieDB();
-    await db.collection.bulkPut(collections);
+    return db.collection.bulkPut(collections);
   },
 
   async fetchCollection(vuexContext, collectionId) {
@@ -401,6 +421,7 @@ export const actions = {
           "Content-Type": "multipart/form-data"
         }
       })).data;
+    console.log("Collection call done");
     const editedNewCollection = {
       speech: collection.speech,
       meaning: collection.meaning,
@@ -420,6 +441,7 @@ export const actions = {
       ...(collection.pictohubId && { pictohubId: Number(collection.pictohubId) }),
     };
     await vuexContext.dispatch("dbAddCollection", editedNewCollection);
+    console.log("Collection added to db");
     return editedNewCollection;
   },
   async editCollection(vuexContext, collection) {
