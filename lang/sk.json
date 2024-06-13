@@ -420,5 +420,11 @@
     "FeedbackSurvey2Link": "Prepojenie na prieskum nájdete v oranžovom tlačidle so symbolom chyby na paneli ponúk.",
     "ErrorTitle": "Vyskytla sa chyba",
     "ErrorSubtitle": "Niekedy veci nejdú podľa plánu a dochádza k chybám, najmä po aktualizáciách. Upozorňujeme, že chyby sa nám hlásia automaticky. Ak problém pretrváva, pošlite nám e-mail alebo nás oslovte na Facebooku alebo Instagrame. Kliknutím na tlačidlo nižšie sa pokúste chybu odstrániť.",
-    "ErrorButton": "Pokúste sa opraviť chybu"
+    "ErrorButton": "Pokúste sa opraviť chybu",
+    "pictalkMoving": "Pictalk sa presúva na novú webovú stránku.",
+    "pictalkMovingLink": "Je to tu !",
+    "pictalkMovingDisclamer": "Žiadna panika, aplikácia zostane online a čoskoro budete mať novú domovskú stránku",
+    "pictalkMovingWhy": "Prečo táto zmena ?",
+    "pictalkMovingWhyText": "Rozširujeme náš balík aplikácií a chceme mať novú stránku, ktorá ich všetky spojí. Na tejto novej stránke budete môcť nájsť naše rôzne blogové články, návody, aktualizácie aplikácií a všetko, čo súvisí s projektom! Okrem toho teraz môžete používať našu novú aplikáciu na organizáciu času: Agenda CAA. ",
+    "pictalkMovingCTA": "Objavte novú webovú stránku"
 }
