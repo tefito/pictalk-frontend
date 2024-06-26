@@ -9,25 +9,18 @@
         </div>
       </section>
       <b-field :label="$t('NewPassword')">
-        <b-input
-          type="password"
-          v-model="password"
-          password-reveal
-          :placeholder="$t('PasswordNotice')"
-          required
-          minlength="8"
-          pattern="((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
-          :validation-message="$t('PasswordValidationMessage')"
-        ></b-input>
+        <b-input type="password" v-model="password" password-reveal :placeholder="$t('PasswordNotice')" required
+          minlength="8" pattern="((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+          :validation-message="$t('PasswordValidationMessage')"></b-input>
       </b-field>
       <b-button class="is-primary" @click="onSubmit(password)">{{
         $t("ChangePassword")
-      }}</b-button>
+        }}</b-button>
     </div>
   </div>
 </template>
 
-<script >
+<script>
 import axios from "axios";
 export default {
   data() {
@@ -49,7 +42,7 @@ export default {
       }
       try {
         const res = await axios.post(
-          "/user/changePassword/" + this.$route.params.token,
+          "/user/changePassword/" + this.$route.query.token,
           {
             password: password,
           }
