@@ -61,9 +61,6 @@ export default {
         return "#f5f5f5";
       }
     },
-    sidebarPictoId() {
-      return this.$store.getters.getSidebarId;
-    },
     fatherCollectionId() {
       return this.$route.query.fatherCollectionId;
     },
@@ -74,12 +71,6 @@ export default {
         console.log("fatherCollectionId", fatherCollectionId, previousId);
         await this.fetchCollection(fatherCollectionId);
         this.pictos = await this.loadedPictos();
-      }
-    },
-    async sidebarPictoId(sidebarId, previousId) {
-      if (sidebarId && sidebarId != previousId) {
-        await this.fetchCollection(sidebarId);
-        this.sidebarPictos = await this.loadedSidebarPictos();
       }
     },
   },
