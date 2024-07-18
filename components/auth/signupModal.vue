@@ -131,11 +131,11 @@
                   {{ $t("IHaveRead") }}
                   <nuxt-link to="/legal-infos/terms-of-use/">{{
                     $t("TermsOfUse")
-                  }} </nuxt-link>
+                    }} </nuxt-link>
                   {{ $t("And") }}
                   <nuxt-link to="/legal-infos/privacy-policy/">{{
                     $t("PrivacyPolicy")
-                  }}</nuxt-link>.
+                    }}</nuxt-link>.
                 </p>
               </div>
             </b-step-item>
@@ -301,24 +301,32 @@ export default {
       this.username = this.credentials.username;
       this.password = this.credentials.password;
     }
-    await this.$store.dispatch("getPublicBundles");
-    console.log(JSON.parse(JSON.stringify(this.$store.getters.getPublicBundles)));
-    this.selectedBundle = this.$store.getters.getPublicBundles
-      ? this.$store.getters.getPublicBundles[0].id
-      : null;
-
-    const bundles = this.$store.getters.getPublicBundles;
-    console.log(JSON.parse(JSON.stringify(bundles)));
-    this.publicBundles =
-      await Promise.all(bundles.map(async (bundle) => {
-        console.log(JSON.parse(JSON.stringify(bundle)));
-        return this.$store.dispatch("getCollectionFromId", bundle.id)
-      }
-      ));
-    console.log(JSON.parse(JSON.stringify(this.publicBundles)));
-    this.initialization = false;
-    if (!this.$store.getters.getPublicBundles) {
+    try {
       await this.$store.dispatch("getPublicBundles");
+      this.selectedBundle = this.$store.getters.getPublicBundles
+        ? this.$store.getters.getPublicBundles[0].id
+        : null;
+
+      const bundles = this.$store.getters.getPublicBundles;
+      this.publicBundles =
+        await Promise.all(bundles.map(async (bundle) => {
+          return this.$store.dispatch("getCollectionFromId", bundle.id)
+        }
+        ));
+      this.initialization = false;
+      if (!this.$store.getters.getPublicBundles) {
+        await this.$store.dispatch("getPublicBundles");
+      }
+    } catch (error) {
+      const notif = this.$buefy.notification.open({
+        duration: 4500,
+        message: this.$t("ServerOffline"),
+        position: "is-top-right",
+        type: "is-danger",
+        hasIcon: true,
+        iconSize: "is-small",
+        icon: "account",
+      });
     }
   },
   async updated() { },
