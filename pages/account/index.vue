@@ -25,7 +25,7 @@ export default {
   computed: {
     getUser() {
       let user = JSON.parse(JSON.stringify(this.$store.getters.getUser));
-      if (user.settings.analytics == null) {
+      if (user.settings && user.settings.analytics == null) {
         user.settings.analytics = true;
       }
       return user;
