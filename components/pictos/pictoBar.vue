@@ -202,7 +202,7 @@ export default {
       const sidebarSpeech = this.$store.getters.getSpeech.filter(
         (picto) => picto.sidebar && picto.collection
       );
-      if (pictoSpeech[pictoSpeech.length - 1].collection) {
+      if (pictoSpeech[pictoSpeech.length - 1] && pictoSpeech[pictoSpeech.length - 1].collection) {
         if (pictoSpeech[pictoSpeech.length - 1].sidebar) {
           if (sidebarSpeech.length <= 1) {
             if (this.publicMode) {
