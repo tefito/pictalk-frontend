@@ -142,7 +142,9 @@ export const actions = {
     toModify = toModify.concat(newCollections);
     for (let newCollection of newCollections) {
       if (newCollection.fatherCollectionId) {
-        collection = await db.collection.get(newCollection.fatherCollectionId);
+        if (db && newCollection.fatherCollectionId) {
+          collection = await db.collection.get(newCollection.fatherCollectionId);
+        }
         if (collection) {
           const collectionIndex = collection.collections.findIndex(
             col => col.id === newCollection.id
@@ -167,7 +169,10 @@ export const actions = {
     }
     const db = await getDexieDB();
     editedCollections = await Promise.all(editedCollections.map(async (collection) => {
-      let col = await db.collection.get(collection.id)
+      let col;
+      if (db && collection.id) {
+        col = await db.collection.get(collection.id)
+      }
       if (!col) {
         col = collection;
       }
@@ -185,7 +190,9 @@ export const actions = {
     let collection;
     const db = await getDexieDB();
     for (let picto of pictos) {
-      collection = await db.collection.get(picto.fatherCollectionId);
+      if (picto.fatherCollectionId && db) {
+        collection = await db.collection.get(picto.fatherCollectionId);
+      }
       if (collection) {
         const pictoIndex = collection.pictos.findIndex(
           pct => pct.id === picto.id
@@ -803,10 +810,12 @@ export const actions = {
   },
   async getCollectionFromId(vuexContext, id) {
     const db = await getDexieDB();
+    if (!db || !id) return;
     return db.collection.get(id);
   },
   async getCollectionsFromFatherCollectionId(vuexContext, fatherCollectionId) {
     const db = await getDexieDB();
+    if (!db || !fatherCollectionId) return;
     const collection = await db.collection.get(fatherCollectionId);
     return Promise.all(collection.collections.map(async (collection) => {
       return db.collection.get(collection.id);
@@ -818,10 +827,12 @@ export const actions = {
   },
   async getPictoFromId(state, id) {
     const db = await getDexieDB();
+    if (!db || !id) return;
     return db.pictogram.get(id);
   },
   async getPictosFromFatherCollectionId(state, fatherCollectionId) {
     const db = await getDexieDB();
+    if (!db || !fatherCollectionId) return;
     const collection = await db.collection.get(fatherCollectionId);
     return Promise.all(collection.pictos.map(async (picto) => {
       return db.pictogram.get(picto.id)
@@ -1041,9 +1052,11 @@ async function parseAndUpdatePictogram(vuexContext, picto) {
 
 async function getCollectionFromId(vuexContext, id) {
   const db = await getDexieDB();
+  if (!db || !id) return;
   return db.collection.get(id);
 }
 async function getPictoFromId(vuexContext, id) {
   const db = await getDexieDB();
+  if (!db || !id) return;
   return db.pictogram.get(id);
 }
